@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "549302769333",
+    "project_id": "habit-tracker-f645b",
+    "storage_bucket": "habit-tracker-f645b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:549302769333:android:1fadbb4fe28f7183e6d0fc",
+        "android_client_info": {
+          "package_name": "com.cmput301f21t26.habittracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "549302769333-b9t5d089m8hs1b1ut7o9rl8vnbj2korq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhwtg73ETEA--_yBqgmzBJa3l3QMzNZWs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "549302769333-b9t5d089m8hs1b1ut7o9rl8vnbj2korq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
