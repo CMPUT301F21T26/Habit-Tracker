@@ -80,7 +80,8 @@
         android:id="@+id/loginConfirmButton"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="144dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
         android:fontFamily="@font/rubik_bold"
         android:text="LOGIN"
         app:cornerRadius="50dp"
@@ -89,6 +90,6 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordET"
-        app:layout_constraintVertical_bias="0.079" />
+        app:layout_constraintVertical_bias="0.46" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
