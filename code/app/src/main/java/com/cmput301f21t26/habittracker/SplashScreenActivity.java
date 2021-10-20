@@ -23,7 +23,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         // Delays the splash screen and then goes to the main activity with intent.
         // ** Should go to login/signup page, will change once that is created **
         new Handler().postDelayed(() -> {
-            Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
+            Intent intent = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
             startActivity(intent);
             finish();
         }, SPLASH_SCREEN_TIME);
