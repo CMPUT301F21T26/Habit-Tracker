@@ -32,6 +32,10 @@ public class Habit {
         this(title, "", startDate);
     }
 
+    public Habit(String title, String reason) {
+        this(title, reason, Calendar.getInstance().getTime());
+    }
+
     public Habit(String title) {
         this(title, "", Calendar.getInstance().getTime());
     }
