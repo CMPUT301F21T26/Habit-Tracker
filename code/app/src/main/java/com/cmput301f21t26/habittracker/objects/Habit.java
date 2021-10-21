@@ -15,6 +15,14 @@ public class Habit {
     private List<HabitPlan> plan;
     */
 
+    /**
+     * A default Habit constructor.
+     *
+     * @param title habit title
+     * @param reason reason why the habit is created
+     * @param startDate date when the habit was created
+     * @throws IllegalArgumentException if habit title or reason are too long
+     */
     public Habit(String title, String reason, Date startDate) {
         if (title.length() > 20) {
             throw new IllegalArgumentException("Habit title must be up to 20 characters");
@@ -28,14 +36,39 @@ public class Habit {
         this.isDoneForToday = false;
     }
 
+    /**
+     * A Habit constructor for the case where the habit reason is not given by the user.
+     * A default habit reason is an empty string.
+     *
+     * @param title habit title
+     * @param startDate date when the habit was created
+     * @throws IllegalArgumentException if habit title or reason are too long
+     */
     public Habit(String title, Date startDate) {
         this(title, "", startDate);
     }
 
+    /**
+     * A Habit constructor for the case where the habit creation date is not given by the user.
+     * A default habit creation date is the time when the constructor is called.
+     *
+     * @param title habit title
+     * @param reason reason why the habit is created
+     * @throws IllegalArgumentException if habit title or reason are too long
+     */
     public Habit(String title, String reason) {
         this(title, reason, Calendar.getInstance().getTime());
     }
 
+    /**
+     * A Habit constructor for the case where both habit creation date habit reason
+     * are not given by the user.
+     * A default habit reason is an empty string.
+     * A default habit creation date is the time when the constructor is called.
+     *
+     * @param title habit title
+     * @throws IllegalArgumentException if habit title or reason are too long
+     */
     public Habit(String title) {
         this(title, "", Calendar.getInstance().getTime());
     }
@@ -44,6 +77,10 @@ public class Habit {
         return title;
     }
 
+    /**
+     * @param title habit title
+     * @throws IllegalArgumentException if habit title is too long
+     */
     public void setTitle(String title) {
         if (title.length() > 20) {
             throw new IllegalArgumentException("Habit title must be up to 20 characters");
@@ -55,6 +92,10 @@ public class Habit {
         return reason;
     }
 
+    /**
+     * @param reason reason why the habit is created
+     * @throws IllegalArgumentException if habit reason is too long
+     */
     public void setReason(String reason) {
         if (reason.length() > 30) {
             throw new IllegalArgumentException("Habit reason must be up to 30 characters");
