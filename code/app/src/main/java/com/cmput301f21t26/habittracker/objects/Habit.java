@@ -1,5 +1,6 @@
 package com.cmput301f21t26.habittracker.objects;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -9,6 +10,7 @@ public class Habit {
     private String reason;
     private Date startDate;
     private boolean isDoneForToday;
+    private final String datePattern = "yyyy-MM-dd_HH:mm:ss";
 
     /* TODO implement after implementing HabitEvent and HabitPlan
     private List<HabitEvent> habitEvents;
@@ -117,5 +119,17 @@ public class Habit {
 
     public void setDoneForToday(boolean doneForToday) {
         isDoneForToday = doneForToday;
+    }
+
+    /**
+     * Return a unique habit id.
+     *
+     * Note: Whenever title, reason, or startDate changes, the habit id changes.
+     *
+     * @return (int) unique habit id
+     */
+    public int getHabitId() {
+        SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
+        return String.format("%s%s%s", title, reason, formatter.format(startDate)).hashCode();
     }
 }

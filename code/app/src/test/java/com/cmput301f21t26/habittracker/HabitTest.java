@@ -8,6 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import android.util.Log;
+
+import java.text.SimpleDateFormat;
+
 public class HabitTest {
 
     private Habit habit;
@@ -39,6 +43,14 @@ public class HabitTest {
             // input validation in constructor
             habit = new Habit("Clean my room", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaab");     // 21 chars
         });
+    }
+
+    @Test
+    void testHabitId() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String strId = habit.getTitle() + habit.getReason() + formatter.format(habit.getStartDate());
+
+        assertEquals(habit.getHabitId(), strId.hashCode());
     }
 
 }
