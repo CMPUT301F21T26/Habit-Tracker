@@ -4,19 +4,11 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_habittracker_logo_green_blue"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HabitTracker">
-        <activity
-            android:name=".SignupActivity"
-            android:exported="true"
-            android:theme="@style/SplashTheme"/>
-        <activity
-            android:name=".LoginActivity"
-            android:exported="true"
-            android:theme="@style/SplashTheme"/>
         <activity
             android:name=".LoginSignupActivity"
             android:exported="true"

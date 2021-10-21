@@ -28,5 +28,8 @@ public class SplashScreenActivity extends AppCompatActivity {
             finish();
         }, SPLASH_SCREEN_TIME);
 
+        // Actually, should check if user has already logged in before on device
+        // if so, go directly to the main activity, rather than the login/signup screen.
+
     }
 }
