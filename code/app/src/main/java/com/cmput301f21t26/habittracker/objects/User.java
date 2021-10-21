@@ -1,12 +1,12 @@
 package com.cmput301f21t26.habittracker.objects;
 
-import android.net.Uri;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import android.net.Uri;
 
 /**
  * Class that interacts with the database as well as other User objects.
