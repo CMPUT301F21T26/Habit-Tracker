@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/loginContainer"
+    tools:context=".fragments.LoginFragment">
+
+    <TextView
+        android:id="@+id/logTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:fontFamily="@font/rubik_bold"
+        android:text="LOG"
+        android:textColor="@color/black"
+        android:textSize="64sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.128"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/inTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-20dp"
+        android:fontFamily="@font/rubik"
+        android:text="IN"
+        android:textColor="@color/black"
+        android:textSize="64sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.103"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logTV" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="logTV,inTV"
+        />
+
+    <EditText
+        android:id="@+id/usernameET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="98dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"
+        android:padding="16dp"
+        android:ems="16"
+        android:maxLines="1"
+        android:fontFamily="@font/rubik"
+        android:hint="Username"
+        android:inputType="textEmailAddress"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inTV" />
+
+    <EditText
+        android:id="@+id/passwordET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="36dp"
+        android:ems="10"
+        android:maxLines="1"
+        android:fontFamily="@font/rubik"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:padding="16dp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameET" />
+
+    <Button
+        android:id="@+id/loginConfirmButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="@font/rubik_bold"
+        android:text="LOGIN"
+        app:cornerRadius="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordET"
+        app:layout_constraintVertical_bias="0.46" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

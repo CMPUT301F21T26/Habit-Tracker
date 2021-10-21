@@ -14,37 +14,11 @@ import android.widget.Button;
  */
 public class LoginSignupActivity extends AppCompatActivity {
 
-    private Button loginButton;
-    private Button signupButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_signup);
 
-        // Set buttons
-        loginButton = findViewById(R.id.loginButton);
-        signupButton = findViewById(R.id.signUpButton);
-
-        // Clicking Login button sends user to LoginActivity
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Authenticate?
-
-                Intent loginIntent = new Intent(LoginSignupActivity.this, LoginActivity.class);
-                startActivity(loginIntent);
-            }
-        });
-
-        // Clicking Signup button sends user to SignupActivity
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent signupIntent = new Intent(LoginSignupActivity.this, SignupActivity.class);
-                startActivity(signupIntent);
-            }
-        });
     }
 
 
