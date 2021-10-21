@@ -1,6 +1,8 @@
 package com.cmput301f21t26.habittracker.objects;
 
-import com.cmput301f21t26.habittracker.Habit;
+
+
+import android.net.Uri;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -117,6 +119,9 @@ public class User implements Serializable {
         habits.add(habit);
     }
 
+    public void changeProfilePic(Uri uri) {
+        // To be implemented
+    }
 
 
 
