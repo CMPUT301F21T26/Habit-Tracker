@@ -1,7 +1,5 @@
 package com.cmput301f21t26.habittracker.objects;
 
-import com.cmput301f21t26.habittracker.Habit;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
