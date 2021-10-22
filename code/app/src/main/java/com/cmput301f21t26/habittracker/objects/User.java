@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import android.net.Uri;
+
 /**
  * Class that interacts with the database as well as other User objects.
  */
@@ -115,6 +117,9 @@ public class User implements Serializable {
         habits.add(habit);
     }
 
+    public void changeProfilePic(Uri uri) {
+        // To be implemented
+    }
 
 
 

@@ -42,42 +42,66 @@
         app:constraint_referenced_ids="logTV,inTV"
         />
 
-    <EditText
-        android:id="@+id/usernameET"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="98dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginEnd="36dp"
-        android:padding="16dp"
-        android:ems="16"
-        android:maxLines="1"
-        android:fontFamily="@font/rubik"
-        android:hint="Username"
-        android:inputType="textEmailAddress"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inTV" />
 
-    <EditText
-        android:id="@+id/passwordET"
+    <LinearLayout
+        android:id="@+id/fieldsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="36dp"
-        android:ems="10"
-        android:maxLines="1"
-        android:fontFamily="@font/rubik"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="16dp"
-        android:textSize="16sp"
+        android:layout_marginTop="100dp"
+        android:orientation="vertical"
+        app:flow_verticalBias="0.8"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/usernameET" />
+        app:layout_constraintTop_toBottomOf="@id/inTV"
+        app:layout_constraintVertical_bias="0.096"
+        app:layout_goneMarginTop="100dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/usernameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/usernameET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:ems="16"
+                android:fontFamily="@font/rubik"
+                android:hint="Username"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:padding="16dp"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:passwordToggleEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:ems="16"
+                android:fontFamily="@font/rubik"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:padding="16dp"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/loginConfirmButton"
@@ -92,8 +116,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordET"
-        app:layout_constraintVertical_bias="0.46" />
+        app:layout_constraintTop_toBottomOf="@+id/fieldsLayout"
+        app:layout_constraintVertical_bias="0.331" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
