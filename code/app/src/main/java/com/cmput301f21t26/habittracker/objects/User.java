@@ -13,21 +13,19 @@ import android.net.Uri;
  */
 public class User implements Serializable {
 
-    private final UserID uid;
-    private String username;
+    private final String username;          // User cannot change username once created
     private String firstName;
     private String lastName;
     private String email;
     private final Date creationDate;
 
-    private final List<UserID> followings;
-    private final List<UserID> followers;
+    private final List<String> followings;
+    private final List<String> followers;
     private final List<Habit> habits;
     private final List<Habit> todayHabits;
     private final List<Permission> permissions;
 
     public User(String username, String firstName, String lastName, String email) {
-        this.uid = new UserID(username);
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -41,20 +39,12 @@ public class User implements Serializable {
         this.permissions = new ArrayList<>();
     }
 
-    public UserID getUid() {
-        return this.uid;
-    }
-
-    public String getStringUid() {
-        return this.uid.toString();
+    public String getUid() {
+        return this.username;
     }
 
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getFirstName() {
@@ -81,11 +71,11 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public List<UserID> getFollowing() {
+    public List<String> getFollowing() {
         return followings;
     }
 
-    public List<UserID> getFollowers() {
+    public List<String> getFollowers() {
         return followers;
     }
 
@@ -101,11 +91,11 @@ public class User implements Serializable {
         return permissions;
     }
 
-    public void addFollowing(UserID uid) {
+    public void addFollowing(String uid) {
         followings.add(uid);
     }
 
-    public void addFollower(UserID uid) {
+    public void addFollower(String uid) {
         followers.add(uid);
     }
 
