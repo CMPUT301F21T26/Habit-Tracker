@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -245,16 +246,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
 
         Map<String, Object> userData = new HashMap<>();
 
-        userData.put("first", firstName);
-        userData.put("last", lastName);
-        userData.put("email", email);
-        userData.put("username", username);
-        userData.put("profile_pic", picturePath);
-        userData.put("following", new ArrayList<>());
-        userData.put("followers", new ArrayList<>());
-        userData.put("habits", new ArrayList<>());
-        userData.put("today_habits", new ArrayList<>());
-        userData.put("permissions", new ArrayList<>());
+        userData.put(username, new User(username, firstName, lastName, email));
 
         final CollectionReference collectionReference = mStore.collection("users");
 
