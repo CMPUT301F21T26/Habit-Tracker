@@ -45,7 +45,10 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
+/**
+ * Contains the logic for the Signup Fragment.
+ * Validates input and attempts to create account with the entered fields.
+ */
 public class SignupFragment extends Fragment implements  View.OnClickListener{
     final private String TAG = "signupAuthentication";
     private EditText firstNameET;
@@ -65,12 +68,12 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
     private Uri imageUri = Uri.parse("android.resource://com.cmput301f21t26.habittracker/drawable/default_profile_pic");
     private String picturePath = "image/" + imageUri.hashCode() + ".jpeg";
 
-
     private NavController navController = null;
 
-    public SignupFragment() {
-        // Required empty public constructor
-    }
+    /**
+     * Required empty public constructor
+     */
+    public SignupFragment() {}
 
     /**
      * Functions essentially like the now deprecated onActivityResult.
@@ -98,6 +101,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
     /**
      * Initialize the sign up fragment and get instances
      * @param savedInstanceState
+     *  The instance that was saved before.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,17 +110,19 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
         mAuth = FirebaseAuth.getInstance();
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance();
-
-
     }
 
     /**
      * inflates view
      *
      * @param inflater
+     *  The inflater
      * @param container
+     *  The container of the fragment
      * @param savedInstanceState
+     *  The instance that was saved before.
      * @return
+     *  Returns essentially the inflated iew.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -129,7 +135,9 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
      * Once views are created, sets the views to their corresponding variables
      *
      * @param view
+     *  The current view.
      * @param savedInstanceState
+     *  The instance that was saved before.
      */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -153,6 +161,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
      * element has been clicked and does its corresponding function.
      *
      * @param view
+     *  The current view.
      */
     @Override
     public void onClick(View view) {
@@ -163,34 +172,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
                 if (!creatingUser) {
                     // Check if the fields are filled in
                     if (checkFieldsFilled()) {
-                        final String firstName = firstNameET.getText().toString();
-                        final String lastName = lastNameET.getText().toString();
-                        final String email = emailET.getText().toString();
-                        final String username = usernameET.getText().toString();
-                        final String password = passwordET.getText().toString();
-
-                        // Check if username already exists
-                        DocumentReference ref = mStore.collection("users").document(username);
-
-                        ref.get()
-                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            DocumentSnapshot document = task.getResult();
-                                            if (document.exists()) {
-                                                // Username exists
-                                                usernameET.setError("Username already exists");
-                                            } else {
-                                                // Username does not exist.
-                                                createUserFirebaseAuth(firstName, lastName, email, username, password);
-                                                creatingUser = true;
-                                            }
-                                        } else {
-                                            Log.d(TAG, "Failed with: ", task.getException());
-                                        }
-                                    }
-                                });
+                        createUser();
                     }
                 } else {
                     Toast.makeText(getActivity(), "Currently creating user...", Toast.LENGTH_LONG).show();
@@ -205,14 +187,57 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
     }
 
     /**
+     * Function gets the text entered in the fields once it has been filled and the signup button
+     * is clicked. It then checks if the username entered exists, and if so starts creating
+     * the user in Firebase Authentication. Otherwise, if the username exists, the user
+     * is notified and they must enter a new one before clicking signup again.
+     */
+    public void createUser() {
+        final String firstName = firstNameET.getText().toString();
+        final String lastName = lastNameET.getText().toString();
+        final String email = emailET.getText().toString();
+        final String username = usernameET.getText().toString();
+        final String password = passwordET.getText().toString();
+
+        // Check if username already exists
+        DocumentReference ref = mStore.collection("users").document(username);
+
+        ref.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                // Username exists
+                                usernameET.setError("Username already exists");
+                            } else {
+                                // Username does not exist.
+                                createUserFirebaseAuth(firstName, lastName, email, username, password);
+                                creatingUser = true;
+                                Toast.makeText(getActivity(), "Creating user, please wait a moment", Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            Log.d(TAG, "Failed with: ", task.getException());
+                        }
+                    }
+                });
+    }
+
+    /**
      * Once user has entered all the fields (which has already been checked) and signup button is clicked,
-     * creates a new user in Firebase Auth.
+     * this function creates a new User within the Firebase Authentication section.
      *
      * @param firstName
+     *  The name entered in the firstNameET EditText, type {@link String}
      * @param lastName
+     *  The name entered in the lastNameET EditText, type {@link String}
      * @param email
+     *  The email entered in the emailET EditText, type {@link String}
      * @param username
+     *  The username entered in the usernameET EditText, type {@link String}
      * @param password
+     *  The password entered in the passwordET EditText, type {@link String}
      */
     public void createUserFirebaseAuth(final String firstName, final String lastName, final String email, final String username, final String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -221,6 +246,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Creation of User with email successful.");
+                            // User created in Firebase Authentication, now to add its data into Firestore database
                             createUserFirebaseFirestore(firstName, lastName, email, username);
                         } else {
                             Log.w(TAG, "Creation of User with email failed. " + task.getException().getMessage());
@@ -229,18 +255,20 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
                         }
                     }
                 });
-
-
     }
 
     /**
-     * Creates a Firestore document for the user with the
+     * Creates a Firestore document for the newly signed up user with
      * all userdata in it.
      *
      * @param firstName
+     *  The name entered in the firstNameET EditText, type {@link String}
      * @param lastName
+     *  The name entered in the lastNameET EditText, type {@link String}
      * @param email
+     *  The email entered in the emailET EditText, type {@link String}
      * @param username
+     *  The username entered in the usernameET EditText, type {@link String}
      */
     public void createUserFirebaseFirestore(String firstName, String lastName, String email, String username) {
 
@@ -253,19 +281,21 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
                     @Override
                     public void onSuccess(Void unused) {
                         Log.d(TAG, "Data added succesfully");
+                        // Notify user that account was created successfully
+                        Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
                         // Go to login fragment once data has been added
                         navController.navigate(R.id.action_signupFragment_to_loginFragment);
                         creatingUser = false;
 
                         mStorageReference = mStorage.getReference(picturePath);
                         mStorageReference
-                                .putFile(imageUri)
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.d(TAG, "Default profile pic was not stored");
-                                    }
-                                });
+                            .putFile(imageUri)
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "Default profile pic was not stored");
+                                }
+                            });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -280,9 +310,11 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
 
     /**
      * Checks all the EditText fields and makes sure they are filled and
-     * that the password and confirmPassword matches.
+     * that the password and confirmPassword matches. If they aren't,
+     * the user is notified and must change it before proceeding again.
      *
      * @return
+     *  Returns true if the fields are filled and the passwords match, false otherwise. Type {@link Boolean}
      */
     private Boolean checkFieldsFilled() {
         Boolean filled = true;
