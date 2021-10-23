@@ -1,24 +1,116 @@
 package com.cmput301f21t26.habittracker.objects;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import android.net.Uri;
 
 /**
  * Class that interacts with the database as well as other User objects.
  */
-public class User {
-    private String uid;
-    private String username;
+public class User implements Serializable {
+
+    private final String username;          // User cannot change username once created
     private String firstName;
     private String lastName;
     private String email;
-    private List<String> following;         // possibly storing uids? storing User objects would prob not be efficient space wise
-    private List<String> followers;
+    private final Date creationDate;
 
-    public User() {
+    private final List<String> followings;
+    private final List<String> followers;
+    private final List<Habit> habits;
+    private final List<Habit> todayHabits;
+    private final List<Permission> permissions;
+
+    public User(String username, String firstName, String lastName, String email) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.creationDate = Calendar.getInstance().getTime();
+
+        this.followings = new ArrayList<>();
+        this.followers = new ArrayList<>();
+        this.habits = new ArrayList<>();
+        this.todayHabits = new ArrayList<>();
+        this.permissions = new ArrayList<>();
     }
 
-    public User(String uid) {
-        this.uid = uid;
+    public String getUid() {
+        return this.username;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public List<String> getFollowing() {
+        return followings;
+    }
+
+    public List<String> getFollowers() {
+        return followers;
+    }
+
+    public List<Habit> getHabits() {
+        return habits;
+    }
+
+    public List<Habit> getTodayHabits() {
+        return todayHabits;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void addFollowing(String uid) {
+        followings.add(uid);
+    }
+
+    public void addFollower(String uid) {
+        followers.add(uid);
+    }
+
+    public void addHabit(Habit habit) {
+        habits.add(habit);
+    }
+
+    public void addTodayHabit(Habit habit) {
+        habits.add(habit);
+    }
+
+    public void changeProfilePic(Uri uri) {
+        // To be implemented
+    }
+
+
 
 }

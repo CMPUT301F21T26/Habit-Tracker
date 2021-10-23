@@ -6,53 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".LoginSignupActivity">
 
-    <ImageView
-        android:id="@+id/logoGreenBlue"
-        android:layout_width="141dp"
-        android:layout_height="123dp"
-        android:layout_marginTop="112dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.555"
-        app:layout_constraintStart_toStartOf="parent"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/loginSignupHostFrag"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_habittracker_logo_green_blue" />
-
-    <ImageView
-        android:id="@+id/fontLogo"
-        android:layout_width="145dp"
-        android:layout_height="133dp"
-        android:layout_marginTop="-50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logoGreenBlue"
-        app:srcCompat="@drawable/ic_habittracker_font_logo_blue" />
-
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="144dp"
-        android:fontFamily="@font/rubik_bold"
-        android:text="LOGIN"
-        app:cornerRadius="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logoGreenBlue" />
-
-    <Button
-        android:id="@+id/signUpButton"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="32dp"
-        android:fontFamily="@font/rubik_bold"
-        android:text="SIGNUP"
-        app:cornerRadius="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginButton"
-        app:layout_constraintVertical_bias="0.0" />
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/login_signup_nav_graph"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
