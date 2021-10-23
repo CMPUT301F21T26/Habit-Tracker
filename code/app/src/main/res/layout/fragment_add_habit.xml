@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/habitTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <EditText
+        android:id="@+id/habitTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="144dp"
+        android:ems="10"
+        android:fontFamily="@font/rubik_bold"
+        android:gravity="center"
+        android:hint="Habit Title"
+        android:inputType="textLongMessage"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/datePromptMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="DATE TO START"
+        android:fontFamily="@font/rubik_bold"
+        android:textColor="@color/blue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/habitReasoning" />
+
+    <TextView
+        android:id="@+id/dateFormatMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="YYYY-MM-DD"
+        android:textColor="@color/blue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/datePromptMessage" />
+
+    <Button
+        android:id="@+id/chooseDateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/rubik_bold"
+        android:text="Choose Date"
+        app:cornerRadius="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dateFormatMessage" />
+
+    <TextView
+        android:id="@+id/pickDaysMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/rubik_bold"
+        android:text="CHOOSE DAYS OF WEEK FOR HABIT TO OCCUR"
+        android:textColor="@color/blue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chooseDateButton" />
+
+    <EditText
+        android:id="@+id/habitReasoning"
+        android:layout_width="match_parent"
+        android:layout_height="82dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="30 character reasoning for why the habit is important"
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/habitTitle" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroup"
+        android:layout_width="393dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.888"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pickDaysMessage"
+        app:layout_constraintVertical_bias="0.008">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/mondayChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MO"
+            android:textStyle="bold" />
+
+        <!--    This is how the chip should look after it is pressed-->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/tuesdayChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TU"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:chipSurfaceColor="@color/blue" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/wednesdayChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WE"
+            android:textStyle="bold" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/thursdayChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TH"
+            android:textStyle="bold" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/fridayChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FR"
+            android:textStyle="bold" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/saturdayChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SA"
+            android:textStyle="bold" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/sundayChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SU"
+            android:textStyle="bold" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <CheckBox
+        android:id="@+id/confirmAdding"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:layout_marginEnd="44dp"
+        android:text="Confirm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
