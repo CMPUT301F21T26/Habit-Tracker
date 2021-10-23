@@ -45,7 +45,10 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
+/**
+ * Contains the logic for the Signup Fragment.
+ * Validates input and attempts to create account with the entered fields.
+ */
 public class SignupFragment extends Fragment implements  View.OnClickListener{
     final private String TAG = "signupAuthentication";
     private EditText firstNameET;
@@ -226,15 +229,15 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
      * this function creates a new User within the Firebase Authentication section.
      *
      * @param firstName
-     *  The name entered in the firstNameET EditText
+     *  The name entered in the firstNameET EditText, type {@link String}
      * @param lastName
-     *  The name entered in the lastNameET EditText
+     *  The name entered in the lastNameET EditText, type {@link String}
      * @param email
-     *  The email entered in the emailET EditText
+     *  The email entered in the emailET EditText, type {@link String}
      * @param username
-     *  The username entered in the usernameET EditText
+     *  The username entered in the usernameET EditText, type {@link String}
      * @param password
-     *  The password entered in the passwordET EditText
+     *  The password entered in the passwordET EditText, type {@link String}
      */
     public void createUserFirebaseAuth(final String firstName, final String lastName, final String email, final String username, final String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -259,13 +262,13 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
      * all userdata in it.
      *
      * @param firstName
-     *  The name entered in the firstNameET EditText
+     *  The name entered in the firstNameET EditText, type {@link String}
      * @param lastName
-     *  The name entered in the lastNameET EditText
+     *  The name entered in the lastNameET EditText, type {@link String}
      * @param email
-     *  The email entered in the emailET EditText
+     *  The email entered in the emailET EditText, type {@link String}
      * @param username
-     *  The username entered in the usernameET EditText
+     *  The username entered in the usernameET EditText, type {@link String}
      */
     public void createUserFirebaseFirestore(String firstName, String lastName, String email, String username) {
 
@@ -311,7 +314,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
      * the user is notified and must change it before proceeding again.
      *
      * @return
-     *  Returns true if the fields are filled and the passwords match, false otherwise.
+     *  Returns true if the fields are filled and the passwords match, false otherwise. Type {@link Boolean}
      */
     private Boolean checkFieldsFilled() {
         Boolean filled = true;
