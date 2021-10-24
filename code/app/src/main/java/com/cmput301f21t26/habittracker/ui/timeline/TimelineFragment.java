@@ -34,6 +34,11 @@ public class TimelineFragment extends Fragment {
                 textView.setText(s);
             }
         });
+
+        if (getActivity().getActionBar() != null) {
+
+        }
+
         return root;
     }
 
