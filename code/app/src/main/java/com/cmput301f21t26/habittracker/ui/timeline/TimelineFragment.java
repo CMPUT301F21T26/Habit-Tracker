@@ -12,19 +12,19 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.cmput301f21t26.habittracker.databinding.FragmentDashboardBinding;
+import com.cmput301f21t26.habittracker.databinding.FragmentTimelineBinding;
 
 public class TimelineFragment extends Fragment {
 
     private TimelineViewModel timelineViewModel;
-    private FragmentDashboardBinding binding;
+    private FragmentTimelineBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         timelineViewModel =
                 new ViewModelProvider(this).get(TimelineViewModel.class);
 
-        binding = FragmentDashboardBinding.inflate(inflater, container, false);
+        binding = FragmentTimelineBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textDashboard;
