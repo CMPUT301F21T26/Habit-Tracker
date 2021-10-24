@@ -5,4 +5,10 @@
 
     <dimen name="primary_font_size">16sp</dimen>
     <dimen name="secondary_font_size">12sp</dimen>
+
+    <!-- general dimensions for all custom menu items -->
+    <dimen name="menu_item_icon_size">35dp</dimen>
+    <dimen name="menu_item_size">48dp</dimen>
+    <dimen name="menu_item_ripple_size">28dp</dimen>
+
 </resources>
