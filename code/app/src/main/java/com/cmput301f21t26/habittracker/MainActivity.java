@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+
         NavigationUI.setupWithNavController(binding.navView, navController);
 
         addHabitButton.setOnClickListener(new View.OnClickListener() {
