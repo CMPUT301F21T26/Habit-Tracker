@@ -5,16 +5,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.cmput301f21t26.habittracker.ui.home.HomeFragment;
+import com.cmput301f21t26.habittracker.ui.home.TodayHabitFragment;
 import com.cmput301f21t26.habittracker.ui.profile.ProfileFragment;
 import com.cmput301f21t26.habittracker.ui.timeline.TimelineFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
@@ -22,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -78,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
                 int id = item.getItemId();
                 if (id == R.id.navigation_home) {
-                    selectedFragment = new HomeFragment();
+                    selectedFragment = new TodayHabitFragment();
                 }
                 if (id == R.id.navigation_timeline) {
                     selectedFragment = new TimelineFragment();
