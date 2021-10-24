@@ -28,8 +28,6 @@ import com.google.android.material.navigation.NavigationBarView;
 public class MainActivity extends AppCompatActivity {
 
     private static BottomNavigationView navView;
-    private static Button addHabitButtonStatic;
-    private static View extendBottomNav;
     private ActivityMainBinding binding;
     private NavController navController = null;
     private Button addHabitButton;
@@ -44,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(view);
 
         addHabitButton = findViewById(R.id.addHabitButton);
-        addHabitButtonStatic = findViewById(R.id.addHabitButton);           // used in hiding bottom nav bar...needs to be static
-        extendBottomNav = findViewById(R.id.extendBottomNav);
         navView = findViewById(R.id.nav_view);
 
         // Setting up toolbar
@@ -79,7 +75,9 @@ public class MainActivity extends AppCompatActivity {
                 if (id == R.id.navigation_profile) {
                     selectedFragment = new ProfileFragment();
                 }
-
+                if (selectedFragment == null) {
+                    throw new RuntimeException("The selected fragment is null!");
+                }
                 getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_container, selectedFragment).commit();
                 return true;
             }
@@ -97,22 +95,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     /**
-     * Hides the bottom navigation bar
+     * Hides the bottom navigation bar including the addHabitButton
+     *
+     * @param addHabitButton
+     *  The addHabitButton in activity_main.xml, type {@link Button}
+     * @param extendBottomNav
+     *  The view that extends the background of the bottom navigation bar to the addHabitButton,
+     *  to make it look more clean. Type {@link View}
      */
-    public static void hideBottomNav(){
+    public static void hideBottomNav(Button addHabitButton, View extendBottomNav){
         navView.setVisibility(View.GONE);
-        addHabitButtonStatic.setVisibility(View.INVISIBLE);
+        addHabitButton.setVisibility(View.INVISIBLE);
         extendBottomNav.setVisibility(View.INVISIBLE);
     }
 
     /**
-     * Shows the bottom navigation bar
+     * Shows the bottom navigation bar including the addHabitButton
+     *
+     * @param addHabitButton
+     *  The addHabitButton in activity_main.xml, type {@link Button}
+     * @param extendBottomNav
+     *  The view that extends the background of the bottom navigation bar to the addHabitButton,
+     *  to make it look more clean. Type {@link View}
      */
-    public static void showBottomNav(){
+    public static void showBottomNav(Button addHabitButton, View extendBottomNav){
         navView.setVisibility(View.VISIBLE);
-        addHabitButtonStatic.setVisibility(View.VISIBLE);
+        addHabitButton.setVisibility(View.VISIBLE);
         extendBottomNav.setVisibility(View.VISIBLE);
 
     }

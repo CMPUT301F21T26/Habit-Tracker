@@ -32,12 +32,12 @@ public class AddHabitFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        MainActivity.hideBottomNav();
+        MainActivity.hideBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        MainActivity.showBottomNav();
+        MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
 }
