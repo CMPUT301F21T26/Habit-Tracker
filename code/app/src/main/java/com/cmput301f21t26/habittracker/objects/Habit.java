@@ -135,6 +135,16 @@ public class Habit {
     }
 
     /**
+     * Return the habit event in the given index.
+     *
+     * @param index (int)
+     * @return HabitEvent obj
+     */
+    public HabitEvent getHabitEventAt(int index) {
+        return habitEvents.get(index);
+    }
+
+    /**
      * Store the given habit event into the list.
      *
      * @param hEvent habit event to store
