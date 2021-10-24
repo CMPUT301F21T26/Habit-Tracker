@@ -24,7 +24,7 @@
 
     <!-- Extends bottom navigator bar's background to behind the addHabitButton for cleaner looks-->
     <View
-        android:id="@+id/divider"
+        android:id="@+id/extendBottomNav"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/blue"

@@ -6,50 +6,52 @@
     android:layout_height="match_parent"
     tools:context=".fragments.AddHabitFragment">
 
-
-    <Toolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/habitTitleLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/habitTitle"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_editor_absoluteX="0dp" />
-
-    <EditText
-        android:id="@+id/habitTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:ems="10"
-        android:fontFamily="@font/rubik_bold"
-        android:textSize="20sp"
-        android:gravity="center"
-        android:hint="Habit Title"
-        android:inputType="textLongMessage"
-        android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:layout_marginTop="36dp"
+        app:counterEnabled="true"
+        app:counterMaxLength="20"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/habitTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:fontFamily="@font/rubik_bold"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:hint="Habit Title"
+            android:inputType="textLongMessage"
+            android:background="@color/transparent"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/habitReasoningLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="36dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginRight="36dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:hint="Reasoning"
         app:counterEnabled="true"
         app:counterMaxLength="30"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/habitTitle"
+        app:layout_constraintTop_toBottomOf="@+id/habitTitleLayout"
         app:placeholderText="Reasoning for why the habit is important">
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/habitReasoning"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -217,14 +219,19 @@
 
     </com.google.android.material.chip.ChipGroup>
 
-    <CheckBox
-        android:id="@+id/confirmAdding"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="52dp"
-        android:layout_marginEnd="44dp"
-        android:text="Confirm"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
+    <Button
+        android:id="@+id/addHabitButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/custom_rounded_square_button"
+        app:elevation="10dp"
+        app:icon="@drawable/ic_checkmark"
+        app:iconSize="38dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chipGroup"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
