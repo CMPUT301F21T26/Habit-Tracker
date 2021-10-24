@@ -22,6 +22,7 @@
         android:layout_marginEnd="16dp"
         app:elevation="10dp"/>
 
+    <!-- Extends bottom navigator bar's background to behind the addHabitButton for cleaner looks-->
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
