@@ -12,7 +12,7 @@ public class HabitEvent {
 
     private String comment;
     private Location loc;
-    private Uri photo_uri;
+    private Uri photoUri;
     private Date hEventDate;
 
     /**
@@ -20,17 +20,17 @@ public class HabitEvent {
      *
      * @param comment optional string comment up to 20 characters
      * @param loc optional location information
-     * @param photo_uri optional photo uri
+     * @param photoUri optional photo uri
      * @param hEventDate date at which the event occurred
      * @throws IllegalArgumentException if habit event comment is too long
      */
-    public HabitEvent(String comment, @Nullable Location loc, @Nullable Uri photo_uri, Date hEventDate) {
+    public HabitEvent(String comment, @Nullable Location loc, @Nullable Uri photoUri, Date hEventDate) {
         if (comment.length() > 20) {
             throw new IllegalArgumentException("Habit event comment must be up to 20 characters");
         }
         this.comment = comment;
         this.loc = loc;
-        this.photo_uri = photo_uri;
+        this.photoUri = photoUri;
         this.hEventDate = hEventDate;
     }
 
