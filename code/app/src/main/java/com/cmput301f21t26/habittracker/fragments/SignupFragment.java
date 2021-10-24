@@ -189,7 +189,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
 
     /**
      * Function gets the text entered in the fields once it has been filled and the signup button
-     * is clicked. It then checks if the username entered exists, and if so starts creating
+     * is clicked. It then checks if the username entered exists, and if not, starts creating
      * the user in Firebase Authentication. Otherwise, if the username exists, the user
      * is notified and they must enter a new one before clicking signup again.
      *

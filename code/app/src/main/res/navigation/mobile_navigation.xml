@@ -8,18 +8,23 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.cmput301f21t26.habittracker.ui.home.HomeFragment"
-        android:label="@string/title_home"
+        android:label="@string/todays_habits"
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_timeline"
         android:name="com.cmput301f21t26.habittracker.ui.timeline.TimelineFragment"
-        android:label="@string/title_dashboard"
+        android:label="@string/title_timeline"
         tools:layout="@layout/fragment_timeline" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.cmput301f21t26.habittracker.ui.notifications.ProfileFragment"
-        android:label="@string/title_notifications"
+        android:id="@+id/navigation_profile"
+        android:name="com.cmput301f21t26.habittracker.ui.profile.ProfileFragment"
+        android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/addHabitFragment"
+        android:name="com.cmput301f21t26.habittracker.fragments.AddHabitFragment"
+        android:label="ADD HABIT"
+        tools:layout="@layout/fragment_add_habit" />
 </navigation>

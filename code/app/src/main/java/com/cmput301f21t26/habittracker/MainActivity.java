@@ -1,39 +1,227 @@
 package com.cmput301f21t26.habittracker;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.cmput301f21t26.habittracker.ui.home.HomeFragment;
+import com.cmput301f21t26.habittracker.ui.profile.ProfileFragment;
+import com.cmput301f21t26.habittracker.ui.timeline.TimelineFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
+import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static BottomNavigationView navView;
     private ActivityMainBinding binding;
+    private NavController navController = null;
+    private Button addHabitButton;
+    private Toolbar toolbar;
+    private ImageView redCircle;
+    private ImageView searchIcon;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        View view = binding.getRoot();
+        setContentView(view);
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
+        mAuth = FirebaseAuth.getInstance();
+
+        addHabitButton = findViewById(R.id.addHabitButton);
+        navView = findViewById(R.id.nav_view);
+
+        // Setting up toolbar
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Setting up navController
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                R.id.navigation_home, R.id.navigation_timeline, R.id.navigation_profile)
                 .build();
-        /*
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
+        assert navHostFragment != null;
+        navController = navHostFragment.getNavController();
+
+        // Clicking on icons navigate to the selected fragments
+        navView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Fragment selectedFragment = null;
+
+                int id = item.getItemId();
+                if (id == R.id.navigation_home) {
+                    selectedFragment = new HomeFragment();
+                }
+                if (id == R.id.navigation_timeline) {
+                    selectedFragment = new TimelineFragment();
+                }
+                if (id == R.id.navigation_profile) {
+                    selectedFragment = new ProfileFragment();
+                }
+                if (selectedFragment == null) {
+                    throw new RuntimeException("The selected fragment is null!");
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_container, selectedFragment).commit();
+                return true;
+            }
+        });
+
         NavigationUI.setupWithNavController(binding.navView, navController);
-        */
+        NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
+
+        addHabitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                navController.navigate(R.id.addHabitFragment);
+            }
+        });
+    }
+
+    /**
+     * Inflates the menu and adds the items to toolbar
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    /**
+     * Before creation of options menu, applies
+     * the custom layouts of the search and
+     * bell/notification icon buttons, and adds
+     * an onClickListener to each since using
+     * actionLayout does not make onOptionsItemSelected
+     * call that item that is using actionLayout.
+     *
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // For notification icon
+        MenuItem notifMenuItem = menu.findItem(R.id.action_notif);
+        FrameLayout notifRootView = (FrameLayout) notifMenuItem.getActionView();
+        redCircle = (ImageView) notifRootView.findViewById(R.id.redCircle);
+        // Because using app:actionLayout makes onOptionsItemSelected not call our custom menu item
+        notifRootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(notifMenuItem);
+            }
+        });
+
+        // For search icon
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        FrameLayout searchRootView = (FrameLayout) searchMenuItem.getActionView();
+        searchIcon = (ImageView) searchRootView.findViewById(R.id.searchIcon);
+        searchRootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(searchMenuItem);
+            }
+        });
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    /**
+     * Called when user clicks on item in toolbar;
+     * Does things according to what is clicked.
+     *
+     * @param item
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            signOut();
+            return true;
+        }
+        if (id == R.id.action_notif) {
+            // Just to show what it would look like with a notif coming in
+            redCircle.setVisibility(View.VISIBLE);
+            return true;
+        }
+        if (id == R.id.action_search) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Signs out the user from Firebase Auth and sends them back
+     * to the signup/login screen
+     */
+    private void signOut() {
+        mAuth.signOut();
+        Intent intent = new Intent(this, LoginSignupActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Hides the bottom navigation bar including the addHabitButton
+     *
+     * @param addHabitButton
+     *  The addHabitButton in activity_main.xml, type {@link Button}
+     * @param extendBottomNav
+     *  The view that extends the background of the bottom navigation bar to the addHabitButton,
+     *  to make it look more clean. Type {@link View}
+     */
+    public static void hideBottomNav(Button addHabitButton, View extendBottomNav){
+        navView.setVisibility(View.GONE);
+        addHabitButton.setVisibility(View.INVISIBLE);
+        extendBottomNav.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * Shows the bottom navigation bar including the addHabitButton
+     *
+     * @param addHabitButton
+     *  The addHabitButton in activity_main.xml, type {@link Button}
+     * @param extendBottomNav
+     *  The view that extends the background of the bottom navigation bar to the addHabitButton,
+     *  to make it look more clean. Type {@link View}
+     */
+    public static void showBottomNav(Button addHabitButton, View extendBottomNav){
+        navView.setVisibility(View.VISIBLE);
+        addHabitButton.setVisibility(View.VISIBLE);
+        extendBottomNav.setVisibility(View.VISIBLE);
+
     }
 
 }

@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker.ui.notifications;
+package com.cmput301f21t26.habittracker.ui.profile;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

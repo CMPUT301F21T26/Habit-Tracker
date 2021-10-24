@@ -27,7 +27,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:label="@string/todays_habits"
             android:theme="@style/Theme.HabitTracker" />
 
     </application>

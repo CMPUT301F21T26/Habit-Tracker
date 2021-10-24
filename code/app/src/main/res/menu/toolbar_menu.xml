@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <menu
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".MainActivity">
+        <item
+            android:id="@+id/action_settings"
+            android:orderInCategory="100"
+            android:title="Sign Out"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_search"
+            android:orderInCategory="200"
+            android:title="Search"
+            app:actionLayout="@layout/search_custom_layout"
+            app:showAsAction="ifRoom" />
+        <item
+            android:id="@+id/action_notif"
+            android:orderInCategory="300"
+            android:title="Notification"
+            app:actionLayout="@layout/notif_red_badge"
+            app:showAsAction="always"/>
+    </menu>
