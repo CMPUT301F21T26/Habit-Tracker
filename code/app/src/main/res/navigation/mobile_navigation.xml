@@ -22,4 +22,9 @@
         android:name="com.cmput301f21t26.habittracker.ui.notifications.ProfileFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/addHabitFragment"
+        android:name="com.cmput301f21t26.habittracker.fragments.AddHabitFragment"
+        android:label="fragment_add_habit"
+        tools:layout="@layout/fragment_add_habit" />
 </navigation>
