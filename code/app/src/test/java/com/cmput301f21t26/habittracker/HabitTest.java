@@ -21,6 +21,9 @@ public class HabitTest {
         habit = new Habit("Do dishes");
     }
 
+    /**
+     * Test whether Habit throws an error when assigning out of bound title.
+     */
     @Test
     void testTitleException() {
         assertThrows(IllegalArgumentException.class, () -> {
@@ -33,8 +36,11 @@ public class HabitTest {
         });
     }
 
+    /**
+     * Test whether Habit throws an error when assigning out of bound reason.
+     */
     @Test
-    void testReasonExpception() {
+    void testReasonException() {
         assertThrows(IllegalArgumentException.class, () -> {
             // input validation in setter
             habit.setReason("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaab");  // 31 chars
@@ -45,12 +51,15 @@ public class HabitTest {
         });
     }
 
+    /**
+     * Test whether two different habits have different habit ids.
+     */
     @Test
-    void testHabitId() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        String strId = habit.getTitle() + habit.getReason() + formatter.format(habit.getStartDate());
+    void testHabitIdUniqueness() {
+        Habit habit2 = new Habit("Clean washroom");
 
-        assertEquals(habit.getHabitId(), strId.hashCode());
+        assertNotEquals(habit.getHabitId(), habit2.getHabitId());
     }
 
+    // TODO test methods that use HabitEvent or HabitPlan as an input
 }
