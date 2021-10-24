@@ -160,6 +160,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
      * Whenever user clicks an element that have OnClickListener, this checks which
      * element has been clicked and does its corresponding function.
      *
+     *
      * @param view
      *  The current view.
      */
@@ -191,6 +192,8 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
      * is clicked. It then checks if the username entered exists, and if so starts creating
      * the user in Firebase Authentication. Otherwise, if the username exists, the user
      * is notified and they must enter a new one before clicking signup again.
+     *
+     *
      */
     public void createUser() {
         final String firstName = firstNameET.getText().toString();
