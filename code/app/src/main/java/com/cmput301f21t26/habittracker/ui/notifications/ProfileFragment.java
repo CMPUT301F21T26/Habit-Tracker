@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker.ui.dashboard;
+package com.cmput301f21t26.habittracker.ui.notifications;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,24 +12,23 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.databinding.FragmentDashboardBinding;
+import com.cmput301f21t26.habittracker.databinding.FragmentNotificationsBinding;
 
-public class DashboardFragment extends Fragment {
+public class ProfileFragment extends Fragment {
 
-    private DashboardViewModel dashboardViewModel;
-    private FragmentDashboardBinding binding;
+    private ProfileViewModel profileViewModel;
+    private FragmentNotificationsBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                new ViewModelProvider(this).get(DashboardViewModel.class);
+        profileViewModel =
+                new ViewModelProvider(this).get(ProfileViewModel.class);
 
-        binding = FragmentDashboardBinding.inflate(inflater, container, false);
+        binding = FragmentNotificationsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textDashboard;
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        final TextView textView = binding.textNotifications;
+        profileViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
