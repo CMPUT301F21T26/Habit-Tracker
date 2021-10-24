@@ -1,10 +1,15 @@
 package com.cmput301f21t26.habittracker;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.cmput301f21t26.habittracker.ui.home.HomeFragment;
 import com.cmput301f21t26.habittracker.ui.profile.ProfileFragment;
@@ -24,6 +29,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private NavController navController = null;
     private Button addHabitButton;
     private Toolbar toolbar;
+    private ImageView redCircle;
+    private ImageView searchIcon;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
+        mAuth = FirebaseAuth.getInstance();
 
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
@@ -94,6 +105,93 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Inflates the menu and adds the items to toolbar
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    /**
+     * Before creation of options menu, applies
+     * the custom layouts of the search and
+     * bell/notification icon buttons, and adds
+     * an onClickListener to each since using
+     * actionLayout does not make onOptionsItemSelected
+     * call that item that is using actionLayout.
+     *
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // For notification icon
+        MenuItem notifMenuItem = menu.findItem(R.id.action_notif);
+        FrameLayout notifRootView = (FrameLayout) notifMenuItem.getActionView();
+        redCircle = (ImageView) notifRootView.findViewById(R.id.redCircle);
+        // Because using app:actionLayout makes onOptionsItemSelected not call our custom menu item
+        notifRootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(notifMenuItem);
+            }
+        });
+
+        // For search icon
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        FrameLayout searchRootView = (FrameLayout) searchMenuItem.getActionView();
+        searchIcon = (ImageView) searchRootView.findViewById(R.id.searchIcon);
+        searchRootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(searchMenuItem);
+            }
+        });
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    /**
+     * Called when user clicks on item in toolbar;
+     * Does things according to what is clicked.
+     *
+     * @param item
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            signOut();
+            return true;
+        }
+        if (id == R.id.action_notif) {
+            // Just to show what it would look like with a notif coming in
+            redCircle.setVisibility(View.VISIBLE);
+            return true;
+        }
+        if (id == R.id.action_search) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Signs out the user from Firebase Auth and sends them back
+     * to the signup/login screen
+     */
+    private void signOut() {
+        mAuth.signOut();
+        Intent intent = new Intent(this, LoginSignupActivity.class);
+        startActivity(intent);
+    }
 
     /**
      * Hides the bottom navigation bar including the addHabitButton
