@@ -27,7 +27,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-
+/**
+ * Contains the logic for the Login Fragment
+ * Validates inputs, and logs in the user if their username matches their password
+ */
 public class LoginFragment extends Fragment implements View.OnClickListener{
 
 
@@ -43,11 +46,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     FirebaseAuth mAuth;
     FirebaseFirestore mStore;
 
+    /**
+     * required empty public constructor
+     */
     public LoginFragment() {
         // Required empty public constructor
     }
 
-
+    /**
+     * Initialize the login fragment and get instances
+     * @param savedInstanceState
+     *
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +122,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if (!(task.isSuccessful())){
                                             Toast.makeText(getActivity(), "Wrong password", Toast.LENGTH_LONG).show();
+                                        } else {
+                                            Toast.makeText(getActivity(), "Logging in", Toast.LENGTH_LONG).show();
+                                            Intent intent = new Intent(getActivity(), MainActivity.class);
+                                            startActivity(intent);
                                         }
                                     }
                                 });
