@@ -14,6 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private NavController navController = null;
     private Button addHabitButton;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +46,19 @@ public class MainActivity extends AppCompatActivity {
         addHabitButton = findViewById(R.id.addHabitButton);
         addHabitButtonStatic = findViewById(R.id.addHabitButton);           // used in hiding bottom nav bar...needs to be static
         extendBottomNav = findViewById(R.id.extendBottomNav);
-
         navView = findViewById(R.id.nav_view);
+
+        // Setting up toolbar
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Setting up navController
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_timeline, R.id.navigation_profile)
                 .build();
-
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
         assert navHostFragment != null;
         navController = navHostFragment.getNavController();
@@ -79,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         NavigationUI.setupWithNavController(binding.navView, navController);
+        NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
 
         addHabitButton.setOnClickListener(new View.OnClickListener() {
             @Override
