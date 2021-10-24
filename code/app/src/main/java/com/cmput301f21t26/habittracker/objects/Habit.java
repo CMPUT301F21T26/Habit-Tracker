@@ -1,8 +1,10 @@
 package com.cmput301f21t26.habittracker.objects;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class Habit {
 
@@ -11,11 +13,8 @@ public class Habit {
     private Date startDate;
     private boolean isDoneForToday;
     private final String datePattern = "yyyy-MM-dd_HH:mm:ss";
-
-    /* TODO implement after implementing HabitEvent and HabitPlan
     private List<HabitEvent> habitEvents;
-    private List<HabitPlan> plan;
-    */
+    private HabitPlan plan;
 
     /**
      * A default Habit constructor.
@@ -36,6 +35,8 @@ public class Habit {
         this.reason = reason;
         this.startDate = startDate;
         this.isDoneForToday = false;
+        this.habitEvents = new ArrayList<>();
+        this.plan = null;
     }
 
     /**
@@ -132,4 +133,36 @@ public class Habit {
         SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
         return String.format("%s%s%s", title, reason, formatter.format(startDate)).hashCode();
     }
+
+    /**
+     * Store the given habit event into the list.
+     *
+     * @param hEvent habit event to store
+     */
+    public void addHabitEvent(HabitEvent hEvent) {
+        habitEvents.add(hEvent);
+    }
+
+    /**
+     * Remove a habit event stored in the given index.
+     *
+     * @param index position at which the target habit event is stored
+     */
+    public void deleteHabitEvent(int index) {
+        habitEvents.remove(index);
+    }
+
+    /**
+     * Return the total number of habit events associated with the habit.
+     *
+     * @return (int) the total number of habit events
+     */
+    public int numTotalHabitEvents() {
+        return habitEvents.size();
+    }
+
+    // TODO methods for HabitPlan
+
+
+
 }
