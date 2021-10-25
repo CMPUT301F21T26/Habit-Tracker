@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.cmput301f21t26.habittracker.MainActivity;
 import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -113,19 +115,21 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
+                        assert document != null;
                         if (document.exists()){
                             //username exists, get the email and attempt to login
-                            String email = (String) document.getData().get("email");
-                            mAuth.signInWithEmailAndPassword(email, password)
+                            User user = document.toObject(User.class);
+                            mAuth.signInWithEmailAndPassword(user.getEmail(), password)
                                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
-                                        if (!(task.isSuccessful())){
-                                            Toast.makeText(getActivity(), "Wrong password", Toast.LENGTH_LONG).show();
-                                        } else {
+                                        if (task.isSuccessful()){
                                             Toast.makeText(getActivity(), "Logging in", Toast.LENGTH_LONG).show();
+
                                             Intent intent = new Intent(getActivity(), MainActivity.class);
                                             startActivity(intent);
+                                        } else {
+                                            Toast.makeText(getActivity(), "Wrong password", Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
