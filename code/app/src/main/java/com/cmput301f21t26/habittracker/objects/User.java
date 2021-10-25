@@ -39,6 +39,10 @@ public class User implements Serializable {
         this.permissions = new ArrayList<>();
     }
 
+    public User() {
+        this("", "", "", "");
+    }
+
     public String getUid() {
         return this.username;
     }
