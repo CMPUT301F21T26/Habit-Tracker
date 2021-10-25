@@ -108,7 +108,7 @@ public class User implements Serializable {
     }
 
     public void addTodayHabit(Habit habit) {
-        habits.add(habit);
+        todayHabits.add(habit);
     }
 
     public void changeProfilePic(Uri uri) {
