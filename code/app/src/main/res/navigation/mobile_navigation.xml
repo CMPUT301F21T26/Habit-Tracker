@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.cmput301f21t26.habittracker.ui.home.HomeFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.home.TodayHabitFragment"
         android:label="@string/todays_habits"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_today_habit" />
 
     <fragment
         android:id="@+id/navigation_timeline"

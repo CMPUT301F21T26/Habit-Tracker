@@ -13,26 +13,26 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.databinding.FragmentHomeBinding;
+import com.cmput301f21t26.habittracker.databinding.FragmentTodayHabitBinding;
 
-public class HomeFragment extends Fragment {
+public class TodayHabitFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
-    private FragmentHomeBinding binding;
+    private FragmentTodayHabitBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
 
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding = FragmentTodayHabitBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textHome;
+        // final TextView textView = binding.textHome;
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                textView.setText(s);
+                // textView.setText(s);
             }
         });
         return root;

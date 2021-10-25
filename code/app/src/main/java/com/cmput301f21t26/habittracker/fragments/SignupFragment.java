@@ -289,10 +289,11 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
     public void createUserFirebaseFirestore(String firstName, String lastName, String email, String username) {
 
         final CollectionReference collectionReference = mStore.collection("users");
+        final User user = new User(username, firstName, lastName, email);
 
         collectionReference
-                .document(username)
-                .set(new User(username, firstName, lastName, email))
+                .document(user.getUid())
+                .set(user)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
