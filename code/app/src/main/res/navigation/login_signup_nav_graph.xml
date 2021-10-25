@@ -21,11 +21,7 @@
         android:id="@+id/loginFragment"
         android:name="com.cmput301f21t26.habittracker.fragments.LoginFragment"
         android:label="fragment_login"
-        tools:layout="@layout/fragment_login" >
-        <action
-            android:id="@+id/action_loginFragment_to_second_graph"
-            app:destination="@+id/mobile_navigation"/>
-    </fragment>
+        tools:layout="@layout/fragment_login" />
 
 
     <fragment
@@ -39,7 +35,5 @@
             app:popUpTo="@id/signupFragment"
             app:popUpToInclusive="true"/>
     </fragment>
-
-    <include app:graph="@navigation/mobile_navigation"/>
 
 </navigation>
