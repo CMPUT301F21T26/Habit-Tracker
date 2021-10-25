@@ -30,6 +30,9 @@ import androidx.navigation.ui.NavigationUI;
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView redCircle;
     private ImageView searchIcon;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore mStore;
+    private String currentUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +56,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(view);
 
         mAuth = FirebaseAuth.getInstance();
+        mStore = FirebaseFirestore.getInstance();
+
+        // Get the username
+        if (mAuth.getCurrentUser() != null) {
+            currentUsername = mAuth.getCurrentUser().getDisplayName();
+        }
 
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
@@ -125,7 +136,9 @@ public class MainActivity extends AppCompatActivity {
      * call that item that is using actionLayout.
      *
      * @param menu
+     *  The menu, type {@link Menu}
      * @return
+     *  Return type {@link Boolean}
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -160,7 +173,9 @@ public class MainActivity extends AppCompatActivity {
      * Does things according to what is clicked.
      *
      * @param item
+     *  The item selected, type {@link MenuItem}
      * @return
+     *  Return type {@link Boolean}
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -191,6 +206,26 @@ public class MainActivity extends AppCompatActivity {
         mAuth.signOut();
         Intent intent = new Intent(this, LoginSignupActivity.class);
         startActivity(intent);
+    }
+
+    /**
+     * Hides the menu items.
+     * MAKE SURE TO HAVE "setHasOptionsMenu(true);"
+     * in your onCreate method in the fragment!
+     *
+     * @param menu
+     *  The Menu, type {@link Menu}
+     */
+    public static void hideMenuItems(Menu menu) {
+        // Make it so the menu items don't appear in the fragment
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        MenuItem notifItem = menu.findItem(R.id.action_notif);
+        MenuItem settingsItem = menu.findItem(R.id.action_settings);
+        if (searchItem != null && notifItem != null && settingsItem != null) {
+            searchItem.setVisible(false);
+            notifItem.setVisible(false);
+            settingsItem.setVisible(false);
+        }
     }
 
     /**
