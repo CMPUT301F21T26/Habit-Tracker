@@ -37,8 +37,8 @@ public class AddHabitFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         mStore = FirebaseFirestore.getInstance();
-
 
     }
 
