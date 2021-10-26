@@ -24,10 +24,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.Arrays;
 import java.util.Date;
 
-public class AddHabitFragment extends Fragment{
+public class AddHabitFragment extends Fragment implements View.OnClickListener{
 
-    Button confirmButton;
-    FirebaseFirestore mStore;
+    private Button confirmHabitButton;
+    private FirebaseFirestore mStore;
     private boolean dayList[] = new boolean[7];
     private ChipGroup chipGroup;
 
@@ -61,8 +61,11 @@ public class AddHabitFragment extends Fragment{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         chipGroup = view.findViewById(R.id.chipGroup);
+        confirmHabitButton = view.findViewById(R.id.confirmHabitButton);
+        confirmHabitButton.setOnClickListener(this);
     }
 
+    @Override
     public void onClick(View view){
 
         //make sure user clicks on confirm button before storing data into firebase
@@ -87,7 +90,7 @@ public class AddHabitFragment extends Fragment{
                 }
                 i++;
             }
-            //wanted to test if the output is proper, but doesn't seem to be working
+
             Toast.makeText(getActivity(),msg,Toast.LENGTH_LONG).show();
 
 
