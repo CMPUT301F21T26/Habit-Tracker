@@ -90,7 +90,7 @@ public class AddHabitFragment extends Fragment implements View.OnClickListener{
                 }
                 i++;
             }
-            //wanted to test if the output is proper, but doesn't seem to be working
+
             Toast.makeText(getActivity(),msg,Toast.LENGTH_LONG).show();
 
 
