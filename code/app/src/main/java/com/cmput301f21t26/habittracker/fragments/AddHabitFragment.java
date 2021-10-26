@@ -9,6 +9,9 @@ import androidx.navigation.Navigation;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -63,6 +66,7 @@ public class AddHabitFragment extends Fragment implements View.OnClickListener{
         chipGroup = view.findViewById(R.id.chipGroup);
         confirmHabitButton = view.findViewById(R.id.confirmHabitButton);
         confirmHabitButton.setOnClickListener(this);
+
     }
 
     @Override
@@ -116,6 +120,19 @@ public class AddHabitFragment extends Fragment implements View.OnClickListener{
     public void storeData(Habit habit){
 
         // mStore.collection("users").document();
+    }
+
+
+    /**
+     * Hides menu items in add habit fragment
+     * 
+     * @param menu
+     * @param inflater
+     */
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        MainActivity.hideMenuItems(menu);
     }
 
     @Override
