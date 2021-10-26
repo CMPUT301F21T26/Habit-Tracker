@@ -49,7 +49,7 @@ public class AddHabitFragment extends Fragment{
     }
 
     @Override
-    public void onCick(View view){
+    public void onClick(View view){
 
         //make sure user clicks on confirm button before storing data into firebase
 
