@@ -1,22 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context=".ui.profile.ProfileFragment">
 
-    <TextView
-        android:id="@+id/text_notifications"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profilePicImageView"
+            android:layout_width="112dp"
+            android:layout_height="114dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="90dp"
+            android:elevation="5dp"
+            android:padding="10dp"
+            android:src="@drawable/default_profile_pic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/Gradient"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/profilePicImageView"
+            app:srcCompat="@drawable/ic_gradient" />
+
+
+        <ImageView
+            android:id="@+id/followersBackground"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
+            android:background="@color/dark_blue"
+            app:layout_constraintTop_toBottomOf="@id/Gradient"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/followingBackground"
+            app:layout_constraintWidth_percent="0.5"/>
+
+        <TextView
+            android:id="@+id/followersTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FOLLOWERS"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            android:fontFamily="@font/rubik_bold"
+            app:layout_constraintStart_toStartOf="@id/followersBackground"
+            app:layout_constraintEnd_toStartOf="@id/profilePicImageView"
+            app:layout_constraintTop_toTopOf="@id/followersBackground"
+            app:layout_constraintBottom_toTopOf="@id/followersNumberTV"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/followersNumberTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1234"
+            android:textColor="@color/white"
+            android:fontFamily="@font/rubik_light"
+            app:layout_constraintStart_toStartOf="@id/followersBackground"
+            app:layout_constraintEnd_toStartOf="@id/profilePicImageView"
+            app:layout_constraintTop_toBottomOf="@id/followersTV"
+            app:layout_constraintBottom_toBottomOf="@id/followersBackground"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"/>
+
+        <ImageView
+            android:id="@+id/followingBackground"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
+            android:background="@color/dark_blue"
+            app:layout_constraintTop_toBottomOf="@id/Gradient"
+            app:layout_constraintStart_toEndOf="@id/followersBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintWidth_percent="0.5"/>
+
+        <TextView
+            android:id="@+id/followingTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FOLLOWERS"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            android:fontFamily="@font/rubik_bold"
+            app:layout_constraintStart_toEndOf="@id/profilePicImageView"
+            app:layout_constraintEnd_toEndOf="@id/followingBackground"
+            app:layout_constraintTop_toTopOf="@id/followingBackground"
+            app:layout_constraintBottom_toTopOf="@id/followingNumberTV"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/followingNumberTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1234"
+            android:textColor="@color/white"
+            android:fontFamily="@font/rubik_light"
+            app:layout_constraintStart_toEndOf="@id/profilePicImageView"
+            app:layout_constraintEnd_toEndOf="@id/followingBackground"
+            app:layout_constraintTop_toBottomOf="@id/followingTV"
+            app:layout_constraintBottom_toBottomOf="@id/followingBackground"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"/>
+
+        <ImageView
+            android:id="@+id/infoBackground"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:background="@color/blue"
+            app:layout_constraintTop_toBottomOf="@id/followersBackground"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/tab_background"
+            app:tabTextColor="@color/white"
+            app:tabIndicatorColor="@color/green"
+            app:tabSelectedTextColor="@color/green"
+            app:tabIndicator="@drawable/tab_indicator"
+            app:tabIndicatorHeight="5dp"
+            app:tabIndicatorFullWidth="false"
+            app:tabPadding="15dp"
+            android:paddingBottom="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoBackground"
+            app:layout_constraintBottom_toTopOf="@+id/viewPager"
+            app:layout_constraintVertical_bias="1"/>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/Gradient"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.2"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
