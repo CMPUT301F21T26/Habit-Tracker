@@ -76,7 +76,7 @@ public class TodayHabitFragment extends Fragment {
         // get todayHabits subcollection, retrieving all habit documents
         // add each to a list of today habits
         // display in a list
-        mStore.collection("users").document(username).collection("todayHabits")
+        mStore.collection("users").document(username).collection("habits")
             .get()
             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
