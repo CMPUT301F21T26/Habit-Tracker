@@ -17,6 +17,11 @@ public class Habit {
     private HabitPlan plan;
 
     /**
+     * Empty Habit constructor for use with firestore
+     */
+    public Habit(){}
+
+    /**
      * A default Habit constructor.
      *
      * @param title habit title
