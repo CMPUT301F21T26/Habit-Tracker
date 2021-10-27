@@ -289,39 +289,135 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
     public void createUserFirebaseFirestore(String firstName, String lastName, String email, String username) {
 
         final CollectionReference collectionReference = mStore.collection("users");
-        final User user = new User(username, firstName, lastName, email);
+        // create a hashmap instead of using serializable user so that users don't have
+        // initialized sub-arrays stored, instead we wish to store a collection which
+        // represents the arrays
+        // this is better both because the document size will not grow with the number of habits
+        // and habit events, so fetches will be faster
+        // but also because they're user-defined objects
+        // though firestore supports this its still conceptually cleaner to use subcollections
+        // this does mean that we have to create fake docs for those subcollections
+
+        // final User user = new User(username, firstName, lastName, email); (deprecated)
+        Map<String, Object> user = new HashMap<>();
+        user.put("firstName", firstName);
+        user.put("lastName", lastName);
+        user.put("email", email);
+        user.put("username", username);
+
+        Map<String, Object> habits = new HashMap<>();
+        habits.put("habitName", "placeholder");
+
+        Map<String, Object> followers = new HashMap<>();
+        followers.put("name", "placeholder");
+
+        Map<String, Object> following = new HashMap<>();
+        following.put("name", "placeholder");
+
+        Map<String, Object> permissions = new HashMap<>();
+        permissions.put("name", "placeholder");
+
+        Map<String, Object> todayHabits = new HashMap<>();
+        todayHabits.put("habitName", "placeholder");
 
         collectionReference
-                .document(user.getUid())
-                .set(user)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Log.d(TAG, "Data added succesfully");
-                        // Notify user that account was created successfully
-                        Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
-                        // Go to login fragment once data has been added
-                        navController.navigate(R.id.action_signupFragment_to_loginFragment);
-                        creatingUser = false;
+            .document(username)
+            .set(user)
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
 
-                        mStorageReference = mStorage.getReference(picturePath);
-                        mStorageReference
-                            .putFile(imageUri)
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "Default profile pic was not stored");
-                                }
-                            });
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "Data failed to add.");
-                        Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
-                    }
-                });
+                    collectionReference.document(username).collection("habits").document("placeholder")
+                        .set(habits)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                collectionReference.document(username).collection("followers").document("placeholder")
+                                    .set(followers)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            collectionReference.document(username).collection("following").document("placeholder")
+                                                .set(following)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        collectionReference.document(username).collection("permissions").document("placeholder")
+                                                            .set(permissions)
+                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void unused) {
+                                                                    collectionReference.document(username).collection("todayHabits").document("placeholder")
+                                                                        .set(todayHabits)
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void unused) {
+                                                                                Log.d(TAG, "Data added succesfully");
+                                                                                // Notify user that account was created successfully
+                                                                                Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
+                                                                                // Go to login fragment once data has been added
+                                                                                navController.navigate(R.id.action_signupFragment_to_loginFragment);
+                                                                                creatingUser = false;
+
+                                                                                mStorageReference = mStorage.getReference(picturePath);
+                                                                                mStorageReference
+                                                                                    .putFile(imageUri)
+                                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                                        @Override
+                                                                                        public void onFailure(@NonNull Exception e) {
+                                                                                            Log.d(TAG, "Default profile pic was not stored");
+                                                                                        }
+                                                                                    });
+                                                                            }
+                                                                        })
+                                                                        .addOnFailureListener(new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(@NonNull Exception e) {
+                                                                                Log.d(TAG, "failed to create todayHabits subcollection");
+                                                                            }
+                                                                        });
+                                                                }
+                                                            })
+                                                            .addOnFailureListener(new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+                                                                    Log.d(TAG, "failed to create permissions subcollection");
+                                                                }
+                                                            });
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.d(TAG, "failed to create following subcollection");
+                                                    }
+                                                });
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d(TAG, "failed to create followers subcollection");
+                                        }
+                                    });
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d(TAG, "failed to create habits subcollection");
+                            }
+                        });
+
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "Data failed to add.");
+                    Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
+                }
+            });
     }
 
 

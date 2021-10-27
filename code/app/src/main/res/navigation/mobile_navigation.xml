@@ -3,28 +3,60 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/todays_habits">
 
     <fragment
-        android:id="@+id/navigation_home"
+        android:id="@+id/todays_habits"
         android:name="com.cmput301f21t26.habittracker.ui.home.TodayHabitFragment"
         android:label="@string/todays_habits"
-        tools:layout="@layout/fragment_today_habit" />
+        tools:layout="@layout/fragment_today_habit" >
+        <argument
+            android:name="user"
+            app:argType="com.cmput301f21t26.habittracker.objects.User"
+            app:nullable="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_timeline"
         android:name="com.cmput301f21t26.habittracker.ui.timeline.TimelineFragment"
         android:label="@string/title_timeline"
-        tools:layout="@layout/fragment_timeline" />
+        tools:layout="@layout/fragment_timeline" >
+        <argument
+            android:name="user"
+            app:argType="com.cmput301f21t26.habittracker.objects.User"
+            app:nullable="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_profile"
         android:name="com.cmput301f21t26.habittracker.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <argument
+            android:name="user"
+            app:argType="com.cmput301f21t26.habittracker.objects.User"
+            app:nullable="true" />
+    </fragment>
     <fragment
         android:id="@+id/addHabitFragment"
         android:name="com.cmput301f21t26.habittracker.fragments.AddHabitFragment"
         android:label="ADD HABIT"
-        tools:layout="@layout/fragment_add_habit" />
+        tools:layout="@layout/fragment_add_habit" >
+        <argument
+            android:name="user"
+            app:argType="com.cmput301f21t26.habittracker.objects.User"
+            app:nullable="true" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_addHabitFragment"
+        app:destination="@id/addHabitFragment" />
+    <action
+        android:id="@+id/action_global_navigation_timeline"
+        app:destination="@id/navigation_timeline" />
+    <action
+        android:id="@+id/action_global_todays_habits"
+        app:destination="@id/todays_habits" />
+    <action
+        android:id="@+id/action_global_navigation_profile"
+        app:destination="@id/navigation_profile" />
 </navigation>

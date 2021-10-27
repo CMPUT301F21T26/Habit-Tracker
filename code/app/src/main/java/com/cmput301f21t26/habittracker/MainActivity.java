@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -27,8 +28,6 @@ import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,8 +47,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
+        setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
         mStore = FirebaseFirestore.getInstance();
@@ -71,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_timeline, R.id.navigation_profile)
+                R.id.todays_habits, R.id.navigation_timeline, R.id.navigation_profile)
                 .build();
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
         assert navHostFragment != null;
@@ -81,22 +79,21 @@ public class MainActivity extends AppCompatActivity {
         navView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment selectedFragment = null;
+                NavDirections action = null;
 
                 int id = item.getItemId();
-                if (id == R.id.navigation_home) {
-                    selectedFragment = new TodayHabitFragment();
+                if (id == R.id.todays_habits) {
+                    action = MobileNavigationDirections.actionGlobalTodaysHabits(null);
                 }
                 if (id == R.id.navigation_timeline) {
-                    selectedFragment = new TimelineFragment();
+                    action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                 }
                 if (id == R.id.navigation_profile) {
-                    selectedFragment = new ProfileFragment();
+                    action = MobileNavigationDirections.actionGlobalNavigationProfile(null);
                 }
-                if (selectedFragment == null) {
-                    throw new RuntimeException("The selected fragment is null!");
-                }
-                getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_container, selectedFragment).commit();
+                assert action != null;
+                navController.navigate(action);
+
                 return true;
             }
         });
@@ -107,7 +104,8 @@ public class MainActivity extends AppCompatActivity {
         addHabitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                navController.navigate(R.id.addHabitFragment);
+                NavDirections action = MobileNavigationDirections.actionGlobalAddHabitFragment(null);
+                navController.navigate(action);
             }
         });
     }

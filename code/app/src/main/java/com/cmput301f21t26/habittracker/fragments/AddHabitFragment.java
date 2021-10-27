@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
@@ -18,110 +20,116 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.cmput301f21t26.habittracker.MainActivity;
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
-public class AddHabitFragment extends Fragment implements View.OnClickListener{
+public class AddHabitFragment extends Fragment {
 
-    private Button confirmHabitButton;
-    private FirebaseFirestore mStore;
-    private boolean dayList[] = new boolean[7];
+    private final String TAG = "AddHabitFragment";
+    private final String datePattern = "yyyy-MM-dd";
+
+    private NavController navController;
+    private Button confirmAddHabitButton;
+    private ArrayList<Boolean> daysList;
     private ChipGroup chipGroup;
+    private FragmentAddHabitBinding binding;
+
+    private FirebaseFirestore mStore;
+    private FirebaseAuth mAuth;
+    private String username;
 
     /**
-     * required empty public constructor
+     * Required empty constructor
      */
-
-    public AddHabitFragment() {
-        // Required empty public constructor
-
-    }
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        mStore = FirebaseFirestore.getInstance();
-
-    }
+    public AddHabitFragment() { }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add_habit, container, false);
+        binding = FragmentAddHabitBinding.inflate(inflater, container, false);
 
+        daysList = new ArrayList<>();       // init everything to false
+        chipGroup = binding.chipGroup;
+        confirmAddHabitButton = binding.confirmAddHabitButton;
+
+        mStore = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        username = mAuth.getCurrentUser().getDisplayName();
+
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        chipGroup = view.findViewById(R.id.chipGroup);
-        confirmHabitButton = view.findViewById(R.id.confirmHabitButton);
-        confirmHabitButton.setOnClickListener(this);
 
+        navController = Navigation.findNavController(view);
+
+        confirmAddHabitButton.setOnClickListener(confirmOnClickListener);
     }
 
-    @Override
-    public void onClick(View view){
+    private View.OnClickListener confirmOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
 
-        //make sure user clicks on confirm button before storing data into firebase
+            Habit newHabit = null;
 
-        String reason = "";
-        Date date = null;
+            // make sure user clicks on confirm button before storing data into firebase
+            final String title = binding.habitTitleET.getText().toString();
+            final String reason = binding.habitReasoningET.getText().toString();
+            final String dateStr = binding.dateFormatMessage.getText().toString();
 
-        //parameters to handle the chips in chip group
-        int chipCount = chipGroup.getChildCount();
-        int i = 0;
-        String msg = "Checked chips are: ";
-        if (view.getId() == R.id.confirmHabitButton){
+            SimpleDateFormat format = new SimpleDateFormat(datePattern);
+            Date date;       // TODO add date
 
-            /* If user presses confirm then go through all the chips in the group and
-            based on if they are selected, update the booleans in dayList to match
-             */
-            while (i<chipCount){
+            try {
+                date = format.parse(dateStr);
+            } catch (ParseException e) {
+                // if invalid date or no date is entered, set the date to right now;
+                date = Calendar.getInstance().getTime();
+            }
+
+            // parameters to handle the chips in chip group
+            int chipCount = chipGroup.getChildCount();
+
+            // If user presses confirm then go through all the chips in the group and
+            // based on if they are selected, update the booleans in daysList to match
+            for (int i=0; i<chipCount; i++) {
                 Chip chip = (Chip) chipGroup.getChildAt(i);
-                if (chip.isChecked() ) {
-                    dayList[i] = true;
-                    msg += chip.getText().toString() + " ";
-                }
-                i++;
+                daysList.add(chip.isChecked());
             }
 
-            Toast.makeText(getActivity(),msg,Toast.LENGTH_LONG).show();
+            assert daysList.size() == 7;
+            newHabit = new Habit(title, reason, date, daysList);
 
+            storeHabitInDb(newHabit);
 
-            //if the user did not give startDate
-            if (reason == ""){
-                Habit habit = new Habit("", "");
-                storeData(habit);
-            }
-            // if the user did not give us a reason or start date
-            if (reason == "" && date == null){
-                Habit habit = new Habit("");
-                storeData(habit);
+            clearEditTexts();
 
-            }
-            //if the user entered everything
-            else{
-                Habit habit = new Habit("","", date);
-                storeData(habit);
-            }
+            NavDirections direction = MobileNavigationDirections.actionGlobalTodaysHabits(null);
+            navController.navigate(direction);      // go to TodayHabitFragment
         }
+    };
+
+    public void storeHabitInDb(Habit habit){
+        mStore.collection("users").document(username).collection("habits")
+                .document(habit.getHabitId())
+                .set(habit);
     }
-
-    public void storeData(Habit habit){
-
-        // mStore.collection("users").document();
-    }
-
 
     /**
      * Hides menu items in add habit fragment
@@ -145,5 +153,11 @@ public class AddHabitFragment extends Fragment implements View.OnClickListener{
     public void onStop() {
         super.onStop();
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
+    }
+
+    public void clearEditTexts() {
+        binding.habitTitleET.setText("");
+        binding.habitReasoningET.setText("");
+        binding.dateFormatMessage.setText("YYYY-MM-DD");
     }
 }

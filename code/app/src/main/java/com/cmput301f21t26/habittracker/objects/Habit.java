@@ -1,20 +1,27 @@
 package com.cmput301f21t26.habittracker.objects;
 
-import java.text.SimpleDateFormat;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.UUID;
 
 public class Habit {
 
+    private String habitId;
     private String title;
     private String reason;
     private Date startDate;
     private boolean isDoneForToday;
-    private final String datePattern = "yyyy-MM-dd_HH:mm:ss";
-    private List<HabitEvent> habitEvents;
-    private HabitPlan plan;
+    private ArrayList<HabitEvent> habitEvents;
+    private ArrayList<Boolean> habitPlan = new ArrayList<>();
+
+    /**
+     * Empty Habit constructor for use with firestore
+     */
+    public Habit(){}
 
     /**
      * A default Habit constructor.
@@ -24,7 +31,7 @@ public class Habit {
      * @param startDate date when the habit was created
      * @throws IllegalArgumentException if habit title or reason are too long
      */
-    public Habit(String title, String reason, Date startDate) {
+    public Habit(String title, String reason, Date startDate, ArrayList<Boolean> habitPlan) throws IllegalArgumentException {
         if (title.length() > 20) {
             throw new IllegalArgumentException("Habit title must be up to 20 characters");
         }
@@ -36,7 +43,8 @@ public class Habit {
         this.startDate = startDate;
         this.isDoneForToday = false;
         this.habitEvents = new ArrayList<>();
-        this.plan = null;
+        this.habitPlan = habitPlan;     // all init to false
+        this.habitId = UUID.randomUUID().toString();
     }
 
     /**
@@ -48,7 +56,7 @@ public class Habit {
      * @throws IllegalArgumentException if habit title or reason are too long
      */
     public Habit(String title, Date startDate) {
-        this(title, "", startDate);
+        this(title, "", startDate, new ArrayList<>());
     }
 
     /**
@@ -60,7 +68,7 @@ public class Habit {
      * @throws IllegalArgumentException if habit title or reason are too long
      */
     public Habit(String title, String reason) {
-        this(title, reason, Calendar.getInstance().getTime());
+        this(title, reason, Calendar.getInstance().getTime(), new ArrayList<>());
     }
 
     /**
@@ -73,7 +81,7 @@ public class Habit {
      * @throws IllegalArgumentException if habit title or reason are too long
      */
     public Habit(String title) {
-        this(title, "", Calendar.getInstance().getTime());
+        this(title, "", Calendar.getInstance().getTime(), new ArrayList<>());
     }
 
     public String getTitle() {
@@ -125,13 +133,10 @@ public class Habit {
     /**
      * Return a unique habit id.
      *
-     * Note: Whenever title, reason, or startDate changes, the habit id changes.
-     *
-     * @return (int) unique habit id
+     * @return (String) unique habit id
      */
-    public int getHabitId() {
-        SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
-        return String.format("%s%s%s", title, reason, formatter.format(startDate)).hashCode();
+    public String getHabitId() {
+        return habitId;
     }
 
     /**
@@ -171,8 +176,14 @@ public class Habit {
         return habitEvents.size();
     }
 
-    // TODO methods for HabitPlan
+    public void setHabitPlan(ArrayList<Boolean> daysList) {
+        assert daysList.size() == 7;
+        for (int i=0; i<daysList.size(); i++) {
+            this.habitPlan.add(daysList.get(i));
+        }
+    }
 
-
-
+    public List<Boolean> getHabitPlan() {
+        return habitPlan;
+    }
 }

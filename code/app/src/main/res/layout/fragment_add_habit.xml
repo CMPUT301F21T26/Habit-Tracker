@@ -29,7 +29,7 @@
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/habitTitle"
+                    android:id="@+id/habitTitleET"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
@@ -60,7 +60,7 @@
                 app:placeholderText="Reasoning for why the habit is important">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/habitReasoning"
+                    android:id="@+id/habitReasoningET"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
@@ -170,6 +170,7 @@
                     android:text="SU"
                     android:clickable="true"
                     android:focusable="true"
+                    android:checkable="true"
                     style="@style/CustomChipChoice"/>
 
                 <com.google.android.material.chip.Chip
@@ -178,6 +179,7 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="true"
+                    android:checkable="true"
                     style="@style/CustomChipChoice"
                     android:text="MO" />
 
@@ -188,6 +190,7 @@
                     android:text="TU"
                     android:clickable="true"
                     android:focusable="true"
+                    android:checkable="true"
                     style="@style/CustomChipChoice"/>
 
                 <com.google.android.material.chip.Chip
@@ -197,6 +200,7 @@
                     android:text="WE"
                     android:clickable="true"
                     android:focusable="true"
+                    android:checkable="true"
                     style="@style/CustomChipChoice"/>
 
                 <com.google.android.material.chip.Chip
@@ -206,6 +210,7 @@
                     android:text="TH"
                     android:clickable="true"
                     android:focusable="true"
+                    android:checkable="true"
                     style="@style/CustomChipChoice"/>
 
                 <com.google.android.material.chip.Chip
@@ -215,6 +220,7 @@
                     android:text="FR"
                     android:clickable="true"
                     android:focusable="true"
+                    android:checkable="true"
                     style="@style/CustomChipChoice"/>
 
                 <com.google.android.material.chip.Chip
@@ -224,6 +230,7 @@
                     android:text="SA"
                     android:clickable="true"
                     android:focusable="true"
+                    android:checkable="true"
                     style="@style/CustomChipChoice"/>
 
             </com.google.android.material.chip.ChipGroup>
@@ -233,7 +240,7 @@
     </ScrollView>
 
     <Button
-        android:id="@+id/confirmHabitButton"
+        android:id="@+id/confirmAddHabitButton"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginEnd="36dp"
