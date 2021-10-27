@@ -2,33 +2,27 @@ package com.cmput301f21t26.habittracker;
 
 import static org.junit.Assert.*;
 
-import android.app.Activity;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.test.core.app.ActivityScenario;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.robotium.solo.Solo;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -53,8 +47,8 @@ public class SignUpAndLoginTest {
     private Fragment signupFragment;
     private Fragment loginFragment;
 
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore mStore;
+    private static FirebaseAuth mAuth;
+    private static FirebaseFirestore mStore;
 
     @Rule
     public ActivityTestRule<LoginSignupActivity> rule = new ActivityTestRule<>(LoginSignupActivity.class);
@@ -73,7 +67,11 @@ public class SignUpAndLoginTest {
     /**
      * Deletes the user from Firebase Auth and Firestore
      */
-    public void deleteUser() {
+    public static void deleteUser() {
+        mAuth = FirebaseAuth.getInstance();
+        mStore = FirebaseFirestore.getInstance();
+        String username = "EspressoTester";
+
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             assert user.getDisplayName().equals(username);
@@ -103,7 +101,7 @@ public class SignUpAndLoginTest {
         username = "EspressoTester";
         firstName = "Espresso";
         lastName = "Grande";
-        email = "NoImNotA@Basic.Bitch";
+        email = "NoImNot@Basic.com";
         password = "starbucksLuvr";
         confirmPass = "starbucksLuvr";
 
@@ -117,12 +115,12 @@ public class SignUpAndLoginTest {
         // Wait for splash screen to end
         solo.waitForActivity(LoginSignupActivity.class);
 
-        mAuth = FirebaseAuth.getInstance();
-        mStore = FirebaseFirestore.getInstance();
 
-        // Make sure user doesn't exist before testing
+    }
+
+    @AfterClass
+    public static void tearDown() {
         deleteUser();
-
     }
 
     @Test
@@ -169,26 +167,8 @@ public class SignUpAndLoginTest {
         solo.waitForFragmentById(R.id.loginFragment, 2000);
         assertFragmentShown(loginFragment);
 
-        // Delete user
-        deleteUser();
     }
 
-
-    public void signup() {
-        testSignupPageShows();
-
-        // Enter values into fields
-        solo.enterText((EditText) solo.getView(R.id.firstNameET), firstName);
-        solo.enterText((EditText) solo.getView(R.id.lastNameET), lastName);
-        solo.enterText((EditText) solo.getView(R.id.emailET), email);
-        solo.enterText((EditText) solo.getView(R.id.usernameET), username);
-        solo.enterText((EditText) solo.getView(R.id.passwordET), password);
-        solo.enterText((EditText) solo.getView(R.id.confirmPassET), confirmPass);
-
-        // Click signup button
-        solo.clickOnButton("SIGNUP");
-
-    }
 
     @Test
     public void testLoginPageShows() {
@@ -204,10 +184,8 @@ public class SignUpAndLoginTest {
 
     @Test
     public void testLoginFieldsEntered() {
-        // Make sure user is signed up
-        signup();
-        solo.waitForFragmentById(R.id.loginFragment, 2000);
-        assertFragmentShown(loginFragment);
+        // Go to login page
+        testLoginPageShows();
 
         // Enter username only
         solo.enterText((EditText) solo.getView(R.id.usernameET), username);
@@ -217,6 +195,7 @@ public class SignUpAndLoginTest {
         assertFragmentShown(loginFragment);
 
         // Enter password only
+        solo.waitForText(username, 1, 2000);
         solo.clearEditText((EditText) solo.getView(R.id.usernameET));
         solo.enterText((EditText) solo.getView(R.id.passwordET), password);
 
@@ -232,6 +211,32 @@ public class SignUpAndLoginTest {
         solo.waitForActivity("MainActivity", 2000);
         solo.assertCurrentActivity("Incorrect activity", MainActivity.class);
 
+    }
+
+    // Logs in user
+    public void login() {
+        testLoginPageShows();
+
+        // Enter fields
+        solo.enterText((EditText) solo.getView(R.id.usernameET), username);
+        solo.enterText((EditText) solo.getView(R.id.passwordET), password);
+
+        // Click login button; MainActivity and its main fragment should be shown
+        solo.clickOnButton("LOGIN");
+        solo.waitForActivity("MainActivity", 2000);
+        solo.assertCurrentActivity("Incorrect activity", MainActivity.class);
+
+    }
+
+    @Test
+    public void testSignout(){
+        login();
+
+        // Test the sign out button
+        solo.clickOnMenuItem("Sign Out");
+
+        // The main login/signup page should be shown
+        assertFragmentShown(mainLoginSignupFragment);
     }
 
 
