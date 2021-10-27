@@ -26,14 +26,18 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.Arrays;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class AddHabitFragment extends Fragment {
 
     private final String TAG = "AddHabitFragment";
+    private final String datePattern = "yyyy-MM-dd";
+
     private Button confirmAddHabitButton;
-    private boolean dayList[] = new boolean[7];
+    private boolean daysList[] = new boolean[7];
     private ChipGroup chipGroup;
     private FragmentAddHabitBinding binding;
 
@@ -72,33 +76,56 @@ public class AddHabitFragment extends Fragment {
     private View.OnClickListener confirmOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //make sure user clicks on confirm button before storing data into firebase
-            final String title = binding.habitTitleET.getText().toString();
-            final String reason = binding.habitReasoningET.getText().toString();
-            Date date = null;       // TODO add date
 
             Habit newHabit = null;
 
-            //parameters to handle the chips in chip group
+            // make sure user clicks on confirm button before storing data into firebase
+            final String title = binding.habitTitleET.getText().toString();
+            final String reason = binding.habitReasoningET.getText().toString();
+            final String dateStr = binding.dateFormatMessage.getText().toString();
+
+            SimpleDateFormat format = new SimpleDateFormat(datePattern);
+            Date date;       // TODO add date
+
+            try {
+                date = format.parse(dateStr);
+            } catch (ParseException e) {
+                // if invalid date or no date is entered, set the date to right now;
+                date = Calendar.getInstance().getTime();
+            }
+
+            // parameters to handle the chips in chip group
             int chipCount = chipGroup.getChildCount();
 
             // If user presses confirm then go through all the chips in the group and
-            // based on if they are selected, update the booleans in dayList to match
+            // based on if they are selected, update the booleans in daysList to match
             for (int i=0; i<chipCount; i++) {
                 Chip chip = (Chip) chipGroup.getChildAt(i);
                 if (chip.isChecked()) {
-                    dayList[i] = true;
+                    daysList[i] = true;
                 }
             }
 
-            newHabit = new Habit(title, reason);        // TODO date
-            storeData(newHabit);
+            newHabit = new Habit(title, reason, date);        // TODO date
+            storeHabitInDb(newHabit);
+
+            int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;   // Starts from index 1, not 0
+            if (daysList[today]) {
+                storeTodayHabitInDb(newHabit);
+            }
         }
     };
 
-    public void storeData(Habit habit){
+    public void storeHabitInDb(Habit habit){
+        mStore.collection("users").document(username).collection("habits")
+                .document(habit.getHabitId())
+                .set(habit);
+    }
 
-        // mStore.collection("users").document();
+    public void storeTodayHabitInDb(Habit habit) {
+        mStore.collection("users").document(username).collection("todayHabits")
+                .document(habit.getHabitId())
+                .set(habit);
     }
 
 
