@@ -79,23 +79,21 @@ public class MainActivity extends AppCompatActivity {
         navView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment selectedFragment = null;
+                NavDirections action = null;
 
                 int id = item.getItemId();
                 if (id == R.id.todays_habits) {
-                    selectedFragment = new TodayHabitFragment();
-                    // NavDirections action = MobileNavigationDirections.actionGlobalTodaysHabits();
+                    action = MobileNavigationDirections.actionGlobalTodaysHabits(null);
                 }
                 if (id == R.id.navigation_timeline) {
-                    selectedFragment = new TimelineFragment();
+                    action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                 }
                 if (id == R.id.navigation_profile) {
-                    selectedFragment = new ProfileFragment();
+                    action = MobileNavigationDirections.actionGlobalNavigationProfile(null);
                 }
-                if (selectedFragment == null) {
-                    throw new RuntimeException("The selected fragment is null!");
-                }
-                getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_container, selectedFragment).commit();
+                assert action != null;
+                navController.navigate(action);
+
                 return true;
             }
         });
@@ -106,7 +104,8 @@ public class MainActivity extends AppCompatActivity {
         addHabitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                navController.navigate(R.id.addHabitFragment);
+                NavDirections action = MobileNavigationDirections.actionGlobalAddHabitFragment(null);
+                navController.navigate(action);
             }
         });
     }
