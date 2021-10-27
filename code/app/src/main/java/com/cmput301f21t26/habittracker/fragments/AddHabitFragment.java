@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
@@ -18,6 +20,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.cmput301f21t26.habittracker.MainActivity;
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
@@ -28,16 +31,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class AddHabitFragment extends Fragment {
 
     private final String TAG = "AddHabitFragment";
     private final String datePattern = "yyyy-MM-dd";
 
+    private NavController navController;
     private Button confirmAddHabitButton;
-    private boolean daysList[] = new boolean[7];
+    private List<Boolean> daysList;
     private ChipGroup chipGroup;
     private FragmentAddHabitBinding binding;
 
@@ -55,6 +62,7 @@ public class AddHabitFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentAddHabitBinding.inflate(inflater, container, false);
 
+        daysList = Arrays.asList(new Boolean[7]);       // init everything to false
         chipGroup = binding.chipGroup;
         confirmAddHabitButton = binding.confirmAddHabitButton;
 
@@ -69,8 +77,9 @@ public class AddHabitFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        confirmAddHabitButton.setOnClickListener(confirmOnClickListener);
+        navController = Navigation.findNavController(view);
 
+        confirmAddHabitButton.setOnClickListener(confirmOnClickListener);
     }
 
     private View.OnClickListener confirmOnClickListener = new View.OnClickListener() {
@@ -101,18 +110,18 @@ public class AddHabitFragment extends Fragment {
             // based on if they are selected, update the booleans in daysList to match
             for (int i=0; i<chipCount; i++) {
                 Chip chip = (Chip) chipGroup.getChildAt(i);
-                if (chip.isChecked()) {
-                    daysList[i] = true;
-                }
+                daysList.set(i, chip.isChecked());
             }
 
-            newHabit = new Habit(title, reason, date);        // TODO date
+            assert daysList.size() == 7;
+            newHabit = new Habit(title, reason, date, daysList);
+
             storeHabitInDb(newHabit);
 
-            int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;   // Starts from index 1, not 0
-            if (daysList[today]) {
-                storeTodayHabitInDb(newHabit);
-            }
+            clearEditTexts();
+
+            NavDirections direction = MobileNavigationDirections.actionGlobalTodaysHabits(null);
+            navController.navigate(direction);      // go to TodayHabitFragment
         }
     };
 
@@ -121,13 +130,6 @@ public class AddHabitFragment extends Fragment {
                 .document(habit.getHabitId())
                 .set(habit);
     }
-
-    public void storeTodayHabitInDb(Habit habit) {
-        mStore.collection("users").document(username).collection("todayHabits")
-                .document(habit.getHabitId())
-                .set(habit);
-    }
-
 
     /**
      * Hides menu items in add habit fragment
@@ -151,5 +153,11 @@ public class AddHabitFragment extends Fragment {
     public void onStop() {
         super.onStop();
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
+    }
+
+    public void clearEditTexts() {
+        binding.habitTitleET.setText("");
+        binding.habitReasoningET.setText("");
+        binding.dateFormatMessage.setText("YYYY-MM-DD");
     }
 }
