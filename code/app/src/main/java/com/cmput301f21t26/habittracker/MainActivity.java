@@ -200,7 +200,10 @@ public class MainActivity extends AppCompatActivity {
     private void signOut() {
         mAuth.signOut();
         Intent intent = new Intent(this, LoginSignupActivity.class);
+        // Make it so user can't press back button to go back to home page
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+        finishAffinity();
     }
 
     /**
