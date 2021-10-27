@@ -44,7 +44,7 @@ public class AddHabitFragment extends Fragment {
 
     private NavController navController;
     private Button confirmAddHabitButton;
-    private List<Boolean> daysList;
+    private ArrayList<Boolean> daysList;
     private ChipGroup chipGroup;
     private FragmentAddHabitBinding binding;
 
@@ -62,7 +62,7 @@ public class AddHabitFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentAddHabitBinding.inflate(inflater, container, false);
 
-        daysList = Arrays.asList(new Boolean[7]);       // init everything to false
+        daysList = new ArrayList<>();       // init everything to false
         chipGroup = binding.chipGroup;
         confirmAddHabitButton = binding.confirmAddHabitButton;
 
@@ -110,7 +110,7 @@ public class AddHabitFragment extends Fragment {
             // based on if they are selected, update the booleans in daysList to match
             for (int i=0; i<chipCount; i++) {
                 Chip chip = (Chip) chipGroup.getChildAt(i);
-                daysList.set(i, chip.isChecked());
+                daysList.add(chip.isChecked());
             }
 
             assert daysList.size() == 7;
