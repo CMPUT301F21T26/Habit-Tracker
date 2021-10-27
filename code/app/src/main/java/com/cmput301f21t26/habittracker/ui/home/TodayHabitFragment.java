@@ -46,7 +46,7 @@ public class TodayHabitFragment extends Fragment {
     private FirebaseFirestore mStore;
 
     private FragmentTodayHabitBinding binding;
-    private ArrayList<Habit> habitList;
+    private ArrayList<Habit> todayHabitList;
     private HabitAdapter habitAdapter;
 
     private RecyclerView mRecyclerView;
@@ -57,6 +57,7 @@ public class TodayHabitFragment extends Fragment {
 
         binding = FragmentTodayHabitBinding.inflate(inflater, container, false);
 
+        todayHabitList = new ArrayList<>();
         mRecyclerView = binding.todayHabitRV;
         mLayoutManager = new LinearLayoutManager(getActivity());
 
@@ -88,14 +89,14 @@ public class TodayHabitFragment extends Fragment {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
 
                                 habit = document.toObject(Habit.class);
-                                habitList.add(habit);
+                                todayHabitList.add(habit);
 
                             }
                         }
-                        //feed habitList to adapter
-                        habitAdapter = new HabitAdapter(habitList);
+                        // feed todayHabitList to the adapter
+                        habitAdapter = new HabitAdapter(todayHabitList);
 
-                        //display today habits
+                        // display today habits
                         mRecyclerView.setLayoutManager(mLayoutManager);
                         mRecyclerView.setAdapter(habitAdapter);
                     } else {
