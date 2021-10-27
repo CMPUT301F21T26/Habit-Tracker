@@ -17,6 +17,7 @@ public class User implements Serializable {
     private String firstName;
     private String lastName;
     private String email;
+    private String picturePath;
     private final Date creationDate;
 
     private final List<String> followings;
@@ -25,11 +26,12 @@ public class User implements Serializable {
     private final List<Habit> todayHabits;
     private final List<Permission> permissions;
 
-    public User(String username, String firstName, String lastName, String email) {
+    public User(String username, String firstName, String lastName, String email, String picturePath) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.picturePath = picturePath;
         this.creationDate = Calendar.getInstance().getTime();
 
         this.followings = new ArrayList<>();
@@ -40,7 +42,7 @@ public class User implements Serializable {
     }
 
     public User() {
-        this("", "", "", "");
+        this("", "", "", "", "");
     }
 
     public String getUid() {
@@ -109,6 +111,14 @@ public class User implements Serializable {
 
     public void addTodayHabit(Habit habit) {
         todayHabits.add(habit);
+    }
+
+    public String getPicturePath() {
+        return picturePath;
+    }
+
+    public void setPicturePath(String picturePath) {
+        this.picturePath = picturePath;
     }
 
     public void changeProfilePic(Uri uri) {

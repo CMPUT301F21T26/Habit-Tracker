@@ -130,6 +130,7 @@
             android:id="@+id/usernameTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="USERNAME"
             android:fontFamily="@font/rubik_bold"
             android:textSize="18sp"
@@ -137,6 +138,21 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/profilePicImageView"
+
+            />
+
+        <TextView
+            android:id="@+id/fullNameTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="FULL NAME"
+            android:fontFamily="@font/rubik"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/usernameTV"
             app:layout_constraintBottom_toBottomOf="@id/usernameBackground"
             />
 
