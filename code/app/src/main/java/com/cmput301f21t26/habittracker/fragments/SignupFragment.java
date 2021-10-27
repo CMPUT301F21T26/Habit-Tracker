@@ -304,6 +304,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
         user.put("lastName", lastName);
         user.put("email", email);
         user.put("username", username);
+        user.put("picturePath", picturePath);
 
         Map<String, Object> habits = new HashMap<>();
         habits.put("habitName", "placeholder");
