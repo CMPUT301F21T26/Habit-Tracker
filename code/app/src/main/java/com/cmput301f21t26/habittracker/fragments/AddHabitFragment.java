@@ -50,7 +50,7 @@ public class AddHabitFragment extends Fragment {
     private ChipGroup chipGroup;
     private FragmentAddHabitBinding binding;
     private SwitchCompat privacySwitch;
-
+    private boolean isPrivate;
     private FirebaseFirestore mStore;
     private FirebaseAuth mAuth;
     private String username;
@@ -69,6 +69,7 @@ public class AddHabitFragment extends Fragment {
         chipGroup = binding.chipGroup;
         confirmAddHabitButton = binding.confirmAddHabitButton;
         privacySwitch = binding.privacySwitch;
+        isPrivate = false;
         mStore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         username = mAuth.getCurrentUser().getDisplayName();
@@ -115,8 +116,11 @@ public class AddHabitFragment extends Fragment {
                 daysList.add(chip.isChecked());
             }
 
+            if(privacySwitch.isChecked()){
+                isPrivate = true;
+            }
             assert daysList.size() == 7;
-            newHabit = new Habit(title, reason, date, daysList);
+            newHabit = new Habit(title, reason, date, daysList, isPrivate);
 
             storeHabitInDb(newHabit);
 
