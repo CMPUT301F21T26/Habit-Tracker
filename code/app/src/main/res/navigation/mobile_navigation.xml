@@ -57,6 +57,9 @@
             android:name="user"
             app:argType="com.cmput301f21t26.habittracker.objects.User"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_viewHabitFragment_to_editHabitFragment"
+            app:destination="@id/editHabitFragment" />
     </fragment>
 
 
@@ -75,6 +78,11 @@
     <action
         android:id="@+id/action_global_navigation_profile"
         app:destination="@id/navigation_profile" />
+    <fragment
+        android:id="@+id/editHabitFragment"
+        android:name="com.cmput301f21t26.habittracker.fragments.EditHabitFragment"
+        android:label="fragment_edit_habit"
+        tools:layout="@layout/fragment_edit_habit" />
 
 
 </navigation>
