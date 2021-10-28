@@ -15,13 +15,16 @@ public class Habit {
     private String reason;
     private Date startDate;
     private boolean isDoneForToday;
+    private boolean isPrivate;
     private ArrayList<HabitEvent> habitEvents;
-    private ArrayList<Boolean> habitPlan = new ArrayList<>();
+    private ArrayList<Boolean> habitPlan;
 
     /**
      * Empty Habit constructor for use with firestore
      */
-    public Habit(){}
+    public Habit() {
+        this("", "", Calendar.getInstance().getTime(), new ArrayList<>());
+    }
 
     /**
      * A default Habit constructor.
@@ -45,6 +48,7 @@ public class Habit {
         this.habitEvents = new ArrayList<>();
         this.habitPlan = habitPlan;     // all init to false
         this.habitId = UUID.randomUUID().toString();
+        this.isPrivate = false;
     }
 
     /**
@@ -185,5 +189,13 @@ public class Habit {
 
     public List<Boolean> getHabitPlan() {
         return habitPlan;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 }
