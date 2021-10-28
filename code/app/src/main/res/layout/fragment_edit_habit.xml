@@ -9,11 +9,12 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="150dp">
+        android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="150dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/habitTitleLayout"
@@ -25,6 +26,8 @@
                 android:layout_marginLeft="36dp"
                 android:layout_marginRight="36dp"
                 android:layout_marginTop="36dp"
+                app:counterEnabled="true"
+                app:counterMaxLength="20"
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -47,13 +50,16 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
                 android:layout_marginVertical="@dimen/activity_vertical_margin"
+                android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
                 android:hint="Reasoning"
+                app:counterEnabled="true"
+                app:counterMaxLength="30"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.496"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/habitTitleLayout"
+                app:layout_constraintBottom_toTopOf="@id/habitProgressBar"
                 app:placeholderText="Reasoning for why the habit is important">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -63,7 +69,7 @@
                     android:ems="10"
                     android:maxLength="30"
                     android:gravity="start|top"
-                    android:inputType="textLongMessage" />
+                    android:inputType="textMultiLine" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -289,8 +295,10 @@
         android:elevation="10dp"
         android:text="Private"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/editHabitButton"
-        app:layout_constraintRight_toRightOf="@id/confirmHabitButton"/>
+        app:layout_constraintEnd_toStartOf="@+id/confirmHabitButton"
+        app:layout_constraintLeft_toLeftOf="@id/deleteHabitButton"
+        app:layout_constraintRight_toRightOf="@id/confirmHabitButton"
+        app:layout_constraintStart_toEndOf="@+id/deleteHabitButton" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
