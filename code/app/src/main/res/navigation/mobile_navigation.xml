@@ -36,6 +36,7 @@
             android:name="user"
             app:argType="com.cmput301f21t26.habittracker.objects.User"
             app:nullable="true" />
+
     </fragment>
     <fragment
         android:id="@+id/addHabitFragment"
@@ -47,9 +48,24 @@
             app:argType="com.cmput301f21t26.habittracker.objects.User"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/viewHabitFragment"
+        android:name="com.cmput301f21t26.habittracker.fragments.ViewHabitFragment"
+        android:label="VIEW HABIT"
+        tools:layout="@layout/fragment_view_habit" >
+        <argument
+            android:name="user"
+            app:argType="com.cmput301f21t26.habittracker.objects.User"
+            app:nullable="true" />
+    </fragment>
+
+
     <action
         android:id="@+id/action_global_addHabitFragment"
         app:destination="@id/addHabitFragment" />
+    <action
+        android:id="@+id/action_global_viewHabitFragment"
+        app:destination="@id/viewHabitFragment" />
     <action
         android:id="@+id/action_global_navigation_timeline"
         app:destination="@id/navigation_timeline" />
@@ -59,4 +75,6 @@
     <action
         android:id="@+id/action_global_navigation_profile"
         app:destination="@id/navigation_profile" />
+
+
 </navigation>
