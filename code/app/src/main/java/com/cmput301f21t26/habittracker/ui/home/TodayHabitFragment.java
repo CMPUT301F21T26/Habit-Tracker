@@ -102,7 +102,13 @@ public class TodayHabitFragment extends Fragment {
                             listener = new HabitAdapter.RecyclerViewClickListener() {
                                 @Override
                                 public void onClick(View view, int position) {
-
+                                    // use position in recycler view to retrieve which habit is clicked
+                                    // pass this string to view habit fragment
+                                    // view habit fragment will use this string to get data from database
+                                    Habit habit = todayHabitList.get(position);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("habitId", habit.getHabitId());
+                                    navController.navigate(R.id.viewHabitFragment, bundle);
                                 }
                             };
                             // feed todayHabitList to the adapter
