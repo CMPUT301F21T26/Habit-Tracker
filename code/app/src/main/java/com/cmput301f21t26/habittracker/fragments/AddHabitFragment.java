@@ -50,7 +50,7 @@ public class AddHabitFragment extends Fragment {
     private NavController navController;
     private Button confirmAddHabitButton;
     private Button chooseDateButton;
-    private ArrayList<Boolean> daysList;
+    private ArrayList<Integer> daysList;
     private ChipGroup chipGroup;
     private FragmentAddHabitBinding binding;
     private SwitchCompat privacySwitch;
@@ -143,13 +143,14 @@ public class AddHabitFragment extends Fragment {
             // based on if they are selected, update the booleans in daysList to match
             for (int i=0; i<chipCount; i++) {
                 Chip chip = (Chip) chipGroup.getChildAt(i);
-                daysList.add(chip.isChecked());
+                if (chip.isChecked()) {
+                    daysList.add(i);
+                }
             }
 
             if(privacySwitch.isChecked()){
                 isPrivate = true;
             }
-            assert daysList.size() == 7;
             newHabit = new Habit(title, reason, date, daysList);
             newHabit.setPrivate(isPrivate);
 
