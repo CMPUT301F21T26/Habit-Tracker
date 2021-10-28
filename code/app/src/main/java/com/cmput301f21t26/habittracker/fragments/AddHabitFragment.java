@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -17,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.cmput301f21t26.habittracker.MainActivity;
@@ -47,6 +49,7 @@ public class AddHabitFragment extends Fragment {
     private ArrayList<Boolean> daysList;
     private ChipGroup chipGroup;
     private FragmentAddHabitBinding binding;
+    private SwitchCompat privacySwitch;
 
     private FirebaseFirestore mStore;
     private FirebaseAuth mAuth;
@@ -65,11 +68,10 @@ public class AddHabitFragment extends Fragment {
         daysList = new ArrayList<>();       // init everything to false
         chipGroup = binding.chipGroup;
         confirmAddHabitButton = binding.confirmAddHabitButton;
-
+        privacySwitch = binding.privacySwitch;
         mStore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         username = mAuth.getCurrentUser().getDisplayName();
-
         return binding.getRoot();
     }
 
