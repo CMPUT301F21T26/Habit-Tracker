@@ -3,6 +3,7 @@ package com.cmput301f21t26.habittracker;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> {
 
     private final ArrayList<Habit> habitList;
+    private int mVisibility = View.VISIBLE;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -38,6 +40,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         public TextView getPlanTV() {
             return planTV;
         }
+
     }
 
     /**
@@ -64,6 +67,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+        // Changes the checkbox visibility depending on mVisibility
+        holder.itemView.findViewById(R.id.habitCheckbox).setVisibility(mVisibility);
 
         Habit habit = habitList.get(position);
 
@@ -80,7 +85,13 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         return habitList.size();
     }
 
-
-
+    /**
+     * Changes the visibility of the check box in the habit item UI
+     * @param visibility
+     *  the visibility (View.VISIBLE, View.INVISIBLE, View.GONE)
+     */
+    public void checkBoxVisibility(int visibility) {
+        mVisibility = visibility;
+    }
 
 }
