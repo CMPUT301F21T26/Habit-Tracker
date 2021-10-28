@@ -146,9 +146,9 @@ public class AddHabitFragment extends Fragment {
                 boolean isPrivate = false;
 
                 // make sure user clicks on confirm button before storing data into firebase
-                final String title = binding.habitTitleET.getText().toString();
-                final String reason = binding.habitReasoningET.getText().toString();
-                final String dateStr = binding.dateFormatMessage.getText().toString();
+                final String title = habitTitleET.getText().toString();
+                final String reason = habitReasoningET.getText().toString();
+                final String dateStr = dateFormatMessageTV.getText().toString();
 
                 SimpleDateFormat format = new SimpleDateFormat(datePattern);
                 Date date;       // TODO add date
@@ -179,9 +179,6 @@ public class AddHabitFragment extends Fragment {
                 newHabit.setPrivate(isPrivate);
 
                 storeHabitInDb(newHabit);
-
-                // Reset all fields for the case when user goes back after adding
-                resetFields();
 
                 // Goes back to previous fragment user was in
                 navController.popBackStack();
@@ -227,8 +224,8 @@ public class AddHabitFragment extends Fragment {
      */
     public boolean checkFieldsFilled() {
         boolean filled = true;
-        final String title = binding.habitTitleET.getText().toString();
-        final String reason = binding.habitReasoningET.getText().toString();
+        final String title = habitTitleET.getText().toString();
+        final String reason = habitReasoningET.getText().toString();
 
         if (title.isEmpty()) {
             habitTitleET.setError("Title cannot be empty");
@@ -255,23 +252,5 @@ public class AddHabitFragment extends Fragment {
 
         return filled;
     }
-
-    /**
-     * Resets all the fields in the add habit fragment
-     */
-    public void resetFields() {
-        binding.habitTitleET.setText("");
-        binding.habitReasoningET.setText("");
-        binding.dateFormatMessage.setText(defaultDate);
-
-        // Reset chip state
-        for (int i=0; i<chipGroup.getChildCount(); i++) {
-            Chip chip = (Chip) chipGroup.getChildAt(i);
-            if (chip.isChecked()) {
-                chip.setChecked(false);
-            }
-        }
-    }
-
 
 }
