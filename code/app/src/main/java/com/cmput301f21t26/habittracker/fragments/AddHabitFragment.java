@@ -28,6 +28,7 @@ import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -38,6 +39,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class AddHabitFragment extends Fragment {
 
@@ -46,6 +48,7 @@ public class AddHabitFragment extends Fragment {
 
     private NavController navController;
     private Button confirmAddHabitButton;
+    private Button chooseDateButton;
     private ArrayList<Boolean> daysList;
     private ChipGroup chipGroup;
     private FragmentAddHabitBinding binding;
@@ -67,6 +70,7 @@ public class AddHabitFragment extends Fragment {
         daysList = new ArrayList<>();       // init everything to false
         chipGroup = binding.chipGroup;
         confirmAddHabitButton = binding.confirmAddHabitButton;
+        chooseDateButton = binding.chooseDateButton;
         privacySwitch = binding.privacySwitch;
         mStore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -80,6 +84,31 @@ public class AddHabitFragment extends Fragment {
 
         navController = Navigation.findNavController(view);
 
+        MaterialDatePicker<Long> datePicker;
+        datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build();
+
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            String selectedDateStr = datePicker.getHeaderText();
+            SimpleDateFormat fromDatePicker = new SimpleDateFormat("MMM dd, yyyy", Locale.ROOT);
+            SimpleDateFormat toUser = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
+            try {
+                String stringDate = toUser.format(fromDatePicker.parse(selectedDateStr));
+                binding.dateFormatMessage.setText(stringDate);
+            } catch (ParseException e) {
+                binding.dateFormatMessage.setText("YYYY-MM-DD");
+            }
+        });
+
+        chooseDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                datePicker.show(requireActivity().getSupportFragmentManager(), "start date");
+            }
+        });
+
         confirmAddHabitButton.setOnClickListener(confirmOnClickListener);
     }
 
@@ -88,12 +117,13 @@ public class AddHabitFragment extends Fragment {
         public void onClick(View view) {
 
             Habit newHabit = null;
+            boolean isPrivate = false;
 
             // make sure user clicks on confirm button before storing data into firebase
             final String title = binding.habitTitleET.getText().toString();
             final String reason = binding.habitReasoningET.getText().toString();
             final String dateStr = binding.dateFormatMessage.getText().toString();
-            boolean isPrivate = false;
+
 
             SimpleDateFormat format = new SimpleDateFormat(datePattern);
             Date date;       // TODO add date
