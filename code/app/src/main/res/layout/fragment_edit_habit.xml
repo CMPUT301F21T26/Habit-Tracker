@@ -32,6 +32,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
+                    android:maxLength="20"
                     android:fontFamily="@font/rubik_bold"
                     android:textSize="20sp"
                     android:gravity="center"
@@ -60,6 +61,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
+                    android:maxLength="30"
                     android:gravity="start|top"
                     android:inputType="textLongMessage" />
 
