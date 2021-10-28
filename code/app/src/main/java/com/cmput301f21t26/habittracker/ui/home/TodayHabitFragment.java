@@ -34,6 +34,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 
 public class TodayHabitFragment extends Fragment {
 
@@ -41,6 +43,7 @@ public class TodayHabitFragment extends Fragment {
     private String username;
     private User user;
     private Habit habit;
+    private int dayToday;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore mStore;
@@ -61,6 +64,7 @@ public class TodayHabitFragment extends Fragment {
         mRecyclerView = binding.todayHabitRV;
         mLayoutManager = new LinearLayoutManager(getActivity());
 
+        dayToday = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;        // Calendar starts the first day as 1, not 0.
         return binding.getRoot();
     }
 
@@ -77,6 +81,7 @@ public class TodayHabitFragment extends Fragment {
         // add each to a list of today habits
         // display in a list
         mStore.collection("users").document(username).collection("habits")
+            .whereArrayContains("daysList", dayToday)
             .get()
             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
