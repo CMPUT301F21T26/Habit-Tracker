@@ -120,6 +120,7 @@ public class ProfileFragment extends Fragment {
 
         }
 
+
         return view;
     }
 
@@ -165,6 +166,12 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Gets the info from the User object and sets
+     * the TextViews accordingly, as well as
+     * setting the profile picture according
+     * the the picturePath given from the User object.
+     */
     private void setFields() {
         // Set fields
         fullNameTV.setText(userObject.getFirstName() + " " + userObject.getLastName());
