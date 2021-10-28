@@ -58,7 +58,6 @@ public class ProfileFragmentHabitsTab extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         todayHabitList = new ArrayList<>();
-        mLayoutManager = new LinearLayoutManager(getActivity());
 
         username = mAuth.getCurrentUser().getDisplayName();
 
@@ -81,20 +80,26 @@ public class ProfileFragmentHabitsTab extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            // Clear list before getting habits ******** meaning everytime we go back to this fragment
+                            // we get the habits from the database every time....is this ideal????
+                            todayHabitList.clear();
                             for (QueryDocumentSnapshot document : task.getResult()){
                                 // each document is retrieved, and if its not the placeholder it converted to a habit
                                 // then it is added to habitList
                                 if (!document.getId().equals("placeholder")){
                                     habit = document.toObject(Habit.class);
-                                    todayHabitList.add(habit);
+                                    // Was creating double habits when clicking habit and going back from view habit fragment...
+                                    // ***** NEEDS A BETTER SOLUTION THIS IS TEMP
+                                    if (!todayHabitList.contains(habit)) {
+                                        todayHabitList.add(habit);
+                                    }
                                 }
                             }
                             // feed todayHabitList to the adapter
                             setOnClickListener();
                             habitAdapter = new HabitAdapter(todayHabitList, listener);
-
                             // display today habits
-                            mRecyclerView.setLayoutManager(mLayoutManager);
+                            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                             mRecyclerView.setAdapter(habitAdapter);
 
                             // Hide checkbox
