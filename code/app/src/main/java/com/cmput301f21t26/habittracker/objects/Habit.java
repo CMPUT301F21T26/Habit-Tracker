@@ -17,7 +17,7 @@ public class Habit {
     private boolean isDoneForToday;
     private boolean isPrivate;
     private ArrayList<HabitEvent> habitEvents;
-    private ArrayList<Boolean> habitPlan;
+    private ArrayList<Integer> daysList;
 
     /**
      * Empty Habit constructor for use with firestore
@@ -34,7 +34,7 @@ public class Habit {
      * @param startDate date when the habit was created
      * @throws IllegalArgumentException if habit title or reason are too long
      */
-    public Habit(String title, String reason, Date startDate, ArrayList<Boolean> habitPlan) throws IllegalArgumentException {
+    public Habit(String title, String reason, Date startDate, ArrayList<Integer> daysList) throws IllegalArgumentException {
         if (title.length() > 20) {
             throw new IllegalArgumentException("Habit title must be up to 20 characters");
         }
@@ -46,7 +46,7 @@ public class Habit {
         this.startDate = startDate;
         this.isDoneForToday = false;
         this.habitEvents = new ArrayList<>();
-        this.habitPlan = habitPlan;     // all init to false
+        this.daysList = daysList;     // all init to false
         this.habitId = UUID.randomUUID().toString();
         this.isPrivate = false;
     }
@@ -180,15 +180,12 @@ public class Habit {
         return habitEvents.size();
     }
 
-    public void setHabitPlan(ArrayList<Boolean> daysList) {
-        assert daysList.size() == 7;
-        for (int i=0; i<daysList.size(); i++) {
-            this.habitPlan.add(daysList.get(i));
-        }
+    public void setDaysList(ArrayList<Integer> daysList) {
+        this.daysList.addAll(daysList);
     }
 
-    public List<Boolean> getHabitPlan() {
-        return habitPlan;
+    public ArrayList<Integer> getDaysList() {
+        return daysList;
     }
 
     public boolean isPrivate() {
