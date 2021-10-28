@@ -45,6 +45,7 @@ public class AddHabitFragment extends Fragment {
 
     private final String TAG = "AddHabitFragment";
     private final String datePattern = "yyyy-MM-dd";
+    private final String defaultDate = "YYYY-MM-DD";
 
     private NavController navController;
     private Button confirmAddHabitButton;
@@ -98,7 +99,7 @@ public class AddHabitFragment extends Fragment {
                 String stringDate = toUser.format(fromDatePicker.parse(selectedDateStr));
                 binding.dateFormatMessage.setText(stringDate);
             } catch (ParseException e) {
-                binding.dateFormatMessage.setText("YYYY-MM-DD");
+                binding.dateFormatMessage.setText(defaultDate);
             }
         });
 
@@ -194,6 +195,6 @@ public class AddHabitFragment extends Fragment {
     public void clearEditTexts() {
         binding.habitTitleET.setText("");
         binding.habitReasoningET.setText("");
-        binding.dateFormatMessage.setText("YYYY-MM-DD");
+        binding.dateFormatMessage.setText(defaultDate);
     }
 }
