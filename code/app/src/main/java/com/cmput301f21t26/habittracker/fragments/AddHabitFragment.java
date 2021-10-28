@@ -50,7 +50,6 @@ public class AddHabitFragment extends Fragment {
     private ChipGroup chipGroup;
     private FragmentAddHabitBinding binding;
     private SwitchCompat privacySwitch;
-    private boolean isPrivate;
     private FirebaseFirestore mStore;
     private FirebaseAuth mAuth;
     private String username;
@@ -69,7 +68,6 @@ public class AddHabitFragment extends Fragment {
         chipGroup = binding.chipGroup;
         confirmAddHabitButton = binding.confirmAddHabitButton;
         privacySwitch = binding.privacySwitch;
-        isPrivate = false;
         mStore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         username = mAuth.getCurrentUser().getDisplayName();
@@ -95,6 +93,7 @@ public class AddHabitFragment extends Fragment {
             final String title = binding.habitTitleET.getText().toString();
             final String reason = binding.habitReasoningET.getText().toString();
             final String dateStr = binding.dateFormatMessage.getText().toString();
+            boolean isPrivate = false;
 
             SimpleDateFormat format = new SimpleDateFormat(datePattern);
             Date date;       // TODO add date
@@ -120,7 +119,8 @@ public class AddHabitFragment extends Fragment {
                 isPrivate = true;
             }
             assert daysList.size() == 7;
-            newHabit = new Habit(title, reason, date, daysList, isPrivate);
+            newHabit = new Habit(title, reason, date, daysList);
+            newHabit.setPrivate(isPrivate);
 
             storeHabitInDb(newHabit);
 

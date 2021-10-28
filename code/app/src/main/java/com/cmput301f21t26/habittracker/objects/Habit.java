@@ -17,12 +17,14 @@ public class Habit {
     private boolean isDoneForToday;
     private boolean isPrivate;
     private ArrayList<HabitEvent> habitEvents;
-    private ArrayList<Boolean> habitPlan = new ArrayList<>();
+    private ArrayList<Boolean> habitPlan;
 
     /**
      * Empty Habit constructor for use with firestore
      */
-    public Habit(){}
+    public Habit() {
+        this("", "", Calendar.getInstance().getTime(), new ArrayList<>());
+    }
 
     /**
      * A default Habit constructor.
@@ -32,7 +34,7 @@ public class Habit {
      * @param startDate date when the habit was created
      * @throws IllegalArgumentException if habit title or reason are too long
      */
-    public Habit(String title, String reason, Date startDate, ArrayList<Boolean> habitPlan, boolean isPrivate) throws IllegalArgumentException {
+    public Habit(String title, String reason, Date startDate, ArrayList<Boolean> habitPlan) throws IllegalArgumentException {
         if (title.length() > 20) {
             throw new IllegalArgumentException("Habit title must be up to 20 characters");
         }
@@ -57,8 +59,8 @@ public class Habit {
      * @param startDate date when the habit was created
      * @throws IllegalArgumentException if habit title or reason are too long
      */
-    public Habit(String title, Date startDate, boolean isPrivate) {
-        this(title, "", startDate, new ArrayList<>(), isPrivate);
+    public Habit(String title, Date startDate) {
+        this(title, "", startDate, new ArrayList<>());
     }
 
     /**
@@ -69,8 +71,8 @@ public class Habit {
      * @param reason reason why the habit is created
      * @throws IllegalArgumentException if habit title or reason are too long
      */
-    public Habit(String title, String reason, boolean isPrivate) {
-        this(title, reason, Calendar.getInstance().getTime(), new ArrayList<>(), isPrivate);
+    public Habit(String title, String reason) {
+        this(title, reason, Calendar.getInstance().getTime(), new ArrayList<>());
     }
 
     /**
@@ -82,8 +84,8 @@ public class Habit {
      * @param title habit title
      * @throws IllegalArgumentException if habit title or reason are too long
      */
-    public Habit(String title, boolean isPrivate) {
-        this(title, "", Calendar.getInstance().getTime(), new ArrayList<>(), isPrivate);
+    public Habit(String title) {
+        this(title, "", Calendar.getInstance().getTime(), new ArrayList<>());
     }
 
     public String getTitle() {
@@ -187,5 +189,13 @@ public class Habit {
 
     public List<Boolean> getHabitPlan() {
         return habitPlan;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 }
