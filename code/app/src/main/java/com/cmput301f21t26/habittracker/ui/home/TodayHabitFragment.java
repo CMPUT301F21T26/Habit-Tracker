@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,6 +53,9 @@ public class TodayHabitFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
+    private HabitAdapter.RecyclerViewClickListener listener;
+
+    private NavController navController;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -72,38 +77,46 @@ public class TodayHabitFragment extends Fragment {
         username = mAuth.getCurrentUser().getDisplayName();
         mStore = FirebaseFirestore.getInstance();
 
+        navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
         // TODO refactor this later
         // get todayHabits subcollection, retrieving all habit documents
         // add each to a list of today habits
         // display in a list
         mStore.collection("users").document(username).collection("habits")
-            .get()
-            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()){
-                            // each document is retrieved, and if its not the placeholder it converted to a habit
-                            // then it is added to habitList
-                            if (!document.getId().equals("placeholder")){
-                                Log.d(TAG, document.getId() + " => " + document.getData());
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()){
+                                // each document is retrieved, and if its not the placeholder it converted to a habit
+                                // then it is added to habitList
+                                if (!document.getId().equals("placeholder")){
+                                    Log.d(TAG, document.getId() + " => " + document.getData());
 
-                                habit = document.toObject(Habit.class);
-                                todayHabitList.add(habit);
+                                    habit = document.toObject(Habit.class);
+                                    todayHabitList.add(habit);
 
+                                }
                             }
-                        }
-                        // feed todayHabitList to the adapter
-                        habitAdapter = new HabitAdapter(todayHabitList);
 
-                        // display today habits
-                        mRecyclerView.setLayoutManager(mLayoutManager);
-                        mRecyclerView.setAdapter(habitAdapter);
-                    } else {
-                        Log.d(TAG, "Error getting documents: ", task.getException());
+                            listener = new HabitAdapter.RecyclerViewClickListener() {
+                                @Override
+                                public void onClick(View view, int position) {
+
+                                }
+                            };
+                            // feed todayHabitList to the adapter
+                            habitAdapter = new HabitAdapter(todayHabitList, listener);
+
+                            // display today habits
+                            mRecyclerView.setLayoutManager(mLayoutManager);
+                            mRecyclerView.setAdapter(habitAdapter);
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
                     }
-                }
-            });
+                });
 
         /*
         // get user object (deprecated)
