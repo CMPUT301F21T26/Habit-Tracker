@@ -17,12 +17,13 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
 
     private final ArrayList<Habit> habitList;
     private int mVisibility = View.VISIBLE;
+    private RecyclerViewClickListener listener;
 
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder)
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final TextView titleTV;
         private final TextView planTV;
 
@@ -31,6 +32,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
 
             titleTV = (TextView) view.findViewById(R.id.habitTitleTV);
             planTV = (TextView) view.findViewById(R.id.habitPlanTV);
+            view.setOnClickListener(this);
         }
 
         public TextView getTitleTV() {
@@ -41,6 +43,10 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
             return planTV;
         }
 
+        @Override
+        public void onClick(View view) {
+            listener.onClick(view, getAdapterPosition());
+        }
     }
 
     /**
@@ -49,8 +55,9 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
      * @param habitList ArrayList<Habit> contains the Habit object to populate views to be
      *                  used by RecyclerView
      */
-    public HabitAdapter(ArrayList<Habit> habitList) {
+    public HabitAdapter(ArrayList<Habit> habitList, RecyclerViewClickListener listener) {
         this.habitList = habitList;
+        this.listener = listener;
     }
 
     // Create new views (invoked by the layout manager)
@@ -92,6 +99,11 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
      */
     public void checkBoxVisibility(int visibility) {
         mVisibility = visibility;
+    }
+
+    // Implementing onClick
+    public interface RecyclerViewClickListener {
+        void onClick(View view, int position);
     }
 
 }
