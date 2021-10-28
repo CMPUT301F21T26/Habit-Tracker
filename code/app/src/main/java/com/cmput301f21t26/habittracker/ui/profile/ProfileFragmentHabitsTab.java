@@ -4,15 +4,23 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.NavHost;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.cmput301f21t26.habittracker.HabitAdapter;
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -35,8 +43,8 @@ public class ProfileFragmentHabitsTab extends Fragment {
     private HabitAdapter habitAdapter;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-
-    private View cardView;
+    private HabitAdapter.RecyclerViewClickListener listener;
+    private NavController navController;
 
     public ProfileFragmentHabitsTab() {
         // Required empty public constructor
@@ -62,8 +70,11 @@ public class ProfileFragmentHabitsTab extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile_habits_tab, container, false);
 
+        NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
+        navController = navHostFragment.getNavController();
         mRecyclerView = view.findViewById(R.id.profileHabitsRecyclerView);
 
+        // Get user's habits and put them into the recycler view
         mStore.collection("users").document(username).collection("habits")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -79,7 +90,8 @@ public class ProfileFragmentHabitsTab extends Fragment {
                                 }
                             }
                             // feed todayHabitList to the adapter
-                            habitAdapter = new HabitAdapter(todayHabitList);
+                            setOnClickListener();
+                            habitAdapter = new HabitAdapter(todayHabitList, listener);
 
                             // display today habits
                             mRecyclerView.setLayoutManager(mLayoutManager);
@@ -87,7 +99,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
 
                             // Hide checkbox
                             habitAdapter.checkBoxVisibility(View.GONE);
-                            habitAdapter.notifyDataSetChanged();
+
 
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -96,5 +108,16 @@ public class ProfileFragmentHabitsTab extends Fragment {
                 });
 
         return view;
+    }
+
+    // When user clicks on item in recycler view, send them to view habit fragment
+    private void setOnClickListener() {
+        listener = new HabitAdapter.RecyclerViewClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                NavDirections action = MobileNavigationDirections.actionGlobalViewHabitFragment(null);
+                navController.navigate(action);
+            }
+        };
     }
 }
