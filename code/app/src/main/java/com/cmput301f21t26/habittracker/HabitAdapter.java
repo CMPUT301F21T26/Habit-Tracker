@@ -1,23 +1,33 @@
 package com.cmput301f21t26.habittracker;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> {
 
+    private final String TAG = "HabitAdapter";
     private final ArrayList<Habit> habitList;
     private int mVisibility = View.VISIBLE;
     private RecyclerViewClickListener listener;
+    private final String userid;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -26,12 +36,14 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final TextView titleTV;
         private final TextView planTV;
+        private final CheckBox doneTodayCB;
 
         public ViewHolder(View view) {
             super(view);
 
             titleTV = (TextView) view.findViewById(R.id.habitTitleTV);
             planTV = (TextView) view.findViewById(R.id.habitPlanTV);
+            doneTodayCB = (CheckBox) view.findViewById(R.id.habitCheckbox);
             view.setOnClickListener(this);
         }
 
@@ -41,6 +53,10 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
 
         public TextView getPlanTV() {
             return planTV;
+        }
+
+        public CheckBox getDoneTodayCB() {
+            return doneTodayCB;
         }
 
         @Override
@@ -55,9 +71,10 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
      * @param habitList ArrayList<Habit> contains the Habit object to populate views to be
      *                  used by RecyclerView
      */
-    public HabitAdapter(ArrayList<Habit> habitList, RecyclerViewClickListener listener) {
+    public HabitAdapter(ArrayList<Habit> habitList, RecyclerViewClickListener listener, String userid) {
         this.habitList = habitList;
         this.listener = listener;
+        this.userid = userid;
     }
 
     // Create new views (invoked by the layout manager)
@@ -80,8 +97,18 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         Habit habit = habitList.get(position);
 
         holder.getTitleTV().setText(habit.getTitle());
-        // TODO update after HabitPlan is implemented
-        holder.getPlanTV().setText("");
+        holder.getPlanTV().setText(getPlanMsg(habit));
+        holder.getDoneTodayCB().setChecked(habit.isDoneForToday());
+        holder.getDoneTodayCB().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
+                habit.setDoneForToday(isChecked);
+                updateDoneTodayInDb(habit, isChecked);
+            }
+        });
+
+
+
 
         // TODO update progress bar
     }
@@ -104,6 +131,62 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     // Implementing onClick
     public interface RecyclerViewClickListener {
         void onClick(View view, int position);
+    }
+
+    private String getPlanMsg(Habit habit) {
+        StringBuilder planMsg = new StringBuilder();
+        for (int i = 0; i < habit.getDaysList().size(); i++) {
+            int day = habit.getDaysList().get(i);
+            if (day == 0) {
+                planMsg.append("Sun, ");
+            }
+            if (day == 1) {
+                planMsg.append("Mon, ");
+            }
+            if (day == 2) {
+                planMsg.append("Tue, ");
+            }
+            if (day == 3) {
+                planMsg.append("Wed, ");
+            }
+            if (day == 4) {
+                planMsg.append("Thu, ");
+            }
+            if (day == 5) {
+                planMsg.append("Fri, ");
+            }
+            if (day == 6) {
+                planMsg.append("Sat, ");
+            }
+        }
+
+        String planMsgStr = planMsg.toString();
+        if (planMsgStr.length() > 0) {
+            planMsgStr = planMsgStr.substring(0, planMsgStr.length() - 2);
+        }
+
+        return planMsgStr;
+    }
+
+    private void updateDoneTodayInDb(Habit habit, boolean isDoneToday) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference habitsRef = db.collection("users").document(userid).collection("habits");
+        int dayToday = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;        // Calendar starts the first day as 1, not 0.
+
+        habitsRef.document(habit.getHabitId())
+                .update("doneForToday", isDoneToday)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Habit doneForToday successfully updated!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating habit doneForToday", e);
+                    }
+                });
     }
 
 }

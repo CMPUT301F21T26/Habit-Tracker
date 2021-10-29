@@ -93,7 +93,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
                             }
                             // feed todayHabitList to the adapter
                             setOnClickListener();
-                            habitAdapter = new HabitAdapter(habitList, listener);
+                            habitAdapter = new HabitAdapter(habitList, listener, username);
                             // display today habits
                             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                             mRecyclerView.setAdapter(habitAdapter);

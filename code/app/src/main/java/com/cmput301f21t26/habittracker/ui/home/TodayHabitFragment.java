@@ -21,8 +21,12 @@ import com.cmput301f21t26.habittracker.databinding.FragmentTodayHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -108,7 +112,7 @@ public class TodayHabitFragment extends Fragment {
                                 }
                             };
                             // feed todayHabitList to the adapter
-                            habitAdapter = new HabitAdapter(todayHabitList, listener);
+                            habitAdapter = new HabitAdapter(todayHabitList, listener, username);
 
                             // display today habits
                             mRecyclerView.setLayoutManager(mLayoutManager);
@@ -145,5 +149,23 @@ public class TodayHabitFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void setDoneForToday(Habit habit, boolean isDone) {
+        CollectionReference habitsRef = mStore.collection("users").document(username).collection("habits");
+        habitsRef.document(habit.getHabitId())
+                .update("doneForToday", isDone)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        habit.setDoneForToday(isDone);      // update locally after updating in db
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating habit", e);
+                    }
+                });
     }
 }
