@@ -3,7 +3,10 @@ package com.cmput301f21t26.habittracker.fragments;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,10 +14,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.cmput301f21t26.habittracker.MainActivity;
 import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
+import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitBinding;
+import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitEventBinding;
+import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,11 +37,22 @@ import com.cmput301f21t26.habittracker.objects.HabitEvent;
 public class EditHabitEventFragment extends Fragment {
 
     private final String TAG = "EditHabitEventFragment";
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore mStore;
+    private String username;
+
+    private FragmentEditHabitEventBinding binding;
+    private Button delBtn;
+    private Button addConfirmBtn;
+
+    private NavController navController;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private Habit habit;
     private HabitEvent hEvent;
 
     // TODO: Rename and change types of parameters
@@ -65,15 +89,36 @@ public class EditHabitEventFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        HabitEvent hEvent = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabitEvent();
-        Log.d(TAG, hEvent.getHabitEventId());
+        mAuth = FirebaseAuth.getInstance();
+        mStore = FirebaseFirestore.getInstance();
+        username = mAuth.getCurrentUser().getDisplayName();
+
+        habit = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabit();
+        hEvent = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabitEvent();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_edit_habit_event, container, false);
+
+        binding = FragmentEditHabitEventBinding.inflate(inflater, container, false);
+
+        delBtn = binding.deleteHabitEventButton;
+        addConfirmBtn = binding.confirmHabitEventButton;
+
+
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        navController = Navigation.findNavController(view);
+
+        delBtn.setOnClickListener(deleteOnClickListener);
+
     }
 
     /**
@@ -99,4 +144,27 @@ public class EditHabitEventFragment extends Fragment {
         super.onStop();
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
+
+    private View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            DocumentReference userRef = mStore.collection("users").document(username);
+            DocumentReference habitRef = userRef.collection("habits").document(habit.getHabitId());
+            habitRef.collection("habitEvents")
+                    .document(hEvent.getHabitEventId())
+                    .delete()
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "Habit event succesfully deleted!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error deleting habit event", e);
+                        }
+                    });
+        }
+    };
 }
