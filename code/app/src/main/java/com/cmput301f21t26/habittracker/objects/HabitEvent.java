@@ -5,15 +5,18 @@ import android.net.Uri;
 
 import androidx.annotation.Nullable;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
-public class HabitEvent {
+public class HabitEvent implements Serializable {
 
     private String comment;
     private Location loc;
     private Uri photoUri;
     private Date hEventDate;
+    private final String habitEventId;
 
     /**
      * Default constructor of HabitEvent
@@ -32,6 +35,7 @@ public class HabitEvent {
         this.loc = loc;
         this.photoUri = photoUri;
         this.hEventDate = hEventDate;
+        this.habitEventId = UUID.randomUUID().toString();
     }
 
     /**
@@ -100,6 +104,10 @@ public class HabitEvent {
 
     public void setHabitEventDate(Date hEventDate) {
         this.hEventDate = hEventDate;
+    }
+
+    public String getHabitEventId() {
+        return habitEventId;
     }
 
 }
