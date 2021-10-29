@@ -60,14 +60,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/habitEventTopLayout">
+
                 <ImageView
                     android:id="@+id/habitEventImage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/default_image"
-                     />
+                    android:scaleType="fitXY"
+                    android:src="@drawable/default_image" />
 
                 <TextView
                     android:id="@+id/habitEventCommentTV"
