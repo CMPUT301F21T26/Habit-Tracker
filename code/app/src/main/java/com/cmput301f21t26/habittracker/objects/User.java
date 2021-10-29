@@ -19,6 +19,7 @@ public class User implements Serializable {
     private String email;
     private String picturePath;
     private final Date creationDate;
+    private Date dateLastAccessed;
 
     private final List<String> followings;
     private final List<String> followers;
@@ -33,6 +34,7 @@ public class User implements Serializable {
         this.email = email;
         this.picturePath = picturePath;
         this.creationDate = Calendar.getInstance().getTime();
+        this.dateLastAccessed = Calendar.getInstance().getTime();
 
         this.followings = new ArrayList<>();
         this.followers = new ArrayList<>();
