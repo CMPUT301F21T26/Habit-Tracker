@@ -86,7 +86,11 @@
     <fragment
         android:id="@+id/editHabitEventFragment"
         android:name="com.cmput301f21t26.habittracker.fragments.EditHabitEventFragment"
-        android:label="EditHabitEventFragment" />
+        android:label="EditHabitEventFragment" >
+        <argument
+            android:name="habitEvent"
+            app:argType="com.cmput301f21t26.habittracker.objects.HabitEvent" />
+    </fragment>
     <action
         android:id="@+id/action_global_editHabitEventFragment"
         app:destination="@id/editHabitEventFragment" />

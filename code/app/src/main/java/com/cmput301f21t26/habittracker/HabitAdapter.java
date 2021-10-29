@@ -17,6 +17,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -35,6 +36,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     private int mVisibility = View.VISIBLE;
     private RecyclerViewClickListener listener;
     private final String userid;
+    private HabitEvent hEvent;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -78,7 +80,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         public void onClick(View view) {
 
             NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_activity_main);
-            @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment();
+            @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent);
+
             navController.navigate(direction);
         }
     }
@@ -126,10 +129,23 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
 
                 if (isChecked) {
 
-                    Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
-                            "Empty habit event is created", Snackbar.LENGTH_SHORT);
-                    snackbar.setAction("EDIT", new OnEditListener());
-                    snackbar.show();
+                    hEvent = new HabitEvent();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    CollectionReference habitsRef = db.collection("users").document(userid).collection("habits");
+
+                    // add empty habit event
+                    habitsRef.document(habit.getHabitId()).collection("habitEvents")
+                            .document(hEvent.getHabitEventId())
+                            .set(hEvent)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
+                                            "Empty habit event is created", Snackbar.LENGTH_SHORT);
+                                    snackbar.setAction("EDIT", new OnEditListener());
+                                    snackbar.show();
+                                }
+                            });
                 }
             }
         });
