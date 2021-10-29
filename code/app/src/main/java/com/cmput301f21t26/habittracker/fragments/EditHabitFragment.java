@@ -20,6 +20,9 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cmput301f21t26.habittracker.MainActivity;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
@@ -33,6 +36,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -46,6 +51,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class EditHabitFragment extends Fragment {
 
@@ -62,6 +68,11 @@ public class EditHabitFragment extends Fragment {
     private NavController navController;
     private FirebaseFirestore mStore;
     private String username;
+    private EditText habitTitleET;
+    private EditText habitReasoningET;
+    private TextView dateFormatMessageTV;
+    private Button chooseDateButton;
+    private SwitchCompat privacySwitch;
 
     private Habit habit;
 
@@ -75,7 +86,7 @@ public class EditHabitFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setHasOptionsMenu(true);
 
     }
 
@@ -94,6 +105,11 @@ public class EditHabitFragment extends Fragment {
         chipGroup = binding.chipGroup;
         confirmHabitButton = binding.confirmHabitButton;
         deleteHabitButton = binding.deleteHabitButton;
+        habitTitleET = binding.habitTitleET;
+        habitReasoningET = binding.habitReasoningET;
+        dateFormatMessageTV = binding.dateFormatMessage;
+        chooseDateButton = binding.chooseDateButton;
+        privacySwitch = binding.privacySwitch;
 
         // Inflate the layout for this fragment
         return binding.getRoot();
@@ -105,6 +121,37 @@ public class EditHabitFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         navController = Navigation.findNavController(view);
+
+        // Build our Date Picker
+        MaterialDatePicker<Long> datePicker;
+        datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build();
+
+        // When date is set
+        datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
+            @Override
+            public void onPositiveButtonClick(Long selection) {
+                SimpleDateFormat toUser = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
+                // Issue with correct timezone
+                // Ref: https://stackoverflow.com/questions/58931051/materialdatepicker-get-selected-dates
+                toUser.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                Date selectedDate = new Date(selection);
+                // Now set our date format message
+                dateFormatMessageTV.setText(toUser.format(selectedDate));
+                Log.d(TAG, "Date is " + selectedDate.toString());
+            }
+        });
+
+        chooseDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                datePicker.show(requireActivity().getSupportFragmentManager(), "start date");
+            }
+        });
+
         assert getArguments() != null;
         String habitId = getArguments().getString("habitId");
         // grabs habit and updates screen with this information
@@ -126,7 +173,8 @@ public class EditHabitFragment extends Fragment {
                             // update DB
                             deleteHabitDB();
                             // leave
-                            navController.navigate(R.id.todays_habits);
+                            navController.popBackStack();
+                            navController.popBackStack();
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -138,10 +186,6 @@ public class EditHabitFragment extends Fragment {
                     .show();
             }
         });
-
-
-
-
 
     }
 
@@ -198,8 +242,8 @@ public class EditHabitFragment extends Fragment {
         Log.d(TAG, "habit is " + habit);
         // habit is retrieved, now populate the View with information
 
-        binding.habitTitleET.setText(habit.getTitle());
-        binding.habitReasoningET.setText(habit.getReason());
+        habitTitleET.setText(habit.getTitle());
+        habitReasoningET.setText(habit.getReason());
 
         //todo set percentage done
 
@@ -207,7 +251,7 @@ public class EditHabitFragment extends Fragment {
         String datePattern = "yyyy-MM-dd";
         SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
         String date = format.format(habit.getStartDate());
-        binding.dateFormatMessage.setText(date);
+        dateFormatMessageTV.setText(date);
 
         //set days of the week
         ArrayList<Integer> chips = habit.getDaysList();
@@ -216,58 +260,64 @@ public class EditHabitFragment extends Fragment {
             chip.setChecked(true);
         }
 
+        // set the privacy switch
+        if (habit.isPrivate()) {
+            privacySwitch.setChecked(habit.isPrivate());
+        }
+
     }
 
     private View.OnClickListener confirmOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            if (checkFieldsFilled()) {
 
-            Habit newHabit = null;
-            boolean isPrivate = false;
+                boolean isPrivate = false;
 
-            // make sure user clicks on confirm button before storing data into firebase
-            final String title = binding.habitTitleET.getText().toString();
-            final String reason = binding.habitReasoningET.getText().toString();
-            final String dateStr = binding.dateFormatMessage.getText().toString();
+                // make sure user clicks on confirm button before storing data into firebase
+                final String title = habitTitleET.getText().toString();
+                final String reason = habitReasoningET.getText().toString();
+                final String dateStr = dateFormatMessageTV.getText().toString();
 
 
-            SimpleDateFormat format = new SimpleDateFormat(datePattern);
-            Date date;       // TODO add date
+                SimpleDateFormat format = new SimpleDateFormat(datePattern);
+                Date date;       // TODO add date
 
-            try {
-                date = format.parse(dateStr);
-            } catch (ParseException e) {
-                // if invalid date or no date is entered, set the date to right now;
-                date = Calendar.getInstance().getTime();
-            }
-
-            // parameters to handle the chips in chip group
-            int chipCount = chipGroup.getChildCount();
-
-            // If user presses confirm then go through all the chips in the group and
-            // based on if they are selected, update the booleans in daysList to match
-            for (int i=0; i<chipCount; i++) {
-                Chip chip = (Chip) chipGroup.getChildAt(i);
-                if (chip.isChecked()) {
-                    daysList.add(i);
+                try {
+                    date = format.parse(dateStr);
+                } catch (ParseException e) {
+                    // if invalid date or no date is entered, set the date to right now;
+                    date = Calendar.getInstance().getTime();
                 }
+
+                // parameters to handle the chips in chip group
+                int chipCount = chipGroup.getChildCount();
+
+                // If user presses confirm then go through all the chips in the group and
+                // based on if they are selected, update the booleans in daysList to match
+                for (int i=0; i<chipCount; i++) {
+                    Chip chip = (Chip) chipGroup.getChildAt(i);
+                    if (chip.isChecked()) {
+                        daysList.add(i);
+                    }
+                }
+
+                Log.d(TAG, "The days list is " + daysList.toString());
+                if(privacySwitch.isChecked()) {
+                    isPrivate = true;
+                }
+                habit.setTitle(title);
+                habit.setDaysList(daysList);
+                habit.setReason(reason);
+                habit.setStartDate(date);
+                habit.setPrivate(isPrivate);
+
+                storeHabitInDb(habit);
+
+                // go to previous fragment user was in
+                navController.popBackStack();       // this goes back to view habit fragment
+                navController.popBackStack();
             }
-
-            /* if(privacySwitch.isChecked()){
-                isPrivate = true;
-            }*/
-            habit.setTitle(title);
-            habit.setDaysList(daysList);
-            habit.setReason(reason);
-            habit.setStartDate(date);
-            //newHabit.setPrivate(isPrivate);
-
-            storeHabitInDb(habit);
-
-            clearEditTexts();
-
-            NavDirections direction = MobileNavigationDirections.actionGlobalTodaysHabits(null);
-            navController.navigate(direction);      // go to TodayHabitFragment
         }
     };
 
@@ -277,12 +327,6 @@ public class EditHabitFragment extends Fragment {
             .set(habit);
     }
 
-    public void clearEditTexts() {
-        binding.habitTitleET.setText("");
-        binding.habitReasoningET.setText("");
-        binding.dateFormatMessage.setText(defaultDate);
-    }
-
     private void deleteHabitDB(){
         //delete the habit, no need to check for subcollections since habit events will be stored in an array
         mStore.collection("users").document(username).collection("habits")
@@ -290,5 +334,38 @@ public class EditHabitFragment extends Fragment {
             .delete();
     }
 
+    /**
+     * Checks all the fields and makes sure
+     * they are not empty (except for choose date)
+     */
+    public boolean checkFieldsFilled() {
+        boolean filled = true;
+        final String title = habitTitleET.getText().toString();
+        final String reason = habitReasoningET.getText().toString();
 
+        if (title.isEmpty()) {
+            habitTitleET.setError("Title cannot be empty");
+            filled = false;
+        }
+        if (reason.isEmpty()) {
+            habitReasoningET.setError("Reasoning cannot be empty");
+            filled = false;
+        }
+
+        // Check if there is any checked chips
+        boolean checked = false;
+        for (int i=0; i<chipGroup.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroup.getChildAt(i);
+            if (chip.isChecked()) {
+                checked = true;
+            }
+        }
+
+        if (!checked) {
+            Toast.makeText(getActivity(), "Must choose at least one day in week for habit to occur!", Toast.LENGTH_LONG).show();
+            filled = false;
+        }
+
+        return filled;
+    }
 }

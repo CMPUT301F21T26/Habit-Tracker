@@ -64,7 +64,7 @@ public class ViewHabitFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setHasOptionsMenu(true);
 
     }
 
@@ -103,7 +103,8 @@ public class ViewHabitFragment extends Fragment {
         confirmHabitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navController.navigate(R.id.todays_habits);
+                // Go back to previous place user was in
+                navController.popBackStack();
             }
         });
         // edit button

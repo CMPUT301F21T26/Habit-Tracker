@@ -181,7 +181,7 @@ public class Habit {
     }
 
     public void setDaysList(ArrayList<Integer> daysList) {
-        this.daysList.addAll(daysList);
+        this.daysList = daysList;
     }
 
     public ArrayList<Integer> getDaysList() {

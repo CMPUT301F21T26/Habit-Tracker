@@ -18,7 +18,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cmput301f21t26.habittracker.MainActivity;
@@ -29,9 +31,11 @@ import com.cmput301f21t26.habittracker.objects.Habit;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,12 +44,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class AddHabitFragment extends Fragment {
 
     private final String TAG = "AddHabitFragment";
     private final String datePattern = "yyyy-MM-dd";
-    private final String defaultDate = "YYYY-MM-DD";
+    private String defaultDate = "YYYY-MM-DD";
 
     private NavController navController;
     private Button confirmAddHabitButton;
@@ -57,6 +62,9 @@ public class AddHabitFragment extends Fragment {
     private FirebaseFirestore mStore;
     private FirebaseAuth mAuth;
     private String username;
+    private TextView dateFormatMessageTV;
+    private EditText habitTitleET;
+    private EditText habitReasoningET;
 
     /**
      * Required empty constructor
@@ -73,9 +81,14 @@ public class AddHabitFragment extends Fragment {
         confirmAddHabitButton = binding.confirmAddHabitButton;
         chooseDateButton = binding.chooseDateButton;
         privacySwitch = binding.privacySwitch;
+        dateFormatMessageTV = binding.dateFormatMessage;
+        habitTitleET = binding.habitTitleET;
+        habitReasoningET = binding.habitReasoningET;
         mStore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         username = mAuth.getCurrentUser().getDisplayName();
+        defaultDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        setHasOptionsMenu(true);
         return binding.getRoot();
     }
 
@@ -84,22 +97,29 @@ public class AddHabitFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         navController = Navigation.findNavController(view);
+        // Set the date format message to the current date
+        dateFormatMessageTV.setText(defaultDate);
 
+        // Build our Date Picker
         MaterialDatePicker<Long> datePicker;
         datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select date")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .build();
 
-        datePicker.addOnPositiveButtonClickListener(selection -> {
-            String selectedDateStr = datePicker.getHeaderText();
-            SimpleDateFormat fromDatePicker = new SimpleDateFormat("MMM dd, yyyy", Locale.ROOT);
-            SimpleDateFormat toUser = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
-            try {
-                String stringDate = toUser.format(fromDatePicker.parse(selectedDateStr));
-                binding.dateFormatMessage.setText(stringDate);
-            } catch (ParseException e) {
-                binding.dateFormatMessage.setText(defaultDate);
+        // When date is set
+        datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
+            @Override
+            public void onPositiveButtonClick(Long selection) {
+                SimpleDateFormat toUser = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
+                // Issue with correct timezone
+                // Ref: https://stackoverflow.com/questions/58931051/materialdatepicker-get-selected-dates
+                toUser.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                Date selectedDate = new Date(selection);
+                // Now set our date format message
+                dateFormatMessageTV.setText(toUser.format(selectedDate));
+                Log.d(TAG, "Date is " + selectedDate.toString());
             }
         });
 
@@ -113,53 +133,58 @@ public class AddHabitFragment extends Fragment {
         confirmAddHabitButton.setOnClickListener(confirmOnClickListener);
     }
 
+    /**
+     * When user clicks the confirm button
+     */
     private View.OnClickListener confirmOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
 
-            Habit newHabit = null;
-            boolean isPrivate = false;
+            if (checkFieldsFilled()) {
 
-            // make sure user clicks on confirm button before storing data into firebase
-            final String title = binding.habitTitleET.getText().toString();
-            final String reason = binding.habitReasoningET.getText().toString();
-            final String dateStr = binding.dateFormatMessage.getText().toString();
+                Habit newHabit = null;
+                boolean isPrivate = false;
 
+                // make sure user clicks on confirm button before storing data into firebase
+                final String title = habitTitleET.getText().toString();
+                final String reason = habitReasoningET.getText().toString();
+                final String dateStr = dateFormatMessageTV.getText().toString();
 
-            SimpleDateFormat format = new SimpleDateFormat(datePattern);
-            Date date;       // TODO add date
+                SimpleDateFormat format = new SimpleDateFormat(datePattern);
+                Date date;       // TODO add date
 
-            try {
-                date = format.parse(dateStr);
-            } catch (ParseException e) {
-                // if invalid date or no date is entered, set the date to right now;
-                date = Calendar.getInstance().getTime();
-            }
-
-            // parameters to handle the chips in chip group
-            int chipCount = chipGroup.getChildCount();
-
-            // If user presses confirm then go through all the chips in the group and
-            // based on if they are selected, update the booleans in daysList to match
-            for (int i=0; i<chipCount; i++) {
-                Chip chip = (Chip) chipGroup.getChildAt(i);
-                if (chip.isChecked()) {
-                    daysList.add(i);
+                try {
+                    date = format.parse(dateStr);
+                } catch (ParseException e) {
+                    // if invalid date or no date is entered, set the date to right now;
+                    date = Calendar.getInstance().getTime();
                 }
+
+                // parameters to handle the chips in chip group
+                int chipCount = chipGroup.getChildCount();
+
+                // If user presses confirm then go through all the chips in the group and
+                // based on if they are selected, update the booleans in daysList to match
+                for (int i=0; i<chipCount; i++) {
+                    Chip chip = (Chip) chipGroup.getChildAt(i);
+                    if (chip.isChecked()) {
+                        daysList.add(i);
+                    }
+                }
+
+                if(privacySwitch.isChecked()){
+                    isPrivate = true;
+                }
+                newHabit = new Habit(title, reason, date, daysList);
+                newHabit.setPrivate(isPrivate);
+
+                storeHabitInDb(newHabit);
+
+                // Goes back to previous fragment user was in
+                navController.popBackStack();
+
             }
 
-            if(privacySwitch.isChecked()){
-                isPrivate = true;
-            }
-            newHabit = new Habit(title, reason, date, daysList);
-            newHabit.setPrivate(isPrivate);
-
-            storeHabitInDb(newHabit);
-
-            clearEditTexts();
-
-            NavDirections direction = MobileNavigationDirections.actionGlobalTodaysHabits(null);
-            navController.navigate(direction);      // go to TodayHabitFragment
         }
     };
 
@@ -193,9 +218,39 @@ public class AddHabitFragment extends Fragment {
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
 
-    public void clearEditTexts() {
-        binding.habitTitleET.setText("");
-        binding.habitReasoningET.setText("");
-        binding.dateFormatMessage.setText(defaultDate);
+    /**
+     * Checks all the fields and makes sure
+     * they are not empty (except for choose date)
+     */
+    public boolean checkFieldsFilled() {
+        boolean filled = true;
+        final String title = habitTitleET.getText().toString();
+        final String reason = habitReasoningET.getText().toString();
+
+        if (title.isEmpty()) {
+            habitTitleET.setError("Title cannot be empty");
+            filled = false;
+        }
+        if (reason.isEmpty()) {
+            habitReasoningET.setError("Reasoning cannot be empty");
+            filled = false;
+        }
+
+        // Check if there is any checked chips
+        boolean checked = false;
+        for (int i=0; i<chipGroup.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroup.getChildAt(i);
+            if (chip.isChecked()) {
+                checked = true;
+            }
+        }
+
+        if (!checked) {
+            Toast.makeText(getActivity(), "Must choose at least one day in week for habit to occur!", Toast.LENGTH_LONG).show();
+            filled = false;
+        }
+
+        return filled;
     }
+
 }
