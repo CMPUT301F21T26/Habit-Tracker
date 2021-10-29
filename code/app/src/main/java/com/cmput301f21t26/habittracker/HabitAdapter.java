@@ -80,8 +80,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         Habit habit = habitList.get(position);
 
         holder.getTitleTV().setText(habit.getTitle());
-        // TODO update after HabitPlan is implemented
-        holder.getPlanTV().setText("");
+        holder.getPlanTV().setText(getPlanMsg(habit));
+
 
         // TODO update progress bar
     }
@@ -105,5 +105,41 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     public interface RecyclerViewClickListener {
         void onClick(View view, int position);
     }
+
+    private String getPlanMsg(Habit habit) {
+        StringBuilder planMsg = new StringBuilder();
+        for (int i = 0; i < habit.getDaysList().size(); i++) {
+            int day = habit.getDaysList().get(i);
+            if (day == 0) {
+                planMsg.append("Sun, ");
+            }
+            if (day == 1) {
+                planMsg.append("Mon, ");
+            }
+            if (day == 2) {
+                planMsg.append("Tue, ");
+            }
+            if (day == 3) {
+                planMsg.append("Wed, ");
+            }
+            if (day == 4) {
+                planMsg.append("Thu, ");
+            }
+            if (day == 5) {
+                planMsg.append("Fri, ");
+            }
+            if (day == 6) {
+                planMsg.append("Sat, ");
+            }
+        }
+
+        String planMsgStr = planMsg.toString();
+        if (planMsgStr.length() > 0) {
+            planMsgStr = planMsgStr.substring(0, planMsgStr.length() - 2);
+        }
+
+        return planMsgStr;
+    }
+
 
 }
