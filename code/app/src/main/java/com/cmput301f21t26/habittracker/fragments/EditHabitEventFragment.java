@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.cmput301f21t26.habittracker.MainActivity;
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
 import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitBinding;
@@ -25,6 +27,7 @@ import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -43,7 +46,8 @@ public class EditHabitEventFragment extends Fragment {
 
     private FragmentEditHabitEventBinding binding;
     private Button delBtn;
-    private Button addConfirmBtn;
+    private Button editConfirmBtn;
+    private TextInputEditText commentET;
 
     private NavController navController;
 
@@ -104,9 +108,8 @@ public class EditHabitEventFragment extends Fragment {
         binding = FragmentEditHabitEventBinding.inflate(inflater, container, false);
 
         delBtn = binding.deleteHabitEventButton;
-        addConfirmBtn = binding.confirmHabitEventButton;
-
-
+        editConfirmBtn = binding.confirmHabitEventButton;
+        commentET = binding.habitEventCommentET;
 
         return binding.getRoot();
     }
@@ -117,6 +120,7 @@ public class EditHabitEventFragment extends Fragment {
 
         navController = Navigation.findNavController(view);
 
+        editConfirmBtn.setOnClickListener(editConfirmOnClickListener);
         delBtn.setOnClickListener(deleteOnClickListener);
 
     }
@@ -145,6 +149,41 @@ public class EditHabitEventFragment extends Fragment {
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
 
+    private View.OnClickListener editConfirmOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            String comment = commentET.getText().toString();
+
+            hEvent.setComment(comment);
+            // TODO get location, photograph from the user
+
+
+            DocumentReference userRef = mStore.collection("users").document(username);
+            DocumentReference habitRef = userRef.collection("habits").document(habit.getHabitId());
+            habitRef.collection("habitEvents")
+                    .document(hEvent.getHabitEventId())
+                    .update(
+                            "comment", comment,
+                            "location", null
+                            // TODO photograph
+                    )
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Log.d(TAG, "Habit event successfully updated!");
+                            NavDirections direction = MobileNavigationDirections.actionGlobalTodaysHabits(null);
+                            navController.navigate(direction);      // navigate to TodayHabitFragment
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error updating habit event", e);
+                        }
+                    });
+        }
+    };
+
     private View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -157,6 +196,8 @@ public class EditHabitEventFragment extends Fragment {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "Habit event succesfully deleted!");
+                            NavDirections direction = MobileNavigationDirections.actionGlobalTodaysHabits(null);
+                            navController.navigate(direction);      // navigate to TodayHabitFragment
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
