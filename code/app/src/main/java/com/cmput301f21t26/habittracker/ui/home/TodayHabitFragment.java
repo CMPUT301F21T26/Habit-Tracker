@@ -112,7 +112,7 @@ public class TodayHabitFragment extends Fragment {
                                 }
                             };
                             // feed todayHabitList to the adapter
-                            habitAdapter = new HabitAdapter(todayHabitList, listener);
+                            habitAdapter = new HabitAdapter(todayHabitList, listener, username);
 
                             // display today habits
                             mRecyclerView.setLayoutManager(mLayoutManager);
