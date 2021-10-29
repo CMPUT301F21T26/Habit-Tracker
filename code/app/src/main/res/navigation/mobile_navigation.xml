@@ -83,6 +83,13 @@
         android:name="com.cmput301f21t26.habittracker.fragments.EditHabitFragment"
         android:label="EDIT HABIT"
         tools:layout="@layout/fragment_edit_habit" />
+    <fragment
+        android:id="@+id/editHabitEventFragment"
+        android:name="com.cmput301f21t26.habittracker.fragments.EditHabitEventFragment"
+        android:label="EditHabitEventFragment" />
+    <action
+        android:id="@+id/action_global_editHabitEventFragment"
+        app:destination="@id/editHabitEventFragment" />
 
 
 </navigation>
