@@ -81,7 +81,7 @@
     <fragment
         android:id="@+id/editHabitFragment"
         android:name="com.cmput301f21t26.habittracker.fragments.EditHabitFragment"
-        android:label="fragment_edit_habit"
+        android:label="EDIT HABIT"
         tools:layout="@layout/fragment_edit_habit" />
 
 

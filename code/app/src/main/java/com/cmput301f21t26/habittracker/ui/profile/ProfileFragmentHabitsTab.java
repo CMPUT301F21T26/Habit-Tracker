@@ -39,7 +39,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
     private FirebaseAuth mAuth;
     private String username;
     private Habit habit;
-    private ArrayList<Habit> todayHabitList;
+    private ArrayList<Habit> habitList;
     private HabitAdapter habitAdapter;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -57,7 +57,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
         mStore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        todayHabitList = new ArrayList<>();
+        habitList = new ArrayList<>();
 
         username = mAuth.getCurrentUser().getDisplayName();
 
@@ -82,22 +82,18 @@ public class ProfileFragmentHabitsTab extends Fragment {
                         if (task.isSuccessful()) {
                             // Clear list before getting habits ******** meaning everytime we go back to this fragment
                             // we get the habits from the database every time....is this ideal????
-                            todayHabitList.clear();
+                            habitList.clear();
                             for (QueryDocumentSnapshot document : task.getResult()){
                                 // each document is retrieved, and if its not the placeholder it converted to a habit
                                 // then it is added to habitList
                                 if (!document.getId().equals("placeholder")){
                                     habit = document.toObject(Habit.class);
-                                    // Was creating double habits when clicking habit and going back from view habit fragment...
-                                    // ***** NEEDS A BETTER SOLUTION THIS IS TEMP
-                                    if (!todayHabitList.contains(habit)) {
-                                        todayHabitList.add(habit);
-                                    }
+                                    habitList.add(habit);
                                 }
                             }
                             // feed todayHabitList to the adapter
                             setOnClickListener();
-                            habitAdapter = new HabitAdapter(todayHabitList, listener);
+                            habitAdapter = new HabitAdapter(habitList, listener);
                             // display today habits
                             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                             mRecyclerView.setAdapter(habitAdapter);
@@ -120,8 +116,11 @@ public class ProfileFragmentHabitsTab extends Fragment {
         listener = new HabitAdapter.RecyclerViewClickListener() {
             @Override
             public void onClick(View view, int position) {
-                NavDirections action = MobileNavigationDirections.actionGlobalViewHabitFragment(null);
-                navController.navigate(action);
+                Log.d(TAG, "Clicked on item at position: " + String.valueOf(position));
+                String habitId = habitList.get(position).getHabitId();
+                Bundle bundle = new Bundle();
+                bundle.putString("habitId", habitId);
+                navController.navigate(R.id.viewHabitFragment, bundle);
             }
         };
     }
