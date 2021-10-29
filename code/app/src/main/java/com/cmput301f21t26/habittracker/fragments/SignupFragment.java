@@ -41,6 +41,7 @@ import com.google.firebase.storage.StorageReference;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -305,6 +306,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
         user.put("email", email);
         user.put("username", username);
         user.put("picturePath", picturePath);
+        user.put("dateLastAccessed", Calendar.getInstance().getTime());
 
         Map<String, Object> habits = new HashMap<>();
         habits.put("habitName", "placeholder");
