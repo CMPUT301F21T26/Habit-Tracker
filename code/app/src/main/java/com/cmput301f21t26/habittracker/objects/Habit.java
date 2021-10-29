@@ -1,5 +1,6 @@
 package com.cmput301f21t26.habittracker.objects;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
-public class Habit {
+public class Habit implements Serializable {
 
     private String habitId;
     private String title;

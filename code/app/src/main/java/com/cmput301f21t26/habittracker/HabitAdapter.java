@@ -1,5 +1,6 @@
 package com.cmput301f21t26.habittracker;
 
+import android.app.Activity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +10,17 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -24,6 +31,7 @@ import java.util.Calendar;
 public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> {
 
     private final String TAG = "HabitAdapter";
+    private final Activity activity;
     private final ArrayList<Habit> habitList;
     private int mVisibility = View.VISIBLE;
     private RecyclerViewClickListener listener;
@@ -71,7 +79,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
      * @param habitList ArrayList<Habit> contains the Habit object to populate views to be
      *                  used by RecyclerView
      */
-    public HabitAdapter(ArrayList<Habit> habitList, RecyclerViewClickListener listener, String userid) {
+    public HabitAdapter(ArrayList<Habit> habitList, Activity activity, RecyclerViewClickListener listener, String userid) {
+        this.activity = activity;
         this.habitList = habitList;
         this.listener = listener;
         this.userid = userid;
@@ -104,6 +113,36 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
             public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
                 habit.setDoneForToday(isChecked);
                 updateDoneTodayInDb(habit, isChecked);
+
+                if (isChecked) {
+
+                    HabitEvent hEvent = new HabitEvent();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    CollectionReference habitsRef = db.collection("users").document(userid).collection("habits");
+
+                    // add empty habit event
+                    habitsRef.document(habit.getHabitId()).collection("habitEvents")
+                            .document(hEvent.getHabitEventId())
+                            .set(hEvent)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+
+                                    Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
+                                            "Empty habit event is created", Snackbar.LENGTH_SHORT);
+                                    snackbar.setAction("EDIT", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_activity_main);
+                                            @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
+
+                                            navController.navigate(direction);
+                                        }
+                                    });
+                                    snackbar.show();
+                                }
+                            });
+                }
             }
         });
 
