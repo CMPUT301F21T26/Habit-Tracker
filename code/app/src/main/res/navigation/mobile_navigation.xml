@@ -106,7 +106,14 @@
     <fragment
         android:id="@+id/viewHabitEventFragment"
         android:name="com.cmput301f21t26.habittracker.fragments.ViewHabitEventFragment"
-        android:label="VIEW HABIT EVENT" />
+        android:label="VIEW HABIT EVENT" >
+        <argument
+            android:name="habitEvent"
+            app:argType="com.cmput301f21t26.habittracker.objects.HabitEvent" />
+        <argument
+            android:name="habit"
+            app:argType="com.cmput301f21t26.habittracker.objects.Habit" />
+    </fragment>
 
 
 </navigation>
