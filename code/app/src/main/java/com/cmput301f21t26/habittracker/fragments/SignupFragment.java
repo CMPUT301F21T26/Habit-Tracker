@@ -38,6 +38,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
     // Make it so the default profile pic is...the default profile pic. So user doesn't have to necessarily choose one.
     private Uri imageUri = Uri.parse("android.resource://com.cmput301f21t26.habittracker/drawable/default_profile_pic");
     private String picturePath = "image/" + imageUri.hashCode() + ".jpeg";
+    private String profileImageUrl;
 
     private NavController navController = null;
 
@@ -305,7 +307,7 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
         user.put("lastName", lastName);
         user.put("email", email);
         user.put("username", username);
-        user.put("picturePath", picturePath);
+        user.put("pictureURL", "");
         user.put("dateLastAccessed", Calendar.getInstance().getTime());
 
         Map<String, Object> habits = new HashMap<>();
@@ -365,6 +367,19 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
                                                                                 mStorageReference = mStorage.getReference(picturePath);
                                                                                 mStorageReference
                                                                                     .putFile(imageUri)
+                                                                                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                                                        @Override
+                                                                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                                                            // If successful, get the download url and store it in pictureURL
+                                                                                            mStorageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                                                                                @Override
+                                                                                                public void onComplete(@NonNull Task<Uri> task) {
+                                                                                                    profileImageUrl = task.getResult().toString();
+                                                                                                    collectionReference.document(username).update("pictureURL", profileImageUrl);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+                                                                                    })
                                                                                     .addOnFailureListener(new OnFailureListener() {
                                                                                         @Override
                                                                                         public void onFailure(@NonNull Exception e) {
