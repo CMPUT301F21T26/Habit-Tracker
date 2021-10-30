@@ -23,13 +23,11 @@
             <LinearLayout
                 android:id="@+id/habitEventTopLayout"
                 android:layout_width="match_parent"
-                android:layout_height="75dp"
-                android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="@dimen/activity_vertical_margin"
-                android:layout_alignParentTop="true">
+                android:layout_margin="@dimen/activity_vertical_margin">
 
                 <TextView
                     android:id="@+id/habitEventTitleTV"
@@ -56,27 +54,29 @@
 
             </LinearLayout>
 
-            <RelativeLayout
+            <ImageView
+                android:id="@+id/habitEventImage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/habitEventTopLayout">
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/default_image"
+                android:layout_below="@id/habitEventTopLayout"/>
 
-                <ImageView
-                    android:id="@+id/habitEventImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/default_image" />
+            <RelativeLayout
+                android:id="@+id/commentLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/habitEventImage"
+                android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+                android:layout_marginVertical="@dimen/activity_horizontal_margin">
 
                 <TextView
                     android:id="@+id/habitEventCommentTV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/habitEventImage"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:padding="@dimen/activity_vertical_margin"
                     android:fontFamily="@font/rubik"
+                    android:paddingHorizontal="@dimen/activity_vertical_margin"
                     android:text="Now listen mate, I need to splash the boots. You know, strain the potatoes. Water the horses. You know, go where the big knobs hang out. Shake hands with the wife’s best friend? Drain the dragon? Siphon the python? Ring the rattlesnake? You know, unbutton the mutton? Like, point Percy at the porcelain?" />
 
             </RelativeLayout>
