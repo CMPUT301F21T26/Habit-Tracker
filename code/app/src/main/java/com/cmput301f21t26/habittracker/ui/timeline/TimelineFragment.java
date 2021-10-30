@@ -1,10 +1,12 @@
 package com.cmput301f21t26.habittracker.ui.timeline;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -14,8 +16,10 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentTimelineBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
@@ -28,8 +32,12 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class TimelineFragment extends Fragment {
     private String TAG = "TimelineFragment";
@@ -39,6 +47,7 @@ public class TimelineFragment extends Fragment {
     private ListView timelineListView;
     private TimelineListAdapter timelineListAdapter;
     private ArrayList<HabitEvent> habitEventsList;
+    private Map<String, Habit> habitEventHabitMap;
     private NavController navController;
 
     private FirebaseAuth mAuth;
@@ -53,12 +62,11 @@ public class TimelineFragment extends Fragment {
         binding = FragmentTimelineBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
-
         mAuth = FirebaseAuth.getInstance();
         username = mAuth.getCurrentUser().getDisplayName();
         mStore = FirebaseFirestore.getInstance();
 
+        habitEventHabitMap = new HashMap<>();
 
         return root;
     }
@@ -76,19 +84,39 @@ public class TimelineFragment extends Fragment {
         readData(new FirestoreCallback() {
             @Override
             public void onCallback(ArrayList<HabitEvent> list) {
+                // Updates the list view with each call back
+                // that adds in a new habit event to the list
                 Log.d(TAG, habitEventsList.toString());
-
                 timelineListAdapter = new TimelineListAdapter(getActivity(), habitEventsList);
                 timelineListView.setAdapter(timelineListAdapter);
             }
         });
 
-        // config ListView
+        timelineListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // Get the habit event from clicked, and its associated habit
+                // to prepare it to be sent to view habit event fragment
+                HabitEvent hEvent = (HabitEvent) adapterView.getItemAtPosition(i);
+                Habit habit = habitEventHabitMap.get(hEvent.getHabitEventId());
 
+                // Navigate to view habit event fragment
+                NavDirections action = MobileNavigationDirections.actionGlobalViewHabitEventFragment(hEvent, habit);
+                navController.navigate(action);
+
+            }
+        });
 
     }
 
-
+    /**
+     * Reads the data from the user and its habit collection and habit
+     * events collection. It then adds each habit's habit events
+     * into the habit events list.
+     *
+     * @param firestoreCallback
+     *  The callback for when readData finishes; This is to deal with asynchronous behaviour.
+     */
     // Ref: https://stackoverflow.com/questions/50650224/wait-until-firestore-data-is-retrieved-to-launch-an-activity/50680352
     // Ref: https://stackoverflow.com/questions/53851955/querying-data-from-firestore-to-arraylist-but-got-nothing
     // https://www.youtube.com/watch?v=0ofkvm97i0s
@@ -100,18 +128,20 @@ public class TimelineFragment extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot habit : task.getResult()) {
-                                String habitID = habit.getString("habitId");
-                                if (habitID != null) {          // for when we inevitably loop to the place holder
-                                    Log.d(TAG, "habitID is " + habitID);
-                                    mStore.collection("users").document(username).collection("habits").document(habitID).collection("habitEvents")
+                                Habit tempHabit = habit.toObject(Habit.class);
+                                if (tempHabit.getHabitId() != null) {          // for when we inevitably loop to the place holder
+                                    Log.d(TAG, "habitID is " + tempHabit.getHabitId());
+                                    mStore.collection("users").document(username).collection("habits").document(tempHabit.getHabitId()).collection("habitEvents")
                                             .get()
                                             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                                     if (task.isSuccessful()) {
                                                         for (QueryDocumentSnapshot habitEvent : task.getResult()) {
-                                                            HabitEvent newHabitEvent = habitEvent.toObject(HabitEvent.class);
-                                                            habitEventsList.add(newHabitEvent);
+                                                            HabitEvent tempHabitEvent = habitEvent.toObject(HabitEvent.class);
+                                                            habitEventsList.add(tempHabitEvent);
+                                                            // Put the habit event's id in a map along with it's associated habit.
+                                                            habitEventHabitMap.put(tempHabitEvent.getHabitEventId(), tempHabit);
                                                         }
                                                         firestoreCallback.onCallback(habitEventsList);
                                                     } else {
@@ -130,6 +160,9 @@ public class TimelineFragment extends Fragment {
         Log.d(TAG, "HabitEventsList AFTER: " + habitEventsList);
     }
 
+    /**
+     * Callback function;
+     */
     private interface FirestoreCallback {
         void onCallback(ArrayList<HabitEvent> list);
     }
