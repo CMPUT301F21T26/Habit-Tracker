@@ -232,7 +232,7 @@ public class ProfileFragment extends Fragment {
 
     /**
      * Sets the profile picture to the image
-     * referenced in the picturePath attribute
+     * referenced in the pictureURL attribute
      * in the user's data in the database.
      */
     private void setProfilePicImageView() {
@@ -297,7 +297,7 @@ public class ProfileFragment extends Fragment {
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // If successful, get the download url and store it in picturePath
+                            // If successful, get the download url and store it in pictureURL
                             mStorageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Uri> task) {
