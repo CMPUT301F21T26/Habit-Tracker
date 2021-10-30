@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.cmput301f21t26.habittracker.MainActivity;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
@@ -32,11 +33,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link EditHabitEventFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class EditHabitEventFragment extends Fragment {
 
     private final String TAG = "EditHabitEventFragment";
@@ -48,50 +47,22 @@ public class EditHabitEventFragment extends Fragment {
     private Button delBtn;
     private Button editConfirmBtn;
     private TextInputEditText commentET;
+    private TextView habitEventDateFormatTV;
+    private TextView habitEventTitleTV;
 
     private NavController navController;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
     private Habit habit;
     private HabitEvent hEvent;
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public EditHabitEventFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment EditHabitEventFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static EditHabitEventFragment newInstance(String param1, String param2) {
-        EditHabitEventFragment fragment = new EditHabitEventFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        setHasOptionsMenu(true);
 
         mAuth = FirebaseAuth.getInstance();
         mStore = FirebaseFirestore.getInstance();
@@ -110,6 +81,8 @@ public class EditHabitEventFragment extends Fragment {
         delBtn = binding.deleteHabitEventButton;
         editConfirmBtn = binding.confirmHabitEventButton;
         commentET = binding.habitEventCommentET;
+        habitEventDateFormatTV = binding.habitEventDateFormatTV;
+        habitEventTitleTV = binding.editHabitEventTitleTV;
 
         return binding.getRoot();
     }
@@ -123,6 +96,14 @@ public class EditHabitEventFragment extends Fragment {
         editConfirmBtn.setOnClickListener(editConfirmOnClickListener);
         delBtn.setOnClickListener(deleteOnClickListener);
 
+        // Get date and set it to TextView
+        String datePattern = "yyyy-MM-dd";
+        SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
+        String habitEventDateFormat = format.format(hEvent.getHabitEventDate());
+        habitEventDateFormatTV.setText(habitEventDateFormat);
+
+        // Temporary...don't know if title should be this.
+        habitEventTitleTV.setText("\"" + habit.getTitle() + "\" was finished on " + habitEventDateFormat );
     }
 
     /**
@@ -171,8 +152,9 @@ public class EditHabitEventFragment extends Fragment {
                         @Override
                         public void onSuccess(Void unused) {
                             Log.d(TAG, "Habit event successfully updated!");
-                            NavDirections direction = MobileNavigationDirections.actionGlobalTodaysHabits(null);
-                            navController.navigate(direction);      // navigate to TodayHabitFragment
+
+                            NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                            navController.navigate(action);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -196,8 +178,9 @@ public class EditHabitEventFragment extends Fragment {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "Habit event succesfully deleted!");
-                            NavDirections direction = MobileNavigationDirections.actionGlobalTodaysHabits(null);
-                            navController.navigate(direction);      // navigate to TodayHabitFragment
+
+                            NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                            navController.navigate(action);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
