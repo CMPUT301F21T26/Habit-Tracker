@@ -123,10 +123,5 @@ public class User implements Serializable {
         this.picturePath = picturePath;
     }
 
-    public void changeProfilePic(Uri uri) {
-        // To be implemented
-    }
-
-
 
 }
