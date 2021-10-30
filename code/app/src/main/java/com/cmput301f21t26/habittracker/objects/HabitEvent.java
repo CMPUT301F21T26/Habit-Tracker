@@ -118,7 +118,7 @@ public class HabitEvent implements Serializable {
         return photoUrl;
     }
 
-    public void setPhotoUri(String photoUrl) {
+    public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
 
