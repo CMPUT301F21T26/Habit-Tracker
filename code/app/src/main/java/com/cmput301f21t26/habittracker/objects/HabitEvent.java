@@ -110,9 +110,11 @@ public class HabitEvent implements Serializable {
         return habitEventId;
     }
 
-    public Uri getImageURI() {
-        return this.photoUri;
+    public Uri getPhotoUri() {
+        return photoUri;
     }
 
-
+    public void setPhotoUri(Uri photoUri) {
+        this.photoUri = photoUri;
+    }
 }
