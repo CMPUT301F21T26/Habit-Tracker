@@ -195,13 +195,7 @@ public class ProfileFragment extends Fragment {
 
                             // set our info into the textViews and profile pic
                             setFields();
-                            // Make sure fragment is added first before setting profile picture
-                            // or possible error occurs
-                            // Ref: https://stackoverflow.com/questions/45388325/you-cannot-start-a-load-on-a-not-yet-attached-view-or-a-fragment-where-getactivi
-                            if (isAdded()) {
-                                setProfilePicImageView();
-                            }
-
+                            setProfilePicImageView();
                         }
                     }
                 });
@@ -239,10 +233,12 @@ public class ProfileFragment extends Fragment {
                             imageUri = uri;
                             // Without Glide there will be bad bitmap error
                             // Ref: https://stackoverflow.com/questions/3681714/bad-bitmap-error-when-setting-uri/58268202
-                            Glide.with(getActivity())       // TODO bug: java.lang.NullPointerException: You cannot start a load on a not yet attached View or a Fragment where getActivity() returns null (which usually occurs when getActivity() is called before the Fragment is attached or after the Fragment is destroyed).
-                                    .load(imageUri)
-                                    .into(profilePic);
-                            Log.d(TAG, "Get profile picture success");
+                            if (getActivity() != null) {
+                                Glide.with(getActivity())
+                                        .load(imageUri)
+                                        .into(profilePic);
+                                Log.d(TAG, "Get profile picture success");
+                            }
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
