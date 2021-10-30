@@ -95,7 +95,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:fontFamily="@font/rubik"
-            android:text="FOLLOWERS"
+            android:text="FOLLOWING"
             android:textColor="@color/green"
             android:textSize="16dp"
             app:layout_constraintBottom_toTopOf="@id/followingNumberTV"
