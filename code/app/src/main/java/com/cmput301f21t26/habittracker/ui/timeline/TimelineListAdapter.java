@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.bumptech.glide.Glide;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
@@ -64,7 +65,9 @@ public class TimelineListAdapter extends BaseAdapter {
         RelativeLayout relativeLayout = (RelativeLayout) convertView.findViewById(R.id.commentLayout);
         LinearLayout linearLayout = (LinearLayout) convertView.findViewById(R.id.habitEventTopLayout);
 
+
         // Assign habit event's attributes to the corresponding views
+        habitEventTitleTV.setText(tempHEvent.getTitle());
         if (tempHEvent.getLocation() == null) {
             locationTV.setText("");
 
@@ -90,7 +93,7 @@ public class TimelineListAdapter extends BaseAdapter {
             habitEventCommentTV.setText(tempHEvent.getComment());
         }
 
-        if (tempHEvent.getPhotoUri() == null) {
+        if (tempHEvent.getPhotoUrl() == null) {
             // If photo DNE then make it transparent and move comment up
             habitEventImageView.setImageResource(R.color.transparent);
             habitEventImageView.setMaxHeight(0);
@@ -106,7 +109,12 @@ public class TimelineListAdapter extends BaseAdapter {
             }
 
         } else {
-            habitEventImageView.setImageURI(tempHEvent.getPhotoUri());
+            if (mContext != null) {
+                Glide.with(mContext)
+                        .load(tempHEvent.getPhotoUrl())
+                        .into(habitEventImageView);
+                Log.d(TAG, "Get image success");
+            }
         }
 
         return convertView;
