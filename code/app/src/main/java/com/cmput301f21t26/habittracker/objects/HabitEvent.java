@@ -14,9 +14,11 @@ public class HabitEvent implements Serializable {
 
     private String comment;
     private Location loc;
-    private Uri photoUri;
+    private String photoUrl;
     private Date hEventDate;
     private final String habitEventId;
+    private String title;
+
 
     /**
      * Default constructor of HabitEvent
@@ -27,15 +29,16 @@ public class HabitEvent implements Serializable {
      * @param hEventDate date at which the event occurred
      * @throws IllegalArgumentException if habit event comment is too long
      */
-    public HabitEvent(String comment, @Nullable Location loc, @Nullable Uri photoUri, Date hEventDate) {
+    public HabitEvent(String comment, @Nullable Location loc, @Nullable Uri photoUri, Date hEventDate, String title) {
         if (comment.length() > 20) {
             throw new IllegalArgumentException("Habit event comment must be up to 20 characters");
         }
         this.comment = comment;
         this.loc = loc;
-        this.photoUri = photoUri;
+        this.photoUrl = photoUrl;
         this.hEventDate = hEventDate;
         this.habitEventId = UUID.randomUUID().toString();
+        this.title = title;
     }
 
     /**
@@ -47,7 +50,7 @@ public class HabitEvent implements Serializable {
      * @throws IllegalArgumentException if habit event comment is too long
      */
     public HabitEvent(String comment, Date hEventDate) {
-        this(comment, null, null, hEventDate);
+        this(comment, null, null, hEventDate, "");
     }
 
     /**
@@ -59,7 +62,7 @@ public class HabitEvent implements Serializable {
      * @throws IllegalArgumentException if habit event comment is too long
      */
     public HabitEvent(String comment) {
-        this(comment, null, null, Calendar.getInstance().getTime());
+        this(comment, null, null, Calendar.getInstance().getTime(), "");
     }
 
     /**
@@ -70,7 +73,7 @@ public class HabitEvent implements Serializable {
      * @throws IllegalArgumentException if habit event comment is too long
      */
     public HabitEvent() {
-        this("", null, null, Calendar.getInstance().getTime());
+        this("", null, null, Calendar.getInstance().getTime(),"");
     }
 
     public String getComment() {
@@ -110,11 +113,19 @@ public class HabitEvent implements Serializable {
         return habitEventId;
     }
 
-    public Uri getPhotoUri() {
-        return photoUri;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setPhotoUri(Uri photoUri) {
-        this.photoUri = photoUri;
+    public void setPhotoUri(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
