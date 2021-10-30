@@ -17,7 +17,7 @@
             android:paddingBottom="150dp">
 
             <TextView
-                android:id="@+id/editHabitEventTitleTV"
+                android:id="@+id/viewHabitEventTitleTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Habit Event Title"
@@ -56,7 +56,7 @@
                 android:textSize="12dp"
                 android:textColor="@color/blue"
 
-                app:layout_constraintTop_toBottomOf="@+id/editHabitEventTitleTV"
+                app:layout_constraintTop_toBottomOf="@+id/viewHabitEventTitleTV"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
