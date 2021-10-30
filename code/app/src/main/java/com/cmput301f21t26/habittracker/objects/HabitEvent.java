@@ -25,11 +25,11 @@ public class HabitEvent implements Serializable {
      *
      * @param comment optional string comment up to 20 characters
      * @param loc optional location information
-     * @param photoUri optional photo uri
+     * @param photoUrl optional photo url, which is obtained from StorageReference.getDownloadUrl();
      * @param hEventDate date at which the event occurred
      * @throws IllegalArgumentException if habit event comment is too long
      */
-    public HabitEvent(String comment, @Nullable Location loc, @Nullable Uri photoUri, Date hEventDate, String title) {
+    public HabitEvent(String comment, @Nullable Location loc, String photoUrl, Date hEventDate, String title) {
         if (comment.length() > 20) {
             throw new IllegalArgumentException("Habit event comment must be up to 20 characters");
         }
@@ -69,6 +69,7 @@ public class HabitEvent implements Serializable {
      * A constructor for creating an empty habit event.
      * The default comment is an empty string, the default location and photo uri are null, and
      * the default habit event date is the time where the constructor is invoked.
+     * The default title is an empty string.
      *
      * @throws IllegalArgumentException if habit event comment is too long
      */
