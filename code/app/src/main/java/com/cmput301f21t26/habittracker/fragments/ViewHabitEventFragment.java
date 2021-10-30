@@ -1,6 +1,7 @@
 package com.cmput301f21t26.habittracker.fragments;
 
 
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -66,8 +67,8 @@ public class ViewHabitEventFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         mStore = FirebaseFirestore.getInstance();
 
-        habit = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabit();
-        hEvent = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabitEvent();
+        habit = ViewHabitEventFragmentArgs.fromBundle(getArguments()).getHabit();
+        hEvent = ViewHabitEventFragmentArgs.fromBundle(getArguments()).getHabitEvent();
 
     }
 
@@ -80,7 +81,7 @@ public class ViewHabitEventFragment extends Fragment {
         // Initiate views
         confirmHabitEventButton = view.findViewById(R.id.confirmHabitEventButton);
         editHabitEventButton = view.findViewById(R.id.editHabitEventButton);
-        habitEventTitleTV = view.findViewById(R.id.habitEventTitleTV);
+        habitEventTitleTV = view.findViewById(R.id.viewHabitEventTitleTV);
         habitEventDateFormatTV = view.findViewById(R.id.habitEventDateFormatTV);
         habitEventCommentET = view.findViewById(R.id.habitEventCommentET);
         habitEventLocationTV = view.findViewById(R.id.habitEventLocationTV);
@@ -113,14 +114,14 @@ public class ViewHabitEventFragment extends Fragment {
             }
         });
 
-        setHabitEventFields();
+        setViewHabitEventFields();
     }
 
     /**
      * Sets all the fields in view habit fragment
      * to the habit event's info
      */
-    private void setHabitEventFields() {
+    private void setViewHabitEventFields() {
 
 
         // Get date and set it to TextView
@@ -130,13 +131,16 @@ public class ViewHabitEventFragment extends Fragment {
         habitEventDateFormatTV.setText(habitEventDateFormat);
 
         // Temporary...don't know if title should be this.
-        habitEventTitleTV.setText("\"" + habit.getTitle() + "\" was finished on " + habitEventDateFormat );
+        habitEventTitleTV.setText(hEvent.getTitle());
 
         habitEventCommentET.setText(hEvent.getComment());
         if (hEvent.getLocation() != null) {
             habitEventLocationTV.setText(hEvent.getLocation().toString());
         }
 
+        if (hEvent.getPhotoUrl() == null) {
+            habitEventImageView.setImageResource(R.color.transparent);
+        }
 
     }
 
