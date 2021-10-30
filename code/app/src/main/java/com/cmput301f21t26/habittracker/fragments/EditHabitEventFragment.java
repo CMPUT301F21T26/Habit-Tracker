@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.cmput301f21t26.habittracker.MainActivity;
@@ -49,6 +50,8 @@ public class EditHabitEventFragment extends Fragment {
     private TextInputEditText commentET;
     private TextView habitEventDateFormatTV;
     private TextView habitEventTitleTV;
+    private TextView habitEventLocationTV;
+    private EditText habitEventCommentET;
 
     private NavController navController;
 
@@ -83,6 +86,8 @@ public class EditHabitEventFragment extends Fragment {
         commentET = binding.habitEventCommentET;
         habitEventDateFormatTV = binding.habitEventDateFormatTV;
         habitEventTitleTV = binding.editHabitEventTitleTV;
+        habitEventCommentET = binding.habitEventCommentET;
+        habitEventLocationTV = binding.habitEventLocationTV;
 
         return binding.getRoot();
     }
@@ -96,6 +101,14 @@ public class EditHabitEventFragment extends Fragment {
         editConfirmBtn.setOnClickListener(editConfirmOnClickListener);
         delBtn.setOnClickListener(deleteOnClickListener);
 
+        setEditHabitEventFields();
+    }
+
+    /**
+     * Sets the fields of the edit habit event fragment views
+     * to the proper values given by the habit event object
+     */
+    private void setEditHabitEventFields() {
         // Get date and set it to TextView
         String datePattern = "yyyy-MM-dd";
         SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
@@ -103,7 +116,17 @@ public class EditHabitEventFragment extends Fragment {
         habitEventDateFormatTV.setText(habitEventDateFormat);
 
         // Temporary...don't know if title should be this.
-        habitEventTitleTV.setText("\"" + habit.getTitle() + "\" was finished on " + habitEventDateFormat );
+        habitEventTitleTV.setText(hEvent.getTitle());
+
+        habitEventCommentET.setText(hEvent.getComment());
+
+        if (hEvent.getLocation() != null) {
+            habitEventLocationTV.setText(hEvent.getLocation().toString());
+        }
+
+        if (hEvent.getPhotoUrl() != null) {
+            // TODO set image view to the image given by habit event
+        }
     }
 
     /**
