@@ -24,7 +24,7 @@ public class MainLoginSignupFragment extends Fragment {
     private NavController navController;
     private FragmentMainLoginSignupBinding binding;
 
-    private View.OnClickListener loginOnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener loginOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             NavDirections direction = MainLoginSignupFragmentDirections.actionMainLoginSignupFragmentToLoginFragment();
@@ -32,7 +32,7 @@ public class MainLoginSignupFragment extends Fragment {
         }
     };
 
-    private View.OnClickListener signUpOnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener signUpOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             NavDirections direction = MainLoginSignupFragmentDirections.actionMainLoginSignupFragmentToSignupFragment();
@@ -47,7 +47,6 @@ public class MainLoginSignupFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
