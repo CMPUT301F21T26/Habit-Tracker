@@ -53,7 +53,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Contains the logic for the Signup Fragment.
  * Validates input and attempts to create account with the entered fields.
  */
-public class SignupFragment extends Fragment implements  View.OnClickListener{
+public class SignupFragment extends Fragment {
     final private String TAG = "signupAuthentication";
     private EditText firstNameET;
     private EditText lastNameET;
@@ -74,6 +74,22 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
     private String profileImageUrl;
 
     private NavController navController = null;
+
+    private final View.OnClickListener signupConfirmOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (!creatingUser && checkFieldsFilled()) {
+                createUser();
+            }
+        }
+    };
+
+    private final View.OnClickListener setProfileOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            mGetContent.launch("image/*");      // Launch file explorer
+        }
+    };
 
     /**
      * Required empty public constructor
@@ -154,42 +170,11 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
         passwordET = view.findViewById(R.id.passwordET);
         confirmPassET = view.findViewById(R.id.confirmPassET);
         signupConfirmButton = view.findViewById(R.id.signUpConfirmButton);
-        signupConfirmButton.setOnClickListener(this);
+        signupConfirmButton.setOnClickListener(signupConfirmOnClickListener);
         setProfilePic = view.findViewById(R.id.circleImageView);
-        setProfilePic.setOnClickListener(this);
+        setProfilePic.setOnClickListener(setProfileOnClickListener);
 
         navController = Navigation.findNavController(view);
-    }
-
-    /**
-     * Whenever user clicks an element that have OnClickListener, this checks which
-     * element has been clicked and does its corresponding function.
-     *
-     *
-     * @param view
-     *  The current view.
-     */
-    @Override
-    public void onClick(View view) {
-        if(view != null) {
-            // User clicks the signupConfirmButton
-            if (view.getId() == R.id.signUpConfirmButton) {
-                // Make sure there currently isn't a user being created..prevents user from spamming signup button
-                if (!creatingUser) {
-                    // Check if the fields are filled in
-                    if (checkFieldsFilled()) {
-                        createUser();
-                    }
-                } else {
-                    Toast.makeText(getActivity(), "Currently creating user...", Toast.LENGTH_LONG).show();
-                }
-
-            }
-            // User clicks circle image view
-            else if (view.getId() == R.id.circleImageView) {          // If the circle image view is clicked
-                mGetContent.launch("image/*");                    // Launch file explorer
-            }
-        }
     }
 
     /**
