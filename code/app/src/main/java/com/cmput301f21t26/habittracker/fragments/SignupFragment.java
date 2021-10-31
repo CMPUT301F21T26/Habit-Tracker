@@ -185,24 +185,21 @@ public class SignupFragment extends Fragment {
         DocumentReference ref = mStore.collection("users").document(username);
 
         ref.get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            assert document != null;
-                            if (document.exists()) {
-                                // Username exists
-                                usernameET.setError("Username already exists");
-                            } else {
-                                // Username does not exist.
-                                createUserFirebaseAuth(firstName, lastName, email, username, password);
-                                creatingUser = true;
-                                Toast.makeText(getActivity(), "Creating user, please wait a moment", Toast.LENGTH_LONG).show();
-                            }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        assert document != null;
+                        if (document.exists()) {
+                            // Username exists
+                            usernameET.setError("Username already exists");
                         } else {
-                            Log.d(TAG, "Fetching username failed with: ", task.getException());
+                            // Username does not exist.
+                            createUserFirebaseAuth(firstName, lastName, email, username, password);
+                            creatingUser = true;
+                            Toast.makeText(getActivity(), "Creating user, please wait a moment", Toast.LENGTH_LONG).show();
                         }
+                    } else {
+                        Log.d(TAG, "Fetching username failed with: ", task.getException());
                     }
                 });
     }
@@ -224,27 +221,24 @@ public class SignupFragment extends Fragment {
      */
     public void createUserFirebaseAuth(final String firstName, final String lastName, final String email, final String username, final String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "Creation of User with email successful.");
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Creation of User with email successful.");
 
-                            // Set Display Name of user in Firebase Authentication so we can get it in MainActivity
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            if (user != null) {
-                                UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
-                                        .setDisplayName(username).build();
-                                user.updateProfile(profileUpdate);
-                            }
-
-                            // User created in Firebase Authentication, now to add its data into Firestore database
-                            createUserFirebaseFirestore(firstName, lastName, email, username);
-                        } else {
-                            Log.w(TAG, "Creation of User with email failed. " + task.getException().getMessage());
-                            Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                            creatingUser = false;
+                        // Set Display Name of user in Firebase Authentication so we can get it in MainActivity
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(username).build();
+                            user.updateProfile(profileUpdate);
                         }
+
+                        // User created in Firebase Authentication, now to add its data into Firestore database
+                        createUserFirebaseFirestore(firstName, lastName, email, username);
+                    } else {
+                        Log.w(TAG, "Creation of User with email failed. " + task.getException().getMessage());
+                        Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        creatingUser = false;
                     }
                 });
     }
