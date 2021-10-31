@@ -27,12 +27,12 @@ public class User implements Serializable {
     private final List<Habit> todayHabits;
     private final List<Permission> permissions;
 
-    public User(String username, String firstName, String lastName, String email, String pictureURL) {
+    public User(String username, String firstName, String lastName, String email) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.pictureURL = pictureURL;
+        this.pictureURL = null;
         this.creationDate = Calendar.getInstance().getTime();
         this.dateLastAccessed = Calendar.getInstance().getTime();
 
@@ -44,7 +44,7 @@ public class User implements Serializable {
     }
 
     public User() {
-        this("", "", "", "", "");
+        this("", "", "", "");
     }
 
     public String getUid() {
