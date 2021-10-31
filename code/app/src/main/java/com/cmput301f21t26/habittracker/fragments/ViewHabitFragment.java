@@ -118,10 +118,6 @@ public class ViewHabitFragment extends Fragment {
             }
         });
 
-
-
-
-
     }
 
     /**

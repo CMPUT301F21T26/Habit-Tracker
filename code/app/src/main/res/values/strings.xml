@@ -3,4 +3,5 @@
     <string name="title_timeline">TIMELINE</string>
     <string name="title_profile">PROFILE</string>
     <string name="todays_habits">TODAY\'S HABITS</string>
+    <string name="habit_event_title">\"%s\" was finished on %s</string>
 </resources>

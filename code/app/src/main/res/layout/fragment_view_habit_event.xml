@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.ViewHabitFragment">
+    tools:context=".fragments.ViewHabitEventFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:paddingBottom="150dp">
 
             <TextView
-                android:id="@+id/editHabitEventTitleTV"
+                android:id="@+id/viewHabitEventTitleTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Habit Event Title"
@@ -56,7 +56,7 @@
                 android:textSize="12dp"
                 android:textColor="@color/blue"
 
-                app:layout_constraintTop_toBottomOf="@+id/editHabitEventTitleTV"
+                app:layout_constraintTop_toBottomOf="@+id/viewHabitEventTitleTV"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -169,7 +169,7 @@
     </ScrollView>
 
     <Button
-        android:id="@+id/confirmHabitButton"
+        android:id="@+id/confirmHabitEventButton"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginEnd="36dp"
@@ -183,7 +183,7 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
-        android:id="@+id/editHabitButton"
+        android:id="@+id/editHabitEventButton"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginStart="36dp"

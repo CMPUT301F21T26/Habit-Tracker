@@ -1,6 +1,8 @@
 package com.cmput301f21t26.habittracker;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,8 +27,10 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> {
 
@@ -36,6 +40,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     private int mVisibility = View.VISIBLE;
     private RecyclerViewClickListener listener;
     private final String userid;
+    private Context mContext;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -94,6 +99,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.habit_content, parent, false);
 
+        // Set context
+        mContext = parent.getContext();
         return new ViewHolder(view);
     }
 
@@ -119,6 +126,13 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                     HabitEvent hEvent = new HabitEvent();
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     CollectionReference habitsRef = db.collection("users").document(userid).collection("habits");
+
+                    // Get the date for use in title
+                    String datePattern = "yyyy-MM-dd";
+                    SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
+                    String habitEventDateFormat = format.format(hEvent.getHabitEventDate());
+                    // Set the title of the habit event
+                    hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
 
                     // add empty habit event
                     habitsRef.document(habit.getHabitId()).collection("habitEvents")

@@ -14,28 +14,31 @@ public class HabitEvent implements Serializable {
 
     private String comment;
     private Location loc;
-    private Uri photoUri;
+    private String photoUrl;
     private Date hEventDate;
     private final String habitEventId;
+    private String title;
+
 
     /**
      * Default constructor of HabitEvent
      *
      * @param comment optional string comment up to 20 characters
      * @param loc optional location information
-     * @param photoUri optional photo uri
+     * @param photoUrl optional photo url, which is obtained from StorageReference.getDownloadUrl();
      * @param hEventDate date at which the event occurred
      * @throws IllegalArgumentException if habit event comment is too long
      */
-    public HabitEvent(String comment, @Nullable Location loc, @Nullable Uri photoUri, Date hEventDate) {
+    public HabitEvent(String comment, @Nullable Location loc, String photoUrl, Date hEventDate, String title) {
         if (comment.length() > 20) {
             throw new IllegalArgumentException("Habit event comment must be up to 20 characters");
         }
         this.comment = comment;
         this.loc = loc;
-        this.photoUri = photoUri;
+        this.photoUrl = photoUrl;
         this.hEventDate = hEventDate;
         this.habitEventId = UUID.randomUUID().toString();
+        this.title = title;
     }
 
     /**
@@ -47,7 +50,7 @@ public class HabitEvent implements Serializable {
      * @throws IllegalArgumentException if habit event comment is too long
      */
     public HabitEvent(String comment, Date hEventDate) {
-        this(comment, null, null, hEventDate);
+        this(comment, null, null, hEventDate, "");
     }
 
     /**
@@ -59,18 +62,19 @@ public class HabitEvent implements Serializable {
      * @throws IllegalArgumentException if habit event comment is too long
      */
     public HabitEvent(String comment) {
-        this(comment, null, null, Calendar.getInstance().getTime());
+        this(comment, null, null, Calendar.getInstance().getTime(), "");
     }
 
     /**
      * A constructor for creating an empty habit event.
      * The default comment is an empty string, the default location and photo uri are null, and
      * the default habit event date is the time where the constructor is invoked.
+     * The default title is an empty string.
      *
      * @throws IllegalArgumentException if habit event comment is too long
      */
     public HabitEvent() {
-        this("", null, null, Calendar.getInstance().getTime());
+        this("", null, null, Calendar.getInstance().getTime(),"");
     }
 
     public String getComment() {
@@ -110,4 +114,19 @@ public class HabitEvent implements Serializable {
         return habitEventId;
     }
 
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 }

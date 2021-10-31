@@ -25,17 +25,24 @@ import com.bumptech.glide.Glide;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
 import com.cmput301f21t26.habittracker.objects.User;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.util.Collection;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -54,6 +61,7 @@ public class ProfileFragment extends Fragment {
     private Uri imageUri;
     private Uri newImageUri;
     private String picturePath;
+    private String profileImageUrl;
     private User userObject;
     private User otherUser = null;
 
@@ -61,6 +69,8 @@ public class ProfileFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseStorage mStorage;
     private StorageReference mStorageReference;
+    private CollectionReference collectionReference;
+    private DocumentReference documentReference;
 
 
 
@@ -92,6 +102,7 @@ public class ProfileFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         mStorage = FirebaseStorage.getInstance();
 
+
         // Initiate views
         tabLayout = view.findViewById(R.id.tabLayout);
         viewPager = view.findViewById(R.id.viewPager);
@@ -104,10 +115,13 @@ public class ProfileFragment extends Fragment {
         // Get the user's username and sets the rest of the info
         // As well as getting the user object
         FirebaseUser user = mAuth.getCurrentUser();
+        String username = mAuth.getCurrentUser().getDisplayName();
         if (user != null) {
-            final String username = mAuth.getCurrentUser().getDisplayName();
             getUserObject(username);
         }
+
+        collectionReference = mStore.collection("users");
+        documentReference = collectionReference.document(username);
 
         return view;
     }
@@ -195,13 +209,7 @@ public class ProfileFragment extends Fragment {
 
                             // set our info into the textViews and profile pic
                             setFields();
-                            // Make sure fragment is added first before setting profile picture
-                            // or possible error occurs
-                            // Ref: https://stackoverflow.com/questions/45388325/you-cannot-start-a-load-on-a-not-yet-attached-view-or-a-fragment-where-getactivi
-                            if (isAdded()) {
-                                setProfilePicImageView();
-                            }
-
+                            setProfilePicImageView();
                         }
                     }
                 });
@@ -224,56 +232,29 @@ public class ProfileFragment extends Fragment {
 
     /**
      * Sets the profile picture to the image
-     * referenced in the picturePath attribute
+     * referenced in the pictureURL attribute
      * in the user's data in the database.
      */
     private void setProfilePicImageView() {
         // Set the profile picture
-        picturePath = userObject.getPicturePath();
-        if (picturePath != null) {
-            mStorageReference = mStorage.getReference(picturePath);
-            mStorageReference.getDownloadUrl()
-                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            imageUri = uri;
-                            // Without Glide there will be bad bitmap error
-                            // Ref: https://stackoverflow.com/questions/3681714/bad-bitmap-error-when-setting-uri/58268202
-                            Glide.with(getActivity())       // TODO bug: java.lang.NullPointerException: You cannot start a load on a not yet attached View or a Fragment where getActivity() returns null (which usually occurs when getActivity() is called before the Fragment is attached or after the Fragment is destroyed).
-                                    .load(imageUri)
-                                    .into(profilePic);
-                            Log.d(TAG, "Get profile picture success");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "Failed to get profile picture");
-                        }
-                    });
-
+        profileImageUrl = userObject.getPictureURL();
+        if (profileImageUrl != null) {
+            // Without Glide there will be bad bitmap error
+            // Ref: https://stackoverflow.com/questions/3681714/bad-bitmap-error-when-setting-uri/58268202
+            if (getActivity() != null) {
+                Glide.with(getActivity())
+                        .load(profileImageUrl)
+                        .into(profilePic);
+                Log.d(TAG, "Get profile picture success");
+            }
         } else {
             // if for whatever reason the picture path is null
             // make the profile picture the default one
             imageUri = Uri.parse("android.resource://com.cmput301f21t26.habittracker/drawable/default_profile_pic");
-            String picturePath = "image/" + imageUri.hashCode() + ".jpeg";
-
-            // Set user picturePath in database to local picturePath (the default picture)
-            userObject.setPicturePath(picturePath);
-            mStore.collection("users")
-                    .document(userObject.getUsername())
-                    .update("picturePath", picturePath);
+            picturePath = "image/" + imageUri.hashCode() + ".jpeg";
 
             // Store default profile picture in storage
-            mStorageReference = mStorage.getReference(picturePath);
-            mStorageReference
-                    .putFile(imageUri)
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "Default profile pic was not stored");
-                        }
-                    });
+            changeProfilePic();
         }
     }
 
@@ -292,25 +273,48 @@ public class ProfileFragment extends Fragment {
                     // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
                     if (uri != null) {
                         newImageUri = uri;
-                        changeProfilePic();
+                        if (newImageUri != imageUri && newImageUri != null) {
+                            picturePath = "image/" + newImageUri.hashCode() + ".jpeg";
+                            profilePic.setImageURI(newImageUri);
+                            imageUri = newImageUri;
+                            changeProfilePic();
+                        }
+
                     }
                 }
             });
 
     /**
      * Changes the profile picture in profile and
-     * changes the picturePath in the database for
+     * changes the pictureURL in the database for
      * the current user.
      */
     private void changeProfilePic() {
 
-        if (newImageUri != imageUri && newImageUri != null) {
-            picturePath = "image/" + newImageUri.hashCode() + ".jpeg";
-            profilePic.setImageURI(newImageUri);
-            mStore.collection("users").document(userObject.getUsername()).update("picturePath",picturePath);
-        }
-
+            mStorageReference = mStorage.getReference(picturePath);
+            mStorageReference
+                    .putFile(imageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // If successful, get the download url and store it in pictureURL
+                            mStorageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    profileImageUrl = task.getResult().toString();
+                                    documentReference.update("pictureURL", profileImageUrl);
+                                }
+                            });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "Default profile pic was not stored");
+                        }
+                    });
     }
+
 
     @Override
     public void onDestroyView() {

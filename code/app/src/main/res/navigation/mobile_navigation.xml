@@ -86,7 +86,7 @@
     <fragment
         android:id="@+id/editHabitEventFragment"
         android:name="com.cmput301f21t26.habittracker.fragments.EditHabitEventFragment"
-        android:label="EditHabitEventFragment" >
+        android:label="EDIT HABIT EVENT" >
         <argument
             android:name="habitEvent"
             app:argType="com.cmput301f21t26.habittracker.objects.HabitEvent" />
@@ -97,6 +97,23 @@
     <action
         android:id="@+id/action_global_editHabitEventFragment"
         app:destination="@id/editHabitEventFragment" />
+    <action
+        android:id="@+id/action_global_viewHabitEventFragment"
+        app:destination="@id/viewHabitEventFragment" />
+    <action
+        android:id="@+id/action_global_timelineFragment"
+        app:destination="@id/navigation_timeline" />
+    <fragment
+        android:id="@+id/viewHabitEventFragment"
+        android:name="com.cmput301f21t26.habittracker.fragments.ViewHabitEventFragment"
+        android:label="VIEW HABIT EVENT" >
+        <argument
+            android:name="habitEvent"
+            app:argType="com.cmput301f21t26.habittracker.objects.HabitEvent" />
+        <argument
+            android:name="habit"
+            app:argType="com.cmput301f21t26.habittracker.objects.Habit" />
+    </fragment>
 
 
 </navigation>

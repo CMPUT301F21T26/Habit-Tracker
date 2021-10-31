@@ -17,7 +17,7 @@ public class User implements Serializable {
     private String firstName;
     private String lastName;
     private String email;
-    private String picturePath;
+    private String pictureURL;
     private final Date creationDate;
     private Date dateLastAccessed;
 
@@ -27,12 +27,12 @@ public class User implements Serializable {
     private final List<Habit> todayHabits;
     private final List<Permission> permissions;
 
-    public User(String username, String firstName, String lastName, String email, String picturePath) {
+    public User(String username, String firstName, String lastName, String email, String pictureURL) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.picturePath = picturePath;
+        this.pictureURL = pictureURL;
         this.creationDate = Calendar.getInstance().getTime();
         this.dateLastAccessed = Calendar.getInstance().getTime();
 
@@ -115,18 +115,11 @@ public class User implements Serializable {
         todayHabits.add(habit);
     }
 
-    public String getPicturePath() {
-        return picturePath;
+    public String getPictureURL() {
+        return pictureURL;
     }
 
-    public void setPicturePath(String picturePath) {
-        this.picturePath = picturePath;
+    public void setPictureURL(String pictureURL) {
+        this.pictureURL = pictureURL;
     }
-
-    public void changeProfilePic(Uri uri) {
-        // To be implemented
-    }
-
-
-
 }
