@@ -2,6 +2,13 @@ package com.cmput301f21t26.habittracker.fragments;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -12,20 +19,11 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-
 import com.cmput301f21t26.habittracker.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -37,11 +35,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -236,7 +233,7 @@ public class SignupFragment extends Fragment {
                         // User created in Firebase Authentication, now to add its data into Firestore database
                         createUserFirebaseFirestore(firstName, lastName, email, username);
                     } else {
-                        Log.w(TAG, "Creation of User with email failed. " + task.getException().getMessage());
+                        Log.w(TAG, "Creation of User with email failed. " + Objects.requireNonNull(task.getException()).getMessage());
                         Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         creatingUser = false;
                     }
@@ -295,46 +292,29 @@ public class SignupFragment extends Fragment {
         usersRef
                 .document(username)
                 .set(user)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Log.d(TAG, "Data added succesfully");
-                        // Notify user that account was created successfully
-                        Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
-                        // Go to login fragment once data has been added
-                        navController.navigate(R.id.action_signupFragment_to_loginFragment);
-                        creatingUser = false;
+                .addOnSuccessListener(unused -> {
+                    Log.d(TAG, "Data added succesfully");
+                    // Notify user that account was created successfully
+                    Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
+                    // Go to login fragment once data has been added
+                    navController.navigate(R.id.action_signupFragment_to_loginFragment);
+                    creatingUser = false;
 
-                        mStorageReference = mStorage.getReference(picturePath);
-                        mStorageReference
-                                .putFile(imageUri)
-                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        // If successful, get the download url and store it in pictureURL
-                                        mStorageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Uri> task) {
-                                                profileImageUrl = task.getResult().toString();
-                                                usersRef.document(username).update("pictureURL", profileImageUrl);
-                                            }
-                                        });
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.d(TAG, "Default profile pic was not stored");
-                                    }
+                    mStorageReference = mStorage.getReference(picturePath);
+                    mStorageReference
+                            .putFile(imageUri)
+                            .addOnSuccessListener(taskSnapshot -> {
+                                // If successful, get the download url and store it in pictureURL
+                                mStorageReference.getDownloadUrl().addOnCompleteListener(task -> {
+                                    profileImageUrl = Objects.requireNonNull(task.getResult()).toString();
+                                    usersRef.document(username).update("pictureURL", profileImageUrl);
                                 });
-                    }
+                            })
+                            .addOnFailureListener(e -> Log.d(TAG, "Default profile pic was not stored"));
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "Data failed to add.");
-                        Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
-                    }
+                .addOnFailureListener(e -> {
+                    Log.d(TAG, "Data failed to add.");
+                    Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
                 });
     }
 
