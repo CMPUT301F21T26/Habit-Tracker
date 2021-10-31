@@ -12,13 +12,17 @@ import androidx.navigation.Navigation;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
-import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.databinding.FragmentMainLoginSignupBinding;
 
+/**
+ * MainLoginSignupFragment directs the user to either sign up for a new account
+ * or log in to an existing account.
+ */
 public class MainLoginSignupFragment extends Fragment {
 
     private NavController navController;
+    private FragmentMainLoginSignupBinding binding;
 
     private View.OnClickListener loginOnClickListener = new View.OnClickListener() {
         @Override
@@ -40,7 +44,6 @@ public class MainLoginSignupFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +51,11 @@ public class MainLoginSignupFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main_login_signup, container, false);
 
+        binding = FragmentMainLoginSignupBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -61,7 +64,7 @@ public class MainLoginSignupFragment extends Fragment {
         navController = Navigation.findNavController(view);
 
         // Set the on click listeners for the buttons
-        view.findViewById(R.id.loginButton).setOnClickListener(loginOnClickListener);
-        view.findViewById(R.id.signUpButton).setOnClickListener(signUpOnClickListener);
+        binding.loginButton.setOnClickListener(loginOnClickListener);
+        binding.signUpButton.setOnClickListener(signUpOnClickListener);
     }
 }
