@@ -1,7 +1,5 @@
 package com.cmput301f21t26.habittracker.fragments;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -23,7 +21,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.objects.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -41,7 +38,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,27 +71,6 @@ public class SignupFragment extends Fragment {
 
     private NavController navController = null;
 
-    private final View.OnClickListener signupConfirmOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            if (!creatingUser && checkFieldsFilled()) {
-                createUser();
-            }
-        }
-    };
-
-    private final View.OnClickListener setProfileOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            mGetContent.launch("image/*");      // Launch file explorer
-        }
-    };
-
-    /**
-     * Required empty public constructor
-     */
-    public SignupFragment() {}
-
     /**
      * Functions essentially like the now deprecated onActivityResult.
      * When User clicks on the circle image view, their default
@@ -118,6 +93,20 @@ public class SignupFragment extends Fragment {
                 }
             });
 
+    private final View.OnClickListener signupConfirmOnClickListener = view -> {
+        if (!creatingUser && checkFieldsFilled()) {
+            createUser();
+        }
+    };
+
+    private final View.OnClickListener setProfileOnClickListener = view -> {
+        mGetContent.launch("image/*");      // Launch file explorer
+    };
+
+    /**
+     * Required empty public constructor
+     */
+    public SignupFragment() {}
 
     /**
      * Initialize the sign up fragment and get instances
