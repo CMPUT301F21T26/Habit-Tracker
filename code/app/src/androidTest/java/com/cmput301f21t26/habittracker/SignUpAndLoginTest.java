@@ -12,6 +12,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -75,7 +76,6 @@ public class SignUpAndLoginTest {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             assert user.getDisplayName().equals(username);
-            // Prompt the user to re-provide their sign-in credentials
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -83,6 +83,12 @@ public class SignUpAndLoginTest {
                             if (task.isSuccessful()) {
                                 Log.d("SignUpAndLoginTest", "User deleted");
                             }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("SignUpAndLoginTest", "User was not deleted: " + e.getMessage());
                         }
                     });
         }
@@ -92,7 +98,13 @@ public class SignUpAndLoginTest {
             public void onSuccess(Void unused) {
                 Log.d("SignUpAndLoginTest", "User deleted from Firestore");
             }
-        });
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("SignUpAndLoginTest", "User was not deleted from Firestore: " + e.getMessage());
+                    }
+                });
     }
 
     @Before
