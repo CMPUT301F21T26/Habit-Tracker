@@ -74,4 +74,19 @@ public class User implements Serializable {
     public void setPictureURL(String pictureURL) {
         this.pictureURL = pictureURL;
     }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public Date getDateLastAccessed() {
+        return dateLastAccessed;
+    }
+
+    /**
+     * Update the date the user accessed to the app to now
+     */
+    public void updateDateLastAccessedToNow() {
+        dateLastAccessed = Calendar.getInstance().getTime();
+    }
 }
