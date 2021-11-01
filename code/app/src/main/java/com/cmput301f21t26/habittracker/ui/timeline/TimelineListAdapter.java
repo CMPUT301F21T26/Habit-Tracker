@@ -31,7 +31,9 @@ public class TimelineListAdapter extends BaseAdapter {
     public TimelineListAdapter(Context context, ArrayList<HabitEvent> habitEvents) {
         this.mContext = context;
         this.hEventsList = habitEvents;
-        dpRatio = mContext.getResources().getDisplayMetrics().density;
+        if (mContext != null) {
+            dpRatio = mContext.getResources().getDisplayMetrics().density;
+        }
     }
 
     @Override
