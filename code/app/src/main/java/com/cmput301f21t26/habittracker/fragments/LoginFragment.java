@@ -43,22 +43,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     private EditText usernameET;
     private EditText passwordET;
     private Button loginConfirmButton;
-    private NavController navController = null;
 
     FirebaseAuth mAuth;
     FirebaseFirestore mStore;
 
     /**
-     * required empty public constructor
+     * Empty constructor
      */
-    public LoginFragment() {
-        // Required empty public constructor
-    }
+    public LoginFragment() { }
 
     /**
      * Initialize the login fragment and get instances
      * @param savedInstanceState
-     *
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,8 +62,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
         mAuth = FirebaseAuth.getInstance();
         mStore = FirebaseFirestore.getInstance();
-
-
     }
 
     @Override
@@ -84,10 +78,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         passwordET = view.findViewById(R.id.passwordET);
         loginConfirmButton = view.findViewById(R.id.loginConfirmButton);
         loginConfirmButton.setOnClickListener(this);
-
-        navController = Navigation.findNavController(view);
     }
-
 
     @Override
     public void onClick(View v) {
@@ -127,6 +118,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                                             Toast.makeText(getActivity(), "Logging in", Toast.LENGTH_LONG).show();
 
                                             Intent intent = new Intent(getActivity(), MainActivity.class);
+                                            // Close existing activity stack and create new root activity
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                             startActivity(intent);
                                         } else {
                                             Toast.makeText(getActivity(), "Wrong password", Toast.LENGTH_LONG).show();
@@ -142,8 +135,5 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                     }
                 }
             });
-
-
-
     }
 }
