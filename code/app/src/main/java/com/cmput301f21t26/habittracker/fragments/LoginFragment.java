@@ -33,8 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * Contains the logic for the Login Fragment
  * Validates inputs, and logs in the user if their username matches their password
  */
-public class LoginFragment extends Fragment implements View.OnClickListener{
-
+public class LoginFragment extends Fragment {
 
     final private String TAG = "loginAuthentication";
     private String username;
@@ -44,8 +43,21 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     private EditText passwordET;
     private Button loginConfirmButton;
 
-    FirebaseAuth mAuth;
-    FirebaseFirestore mStore;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore mStore;
+
+    private final View.OnClickListener loginConfirmOnClickListener = view -> {
+        username = usernameET.getText().toString();
+        password = passwordET.getText().toString();
+
+        if (username.isEmpty()) {
+            Toast.makeText(getActivity(), "Must enter a username", Toast.LENGTH_LONG).show();
+        } else if (password.isEmpty()){
+            Toast.makeText(getActivity(), "Must enter a password", Toast.LENGTH_LONG).show();
+        } else {
+            login(username, password);
+        }
+    };
 
     /**
      * Empty constructor
@@ -78,22 +90,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         passwordET = view.findViewById(R.id.passwordET);
         loginConfirmButton = view.findViewById(R.id.loginConfirmButton);
         loginConfirmButton.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.loginConfirmButton){
-            username = usernameET.getText().toString();
-            password = passwordET.getText().toString();
-
-            if (username.isEmpty()) {
-                Toast.makeText(getActivity(), "Must enter a username", Toast.LENGTH_LONG).show();
-            }else if (password.isEmpty()){
-                Toast.makeText(getActivity(), "Must enter a password", Toast.LENGTH_LONG).show();
-            }else{
-                login(username, password);
-            }
-        }
     }
 
     public void login(String username, String password){
