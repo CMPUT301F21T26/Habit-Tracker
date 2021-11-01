@@ -188,7 +188,9 @@ public class SignupFragment extends Fragment {
                             // Username does not exist.
                             createUserFirebaseAuth(firstName, lastName, email, username, password);
                             creatingUser = true;
-                            Toast.makeText(getActivity(), "Creating user, please wait a moment", Toast.LENGTH_LONG).show();
+                            if (getActivity() != null) {
+                                Toast.makeText(getActivity(), "Creating user, please wait a moment", Toast.LENGTH_LONG).show();
+                            }
                         }
                     } else {
                         Log.d(TAG, "Fetching username failed with: ", task.getException());
@@ -286,7 +288,9 @@ public class SignupFragment extends Fragment {
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.d(TAG, "Data failed to add.");
-                                    Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
+                                    if (getActivity() != null) {
+                                        Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
+                                    }
                                 });
                     });
                 })

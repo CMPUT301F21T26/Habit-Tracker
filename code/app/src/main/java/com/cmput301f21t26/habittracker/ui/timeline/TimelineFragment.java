@@ -87,8 +87,10 @@ public class TimelineFragment extends Fragment {
                 // Updates the list view with each call back
                 // that adds in a new habit event to the list
                 Log.d(TAG, habitEventsList.toString());
-                timelineListAdapter = new TimelineListAdapter(getActivity(), habitEventsList);
-                timelineListView.setAdapter(timelineListAdapter);
+                if (getActivity() != null) {
+                    timelineListAdapter = new TimelineListAdapter(getActivity(), habitEventsList);
+                    timelineListView.setAdapter(timelineListAdapter);
+                }
             }
         });
 
