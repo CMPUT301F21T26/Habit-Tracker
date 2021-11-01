@@ -66,7 +66,7 @@ public class LoginFragment extends Fragment {
 
     /**
      * Initialize the login fragment and get instances
-     * @param savedInstanceState
+     * @param savedInstanceState a reference to Bundle object
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,39 +97,38 @@ public class LoginFragment extends Fragment {
         DocumentReference ref = mStore.collection("users").document(username);
         // if the user exists, pull their email and try to sign them in
         ref.get()
-            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        assert document != null;
-                        if (document.exists()){
-                            //username exists, get the email and attempt to login
-                            User user = document.toObject(User.class);
-                            assert user != null;
-                            mAuth.signInWithEmailAndPassword(user.getEmail(), password)
-                                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-                                        if (task.isSuccessful()){
-                                            Toast.makeText(getActivity(), "Logging in", Toast.LENGTH_LONG).show();
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
 
-                                            Intent intent = new Intent(getActivity(), MainActivity.class);
-                                            // Close existing activity stack and create new root activity
-                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            startActivity(intent);
-                                        } else {
-                                            Toast.makeText(getActivity(), "Wrong password", Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-                        } else {
-                            //username does not exist
-                            Toast.makeText(getActivity(), "Invalid username", Toast.LENGTH_LONG).show();
-                        }
-                    }else{
-                        Log.d(TAG, "Failed with: ", task.getException());
+                    DocumentSnapshot document = task.getResult();
+
+                    assert document != null;
+                    if (document.exists()){
+
+                        // username exists, get the email and attempt to login
+                        User user = document.toObject(User.class);
+                        assert user != null;
+
+                        mAuth.signInWithEmailAndPassword(user.getEmail(), password)
+                            .addOnCompleteListener(authTask -> {
+                                if (authTask.isSuccessful()){
+                                    Toast.makeText(getActivity(), "Logging in", Toast.LENGTH_LONG).show();
+
+                                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                                    // Close existing activity stack and create new root activity
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+
+                                } else {
+                                    Toast.makeText(getActivity(), "Wrong password", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                    } else {
+                        // username does not exist
+                        Toast.makeText(getActivity(), "Invalid username", Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    Log.d(TAG, "Fetching user info failed: ", task.getException());
                 }
             });
     }
