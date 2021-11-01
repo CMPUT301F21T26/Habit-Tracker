@@ -2,6 +2,7 @@ package com.cmput301f21t26.habittracker;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -57,5 +58,47 @@ public class UserTest {
         assertEquals(userTest.getLastName(), testString);
         userTest.setPictureURL(testString);
         assertEquals(userTest.getPictureURL(), testString);
+    }
+
+    /**
+     * Tests adding objects to their respective lists
+     * in the user class by using the add methods
+     */
+    @Test
+    public void testAddingObjects() {
+        // Test adding follower
+        userTest.addFollower("UserOne");
+        userTest.addFollower("UserTwo");
+        assertTrue(userTest.getFollowers().contains("UserOne"));
+        assertTrue(userTest.getFollowers().contains("UserTwo"));
+        assertEquals(userTest.getFollowers().size(), 2);
+
+        // Test adding following
+        userTest.addFollowing("UserOne");
+        assertTrue(userTest.getFollowing().contains("UserOne"));
+        assertFalse(userTest.getFollowing().contains("UserTwo"));
+        assertEquals(userTest.getFollowing().size(), 1);
+
+        // Test adding habits
+        Habit habit = new Habit();
+        userTest.addHabit(habit);
+        assertTrue(userTest.getHabits().contains(habit));
+        assertEquals(userTest.getHabits().size(), 1);
+
+        // Test adding todays habits
+        Habit habit2 = new Habit();
+        Habit habit3 = new Habit("title", "reason");
+        userTest.addTodayHabit(habit2);
+        userTest.addTodayHabit(habit3);
+        assertTrue(userTest.getTodayHabits().contains(habit2));
+        assertEquals(userTest.getTodayHabits().size(), 2);
+        // Doubly make sure the correct habit is being stored
+        boolean correct = false;
+        for (Habit todayHabit : userTest.getTodayHabits()) {
+            if (todayHabit.getTitle().equals("title")) {
+                correct = true;
+            }
+        }
+        assertTrue(correct);
     }
 }
