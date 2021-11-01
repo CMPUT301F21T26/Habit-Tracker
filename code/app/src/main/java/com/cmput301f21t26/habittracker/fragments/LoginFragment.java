@@ -89,7 +89,7 @@ public class LoginFragment extends Fragment {
         usernameET = view.findViewById(R.id.usernameET);
         passwordET = view.findViewById(R.id.passwordET);
         loginConfirmButton = view.findViewById(R.id.loginConfirmButton);
-        loginConfirmButton.setOnClickListener(this);
+        loginConfirmButton.setOnClickListener(loginConfirmOnClickListener);
     }
 
     public void login(String username, String password){
@@ -106,6 +106,7 @@ public class LoginFragment extends Fragment {
                         if (document.exists()){
                             //username exists, get the email and attempt to login
                             User user = document.toObject(User.class);
+                            assert user != null;
                             mAuth.signInWithEmailAndPassword(user.getEmail(), password)
                                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                     @Override
