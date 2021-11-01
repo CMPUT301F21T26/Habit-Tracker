@@ -6,36 +6,55 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
-import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.databinding.FragmentMainLoginSignupBinding;
 
-public class MainLoginSignupFragment extends Fragment implements View.OnClickListener {
+/**
+ * MainLoginSignupFragment directs the user to either sign up for a new account
+ * or log in to an existing account.
+ */
+public class MainLoginSignupFragment extends Fragment {
 
-    NavController navController = null;
+    private NavController navController;
+    private FragmentMainLoginSignupBinding binding;
+
+    private final View.OnClickListener loginOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            NavDirections direction = MainLoginSignupFragmentDirections.actionMainLoginSignupFragmentToLoginFragment();
+            navController.navigate(direction);
+        }
+    };
+
+    private final View.OnClickListener signUpOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            NavDirections direction = MainLoginSignupFragmentDirections.actionMainLoginSignupFragmentToSignupFragment();
+            navController.navigate(direction);
+        }
+    };
 
     public MainLoginSignupFragment() {
         // Required empty public constructor
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main_login_signup, container, false);
 
+        binding = FragmentMainLoginSignupBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -44,19 +63,7 @@ public class MainLoginSignupFragment extends Fragment implements View.OnClickLis
         navController = Navigation.findNavController(view);
 
         // Set the on click listeners for the buttons
-        view.findViewById(R.id.loginButton).setOnClickListener(this);
-        view.findViewById(R.id.signUpButton).setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View view) {
-        if(view != null) {
-            // Get the ID of whatever was clicked, switch to corresponding case
-            if (view.getId() == R.id.loginButton) {
-                navController.navigate(R.id.action_mainLoginSignupFragment_to_loginFragment);
-            } else if (view.getId() == R.id.signUpButton) {
-                navController.navigate(R.id.action_mainLoginSignupFragment_to_signupFragment);
-            }
-        }
+        binding.loginButton.setOnClickListener(loginOnClickListener);
+        binding.signUpButton.setOnClickListener(signUpOnClickListener);
     }
 }

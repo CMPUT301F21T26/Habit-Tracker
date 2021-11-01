@@ -27,12 +27,12 @@ public class User implements Serializable {
     private final List<Habit> todayHabits;
     private final List<Permission> permissions;
 
-    public User(String username, String firstName, String lastName, String email) {
+    public User(String username, String firstName, String lastName, String email, String pictureURL) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.pictureURL = null;
+        this.pictureURL = pictureURL;
         this.creationDate = Calendar.getInstance().getTime();
         this.dateLastAccessed = Calendar.getInstance().getTime();
 
@@ -44,7 +44,7 @@ public class User implements Serializable {
     }
 
     public User() {
-        this("", "", "", "");
+        this("", "", "", "", "");
     }
 
     public String getUid() {
@@ -77,6 +77,29 @@ public class User implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPictureURL() {
+        return pictureURL;
+    }
+
+    public void setPictureURL(String pictureURL) {
+        this.pictureURL = pictureURL;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public Date getDateLastAccessed() {
+        return dateLastAccessed;
+    }
+
+    /**
+     * Update the date the user accessed to the app to now
+     */
+    public void updateDateLastAccessedToNow() {
+        dateLastAccessed = Calendar.getInstance().getTime();
     }
 
     public List<String> getFollowing() {
@@ -113,13 +136,5 @@ public class User implements Serializable {
 
     public void addTodayHabit(Habit habit) {
         todayHabits.add(habit);
-    }
-
-    public String getPictureURL() {
-        return pictureURL;
-    }
-
-    public void setPictureURL(String pictureURL) {
-        this.pictureURL = pictureURL;
     }
 }
