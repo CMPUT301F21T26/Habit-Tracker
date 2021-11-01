@@ -229,7 +229,9 @@ public class SignupFragment extends Fragment {
                         createUserFirebaseFirestore(firstName, lastName, email, username);
                     } else {
                         Log.w(TAG, "Creation of User with email failed. " + Objects.requireNonNull(task.getException()).getMessage());
-                        Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        if (getActivity() != null) {
+                            Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        }
                         creatingUser = false;
                     }
                 });
@@ -275,7 +277,9 @@ public class SignupFragment extends Fragment {
                                 .addOnSuccessListener(unused -> {
                                     Log.d(TAG, "Data added succesfully");
                                     // Notify user that account was created successfully
-                                    Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
+                                    if (getActivity() != null) {
+                                        Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
+                                    }
                                     // Go to login fragment once data has been added
                                     navController.navigate(R.id.action_signupFragment_to_loginFragment);
                                     creatingUser = false;
