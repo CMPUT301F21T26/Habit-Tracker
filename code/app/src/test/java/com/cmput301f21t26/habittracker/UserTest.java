@@ -30,7 +30,7 @@ public class UserTest {
         lastName = "Grande";
         email = "NoImNot@Basic.com";
         pictureURL = "google.com/yeeeeeeeeeeeeeeeeeeeeaaaaahh boiiiiiiiiii";
-        userTest = new User(username, firstName, lastName, email);
+        userTest = new User(username, firstName, lastName, email, pictureURL);
     }
 
     /**
@@ -42,11 +42,7 @@ public class UserTest {
         assertEquals(firstName, userTest.getFirstName());
         assertEquals(lastName, userTest.getLastName());
         assertEquals(email, userTest.getEmail());
-        assertTrue(userTest.getFollowers() instanceof ArrayList);
-        assertTrue(userTest.getFollowing() instanceof ArrayList);
-        assertTrue(userTest.getTodayHabits() instanceof ArrayList);
-        assertTrue(userTest.getHabits() instanceof ArrayList);
-        assertTrue(userTest.getPermissions() instanceof ArrayList);
+        assertEquals(pictureURL, userTest.getPictureURL());
     }
 
     /**

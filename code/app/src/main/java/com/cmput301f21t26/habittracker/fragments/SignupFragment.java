@@ -1,9 +1,14 @@
 package com.cmput301f21t26.habittracker.fragments;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -14,21 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.objects.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -38,14 +29,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -53,7 +41,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Contains the logic for the Signup Fragment.
  * Validates input and attempts to create account with the entered fields.
  */
-public class SignupFragment extends Fragment implements  View.OnClickListener{
+public class SignupFragment extends Fragment {
     final private String TAG = "signupAuthentication";
     private EditText firstNameET;
     private EditText lastNameET;
@@ -74,11 +62,6 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
     private String profileImageUrl;
 
     private NavController navController = null;
-
-    /**
-     * Required empty public constructor
-     */
-    public SignupFragment() {}
 
     /**
      * Functions essentially like the now deprecated onActivityResult.
@@ -102,6 +85,20 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
                 }
             });
 
+    private final View.OnClickListener signupConfirmOnClickListener = view -> {
+        if (!creatingUser && checkFieldsFilled()) {
+            createUser();
+        }
+    };
+
+    private final View.OnClickListener setProfileOnClickListener = view -> {
+        mGetContent.launch("image/*");      // Launch file explorer
+    };
+
+    /**
+     * Required empty public constructor
+     */
+    public SignupFragment() {}
 
     /**
      * Initialize the sign up fragment and get instances
@@ -154,42 +151,11 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
         passwordET = view.findViewById(R.id.passwordET);
         confirmPassET = view.findViewById(R.id.confirmPassET);
         signupConfirmButton = view.findViewById(R.id.signUpConfirmButton);
-        signupConfirmButton.setOnClickListener(this);
+        signupConfirmButton.setOnClickListener(signupConfirmOnClickListener);
         setProfilePic = view.findViewById(R.id.circleImageView);
-        setProfilePic.setOnClickListener(this);
+        setProfilePic.setOnClickListener(setProfileOnClickListener);
 
         navController = Navigation.findNavController(view);
-    }
-
-    /**
-     * Whenever user clicks an element that have OnClickListener, this checks which
-     * element has been clicked and does its corresponding function.
-     *
-     *
-     * @param view
-     *  The current view.
-     */
-    @Override
-    public void onClick(View view) {
-        if(view != null) {
-            // User clicks the signupConfirmButton
-            if (view.getId() == R.id.signUpConfirmButton) {
-                // Make sure there currently isn't a user being created..prevents user from spamming signup button
-                if (!creatingUser) {
-                    // Check if the fields are filled in
-                    if (checkFieldsFilled()) {
-                        createUser();
-                    }
-                } else {
-                    Toast.makeText(getActivity(), "Currently creating user...", Toast.LENGTH_LONG).show();
-                }
-
-            }
-            // User clicks circle image view
-            else if (view.getId() == R.id.circleImageView) {          // If the circle image view is clicked
-                mGetContent.launch("image/*");                    // Launch file explorer
-            }
-        }
     }
 
     /**
@@ -211,23 +177,21 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
         DocumentReference ref = mStore.collection("users").document(username);
 
         ref.get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                // Username exists
-                                usernameET.setError("Username already exists");
-                            } else {
-                                // Username does not exist.
-                                createUserFirebaseAuth(firstName, lastName, email, username, password);
-                                creatingUser = true;
-                                Toast.makeText(getActivity(), "Creating user, please wait a moment", Toast.LENGTH_LONG).show();
-                            }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        assert document != null;
+                        if (document.exists()) {
+                            // Username exists
+                            usernameET.setError("Username already exists");
                         } else {
-                            Log.d(TAG, "Failed with: ", task.getException());
+                            // Username does not exist.
+                            createUserFirebaseAuth(firstName, lastName, email, username, password);
+                            creatingUser = true;
+                            Toast.makeText(getActivity(), "Creating user, please wait a moment", Toast.LENGTH_LONG).show();
                         }
+                    } else {
+                        Log.d(TAG, "Fetching username failed with: ", task.getException());
                     }
                 });
     }
@@ -249,31 +213,26 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
      */
     public void createUserFirebaseAuth(final String firstName, final String lastName, final String email, final String username, final String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "Creation of User with email successful.");
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Creation of User with email successful.");
 
-                            // Set Display Name of user in Firebase Authentication so we can get it in MainActivity
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            if (user != null) {
-                                UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
-                                        .setDisplayName(username).build();
-                                user.updateProfile(profileUpdate);
-                            }
-
-                            // User created in Firebase Authentication, now to add its data into Firestore database
-                            createUserFirebaseFirestore(firstName, lastName, email, username);
-                        } else {
-                            Log.w(TAG, "Creation of User with email failed. " + task.getException().getMessage());
-                            Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                            creatingUser = false;
+                        // Set Display Name of user in Firebase Authentication so we can get it in MainActivity
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(username).build();
+                            user.updateProfile(profileUpdate);
                         }
+
+                        // User created in Firebase Authentication, now to add its data into Firestore database
+                        createUserFirebaseFirestore(firstName, lastName, email, username);
+                    } else {
+                        Log.w(TAG, "Creation of User with email failed. " + Objects.requireNonNull(task.getException()).getMessage());
+                        Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        creatingUser = false;
                     }
                 });
-
-
     }
 
     /**
@@ -291,153 +250,44 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
      */
     public void createUserFirebaseFirestore(String firstName, String lastName, String email, String username) {
 
-        final CollectionReference collectionReference = mStore.collection("users");
-        // create a hashmap instead of using serializable user so that users don't have
-        // initialized sub-arrays stored, instead we wish to store a collection which
-        // represents the arrays
-        // this is better both because the document size will not grow with the number of habits
-        // and habit events, so fetches will be faster
-        // but also because they're user-defined objects
-        // though firestore supports this its still conceptually cleaner to use subcollections
-        // this does mean that we have to create fake docs for those subcollections
+        final CollectionReference usersRef = mStore.collection("users");
+        mStorageReference = mStorage.getReference(picturePath);
 
-        // final User user = new User(username, firstName, lastName, email); (deprecated)
-        Map<String, Object> user = new HashMap<>();
-        user.put("firstName", firstName);
-        user.put("lastName", lastName);
-        user.put("email", email);
-        user.put("username", username);
-        user.put("pictureURL", "");
-        user.put("dateLastAccessed", Calendar.getInstance().getTime());
+        mStorageReference
+                .putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // If successful, get the download url and store it in pictureURL
+                    mStorageReference.getDownloadUrl().addOnCompleteListener(task -> {
 
-        Map<String, Object> habits = new HashMap<>();
-        habits.put("habitName", "placeholder");
+                        profileImageUrl = Objects.requireNonNull(task.getResult()).toString();
+                        Map<String, Object> user = new HashMap<>();
 
-        Map<String, Object> followers = new HashMap<>();
-        followers.put("name", "placeholder");
+                        user.put("firstName", firstName);
+                        user.put("lastName", lastName);
+                        user.put("email", email);
+                        user.put("username", username);
+                        user.put("pictureURL", profileImageUrl);
+                        user.put("dateLastAccessed", Calendar.getInstance().getTime());
 
-        Map<String, Object> following = new HashMap<>();
-        following.put("name", "placeholder");
-
-        Map<String, Object> permissions = new HashMap<>();
-        permissions.put("name", "placeholder");
-
-        Map<String, Object> todayHabits = new HashMap<>();
-        todayHabits.put("habitName", "placeholder");
-
-        collectionReference
-            .document(username)
-            .set(user)
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void unused) {
-
-                    collectionReference.document(username).collection("habits").document("placeholder")
-                        .set(habits)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                collectionReference.document(username).collection("followers").document("placeholder")
-                                    .set(followers)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            collectionReference.document(username).collection("following").document("placeholder")
-                                                .set(following)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void unused) {
-                                                        collectionReference.document(username).collection("permissions").document("placeholder")
-                                                            .set(permissions)
-                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void unused) {
-                                                                    collectionReference.document(username).collection("todayHabits").document("placeholder")
-                                                                        .set(todayHabits)
-                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                            @Override
-                                                                            public void onSuccess(Void unused) {
-                                                                                Log.d(TAG, "Data added succesfully");
-                                                                                // Notify user that account was created successfully
-                                                                                Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
-                                                                                // Go to login fragment once data has been added
-                                                                                navController.navigate(R.id.action_signupFragment_to_loginFragment);
-                                                                                creatingUser = false;
-
-                                                                                mStorageReference = mStorage.getReference(picturePath);
-                                                                                mStorageReference
-                                                                                    .putFile(imageUri)
-                                                                                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                                                                        @Override
-                                                                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                                                            // If successful, get the download url and store it in pictureURL
-                                                                                            mStorageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                                                                                                @Override
-                                                                                                public void onComplete(@NonNull Task<Uri> task) {
-                                                                                                    profileImageUrl = task.getResult().toString();
-                                                                                                    collectionReference.document(username).update("pictureURL", profileImageUrl);
-                                                                                                }
-                                                                                            });
-                                                                                        }
-                                                                                    })
-                                                                                    .addOnFailureListener(new OnFailureListener() {
-                                                                                        @Override
-                                                                                        public void onFailure(@NonNull Exception e) {
-                                                                                            Log.d(TAG, "Default profile pic was not stored");
-                                                                                        }
-                                                                                    });
-                                                                            }
-                                                                        })
-                                                                        .addOnFailureListener(new OnFailureListener() {
-                                                                            @Override
-                                                                            public void onFailure(@NonNull Exception e) {
-                                                                                Log.d(TAG, "failed to create todayHabits subcollection");
-                                                                            }
-                                                                        });
-                                                                }
-                                                            })
-                                                            .addOnFailureListener(new OnFailureListener() {
-                                                                @Override
-                                                                public void onFailure(@NonNull Exception e) {
-                                                                    Log.d(TAG, "failed to create permissions subcollection");
-                                                                }
-                                                            });
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.d(TAG, "failed to create following subcollection");
-                                                    }
-                                                });
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.d(TAG, "failed to create followers subcollection");
-                                        }
-                                    });
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d(TAG, "failed to create habits subcollection");
-                            }
-                        });
-
-                }
-            })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d(TAG, "Data failed to add.");
-                    Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
-                }
-            });
+                        usersRef
+                                .document(username)     // user id: username
+                                .set(user)
+                                .addOnSuccessListener(unused -> {
+                                    Log.d(TAG, "Data added succesfully");
+                                    // Notify user that account was created successfully
+                                    Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
+                                    // Go to login fragment once data has been added
+                                    navController.navigate(R.id.action_signupFragment_to_loginFragment);
+                                    creatingUser = false;
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.d(TAG, "Data failed to add.");
+                                    Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
+                                });
+                    });
+                })
+                .addOnFailureListener(e -> Log.d(TAG, "Default profile picture was not stored"));
     }
-
 
     /**
      * Checks all the EditText fields and makes sure they are filled and
@@ -445,10 +295,10 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
      * the user is notified and must change it before proceeding again.
      *
      * @return
-     *  Returns true if the fields are filled and the passwords match, false otherwise. Type {@link Boolean}
+     *  Returns true if the fields are filled and the passwords match, false otherwise. Type {@link boolean}
      */
-    private Boolean checkFieldsFilled() {
-        Boolean filled = true;
+    private boolean checkFieldsFilled() {
+        boolean filled = true;
 
         final String firstName = firstNameET.getText().toString();
         final String lastName = lastNameET.getText().toString();
@@ -456,7 +306,6 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
         final String username = usernameET.getText().toString();
         final String password = passwordET.getText().toString();
         final String confirmPass = confirmPassET.getText().toString();
-
 
         if (firstName.isEmpty()) {
             firstNameET.setError("Cannot be empty");
@@ -489,6 +338,4 @@ public class SignupFragment extends Fragment implements  View.OnClickListener{
 
         return filled;
     }
-
-
 }

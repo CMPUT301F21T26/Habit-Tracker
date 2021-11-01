@@ -2,14 +2,6 @@ package com.cmput301f21t26.habittracker.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,12 +10,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.cmput301f21t26.habittracker.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -33,8 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * Contains the logic for the Login Fragment
  * Validates inputs, and logs in the user if their username matches their password
  */
-public class LoginFragment extends Fragment implements View.OnClickListener{
-
+public class LoginFragment extends Fragment {
 
     final private String TAG = "loginAuthentication";
     private String username;
@@ -43,22 +35,31 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     private EditText usernameET;
     private EditText passwordET;
     private Button loginConfirmButton;
-    private NavController navController = null;
 
-    FirebaseAuth mAuth;
-    FirebaseFirestore mStore;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore mStore;
+
+    private final View.OnClickListener loginConfirmOnClickListener = view -> {
+        username = usernameET.getText().toString();
+        password = passwordET.getText().toString();
+
+        if (username.isEmpty()) {
+            Toast.makeText(getActivity(), "Must enter a username", Toast.LENGTH_LONG).show();
+        } else if (password.isEmpty()){
+            Toast.makeText(getActivity(), "Must enter a password", Toast.LENGTH_LONG).show();
+        } else {
+            login(username, password);
+        }
+    };
 
     /**
-     * required empty public constructor
+     * Empty constructor
      */
-    public LoginFragment() {
-        // Required empty public constructor
-    }
+    public LoginFragment() { }
 
     /**
      * Initialize the login fragment and get instances
-     * @param savedInstanceState
-     *
+     * @param savedInstanceState a reference to Bundle object
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,8 +67,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
         mAuth = FirebaseAuth.getInstance();
         mStore = FirebaseFirestore.getInstance();
-
-
     }
 
     @Override
@@ -83,26 +82,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         usernameET = view.findViewById(R.id.usernameET);
         passwordET = view.findViewById(R.id.passwordET);
         loginConfirmButton = view.findViewById(R.id.loginConfirmButton);
-        loginConfirmButton.setOnClickListener(this);
-
-        navController = Navigation.findNavController(view);
-    }
-
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.loginConfirmButton){
-            username = usernameET.getText().toString();
-            password = passwordET.getText().toString();
-
-            if (username.isEmpty()) {
-                Toast.makeText(getActivity(), "Must enter a username", Toast.LENGTH_LONG).show();
-            }else if (password.isEmpty()){
-                Toast.makeText(getActivity(), "Must enter a password", Toast.LENGTH_LONG).show();
-            }else{
-                login(username, password);
-            }
-        }
+        loginConfirmButton.setOnClickListener(loginConfirmOnClickListener);
     }
 
     public void login(String username, String password){
@@ -110,40 +90,39 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         DocumentReference ref = mStore.collection("users").document(username);
         // if the user exists, pull their email and try to sign them in
         ref.get()
-            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        assert document != null;
-                        if (document.exists()){
-                            //username exists, get the email and attempt to login
-                            User user = document.toObject(User.class);
-                            mAuth.signInWithEmailAndPassword(user.getEmail(), password)
-                                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-                                        if (task.isSuccessful()){
-                                            Toast.makeText(getActivity(), "Logging in", Toast.LENGTH_LONG).show();
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
 
-                                            Intent intent = new Intent(getActivity(), MainActivity.class);
-                                            startActivity(intent);
-                                        } else {
-                                            Toast.makeText(getActivity(), "Wrong password", Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-                        } else {
-                            //username does not exist
-                            Toast.makeText(getActivity(), "Invalid username", Toast.LENGTH_LONG).show();
-                        }
-                    }else{
-                        Log.d(TAG, "Failed with: ", task.getException());
+                    DocumentSnapshot document = task.getResult();
+
+                    assert document != null;
+                    if (document.exists()){
+
+                        // username exists, get the email and attempt to login
+                        User user = document.toObject(User.class);
+                        assert user != null;
+
+                        mAuth.signInWithEmailAndPassword(user.getEmail(), password)
+                            .addOnCompleteListener(authTask -> {
+                                if (authTask.isSuccessful()){
+                                    Toast.makeText(getActivity(), "Logging in", Toast.LENGTH_LONG).show();
+
+                                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                                    // Close existing activity stack and create new root activity
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+
+                                } else {
+                                    Toast.makeText(getActivity(), "Wrong password", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                    } else {
+                        // username does not exist
+                        Toast.makeText(getActivity(), "Invalid username", Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    Log.d(TAG, "Fetching user info failed: ", task.getException());
                 }
             });
-
-
-
     }
 }
