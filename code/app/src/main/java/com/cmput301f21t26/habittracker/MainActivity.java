@@ -90,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         // Setting up navController
-        navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
+        assert navHostFragment != null;
+        navController = navHostFragment.getNavController();
 
         // Clicking on icons navigate to the selected fragments
         navView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
