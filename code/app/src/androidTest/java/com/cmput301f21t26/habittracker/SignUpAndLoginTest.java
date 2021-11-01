@@ -21,6 +21,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.robotium.solo.Solo;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -73,6 +74,7 @@ public class SignUpAndLoginTest {
         mStore = FirebaseFirestore.getInstance();
         String username = "EspressoTester";
 
+        // TODO auth not deleting user
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             assert user.getDisplayName().equals(username);
@@ -145,7 +147,6 @@ public class SignUpAndLoginTest {
 
         // Check if the signup fragment shows up
         assertFragmentShown(signupFragment);
-
     }
 
     @Test
