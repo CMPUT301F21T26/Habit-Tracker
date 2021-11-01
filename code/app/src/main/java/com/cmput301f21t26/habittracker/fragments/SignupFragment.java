@@ -20,7 +20,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.objects.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -253,15 +252,6 @@ public class SignupFragment extends Fragment {
 
         final CollectionReference usersRef = mStore.collection("users");
         mStorageReference = mStorage.getReference(picturePath);
-        // create a hashmap instead of using serializable user so that users don't have
-        // initialized sub-arrays stored, instead we wish to store a collection which
-        // represents the arrays
-        // this is better both because the document size will not grow with the number of habits
-        // and habit events, so fetches will be faster
-        // but also because they're user-defined objects
-        // though firestore supports this its still conceptually cleaner to use subcollections
-        // this does mean that we have to create fake docs for those subcollections
-
 
         mStorageReference
                 .putFile(imageUri)
@@ -297,7 +287,6 @@ public class SignupFragment extends Fragment {
                     });
                 })
                 .addOnFailureListener(e -> Log.d(TAG, "Default profile picture was not stored"));
-
     }
 
     /**
