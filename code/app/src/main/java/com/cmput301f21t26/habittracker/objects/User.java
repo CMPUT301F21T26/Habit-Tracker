@@ -21,30 +21,18 @@ public class User implements Serializable {
     private final Date creationDate;
     private Date dateLastAccessed;
 
-    private final List<String> followings;
-    private final List<String> followers;
-    private final List<Habit> habits;
-    private final List<Habit> todayHabits;
-    private final List<Permission> permissions;
-
-    public User(String username, String firstName, String lastName, String email) {
+    public User(String username, String firstName, String lastName, String email, String pictureURL) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.pictureURL = null;
+        this.pictureURL = pictureURL;
         this.creationDate = Calendar.getInstance().getTime();
         this.dateLastAccessed = Calendar.getInstance().getTime();
-
-        this.followings = new ArrayList<>();
-        this.followers = new ArrayList<>();
-        this.habits = new ArrayList<>();
-        this.todayHabits = new ArrayList<>();
-        this.permissions = new ArrayList<>();
     }
 
     public User() {
-        this("", "", "", "");
+        this("", "", "", "", "");
     }
 
     public String getUid() {
@@ -77,42 +65,6 @@ public class User implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public List<String> getFollowing() {
-        return followings;
-    }
-
-    public List<String> getFollowers() {
-        return followers;
-    }
-
-    public List<Habit> getHabits() {
-        return habits;
-    }
-
-    public List<Habit> getTodayHabits() {
-        return todayHabits;
-    }
-
-    public List<Permission> getPermissions() {
-        return permissions;
-    }
-
-    public void addFollowing(String uid) {
-        followings.add(uid);
-    }
-
-    public void addFollower(String uid) {
-        followers.add(uid);
-    }
-
-    public void addHabit(Habit habit) {
-        habits.add(habit);
-    }
-
-    public void addTodayHabit(Habit habit) {
-        todayHabits.add(habit);
     }
 
     public String getPictureURL() {
