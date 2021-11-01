@@ -20,6 +20,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -251,6 +252,7 @@ public class SignupFragment extends Fragment {
     public void createUserFirebaseFirestore(String firstName, String lastName, String email, String username) {
 
         final CollectionReference usersRef = mStore.collection("users");
+        mStorageReference = mStorage.getReference(picturePath);
         // create a hashmap instead of using serializable user so that users don't have
         // initialized sub-arrays stored, instead we wish to store a collection which
         // represents the arrays
@@ -260,57 +262,42 @@ public class SignupFragment extends Fragment {
         // though firestore supports this its still conceptually cleaner to use subcollections
         // this does mean that we have to create fake docs for those subcollections
 
-        // final User user = new User(username, firstName, lastName, email); (deprecated)
-        Map<String, Object> user = new HashMap<>();
-        user.put("firstName", firstName);
-        user.put("lastName", lastName);
-        user.put("email", email);
-        user.put("username", username);
-        user.put("pictureURL", "");
-        user.put("dateLastAccessed", Calendar.getInstance().getTime());
 
-        Map<String, Object> habits = new HashMap<>();
-        habits.put("habitName", "placeholder");
+        mStorageReference
+                .putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // If successful, get the download url and store it in pictureURL
+                    mStorageReference.getDownloadUrl().addOnCompleteListener(task -> {
 
-        Map<String, Object> followers = new HashMap<>();
-        followers.put("name", "placeholder");
+                        profileImageUrl = Objects.requireNonNull(task.getResult()).toString();
+                        Map<String, Object> user = new HashMap<>();
 
-        Map<String, Object> following = new HashMap<>();
-        following.put("name", "placeholder");
+                        user.put("firstName", firstName);
+                        user.put("lastName", lastName);
+                        user.put("email", email);
+                        user.put("username", username);
+                        user.put("pictureURL", profileImageUrl);
+                        user.put("dateLastAccessed", Calendar.getInstance().getTime());
 
-        Map<String, Object> permissions = new HashMap<>();
-        permissions.put("name", "placeholder");
-
-        Map<String, Object> todayHabits = new HashMap<>();
-        todayHabits.put("habitName", "placeholder");
-
-        usersRef
-                .document(username)
-                .set(user)
-                .addOnSuccessListener(unused -> {
-                    Log.d(TAG, "Data added succesfully");
-                    // Notify user that account was created successfully
-                    Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
-                    // Go to login fragment once data has been added
-                    navController.navigate(R.id.action_signupFragment_to_loginFragment);
-                    creatingUser = false;
-
-                    mStorageReference = mStorage.getReference(picturePath);
-                    mStorageReference
-                            .putFile(imageUri)
-                            .addOnSuccessListener(taskSnapshot -> {
-                                // If successful, get the download url and store it in pictureURL
-                                mStorageReference.getDownloadUrl().addOnCompleteListener(task -> {
-                                    profileImageUrl = Objects.requireNonNull(task.getResult()).toString();
-                                    usersRef.document(username).update("pictureURL", profileImageUrl);
+                        usersRef
+                                .document(username)     // user id: username
+                                .set(user)
+                                .addOnSuccessListener(unused -> {
+                                    Log.d(TAG, "Data added succesfully");
+                                    // Notify user that account was created successfully
+                                    Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
+                                    // Go to login fragment once data has been added
+                                    navController.navigate(R.id.action_signupFragment_to_loginFragment);
+                                    creatingUser = false;
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.d(TAG, "Data failed to add.");
+                                    Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
                                 });
-                            })
-                            .addOnFailureListener(e -> Log.d(TAG, "Default profile pic was not stored"));
+                    });
                 })
-                .addOnFailureListener(e -> {
-                    Log.d(TAG, "Data failed to add.");
-                    Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
-                });
+                .addOnFailureListener(e -> Log.d(TAG, "Default profile picture was not stored"));
+
     }
 
     /**
