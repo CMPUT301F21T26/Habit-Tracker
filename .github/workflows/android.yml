@@ -10,6 +10,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      GITHUB_WORKSPACE: ./code
 
     steps:
     - uses: actions/checkout@v2
