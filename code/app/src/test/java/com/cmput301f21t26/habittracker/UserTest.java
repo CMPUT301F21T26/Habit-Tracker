@@ -1,6 +1,7 @@
 package com.cmput301f21t26.habittracker;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.cmput301f21t26.habittracker.objects.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+
 
 public class UserTest {
     private String username;
@@ -32,6 +34,8 @@ public class UserTest {
         pictureURL = "google.com/yeeeeeeeeeeeeeeeeeeeeaaaaahh boiiiiiiiiii";
         userTest = new User(username, firstName, lastName, email);
     }
+
+
 
     /**
      * Tests the getter methods of the User class
