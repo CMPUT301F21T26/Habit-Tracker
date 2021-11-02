@@ -144,6 +144,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
 
                                     Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
                                             "Empty habit event is created", Snackbar.LENGTH_SHORT);
+                                    snackbar.setAnchorView(activity.findViewById(R.id.addHabitButton));
                                     snackbar.setAction("EDIT", new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
