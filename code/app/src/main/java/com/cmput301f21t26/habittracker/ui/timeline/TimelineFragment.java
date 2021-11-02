@@ -34,6 +34,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
@@ -87,8 +88,21 @@ public class TimelineFragment extends Fragment {
                 // Updates the list view with each call back
                 // that adds in a new habit event to the list
                 Log.d(TAG, habitEventsList.toString());
-                timelineListAdapter = new TimelineListAdapter(getActivity(), habitEventsList);
-                timelineListView.setAdapter(timelineListAdapter);
+                if (getActivity() != null) {
+                    // Sort habitEventsList by date before creating the adapter
+                    Collections.sort(habitEventsList, new Comparator<HabitEvent>() {
+                        @Override
+                        public int compare(HabitEvent habitEvent, HabitEvent t1) {
+                            if (habitEvent.getHabitEventDate() != null && t1.getHabitEventDate() != null) {
+                                return t1.getHabitEventDate().compareTo(habitEvent.getHabitEventDate());
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    timelineListAdapter = new TimelineListAdapter(getActivity(), habitEventsList);
+                    timelineListView.setAdapter(timelineListAdapter);
+                }
             }
         });
 
