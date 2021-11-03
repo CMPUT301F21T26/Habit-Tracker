@@ -20,9 +20,6 @@ import org.junit.Test;
 import io.victoralbertos.device_animation_test_rule.DeviceAnimationTestRule;
 
 public class ViewHabitEventFragmentTest {
-    // Disable device animations as it is required by espresso
-    @ClassRule
-    static public DeviceAnimationTestRule deviceAnimationTestRule = new DeviceAnimationTestRule();
 
     @Rule
     public ActivityTestRule<LoginSignupActivity> rule = new ActivityTestRule<>(LoginSignupActivity.class);
