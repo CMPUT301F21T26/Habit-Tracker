@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView searchIcon;
     private FirebaseAuth mAuth;
     private FirebaseFirestore mStore;
-    private User user;
     private String currentUsername;
 
     @Override
@@ -73,9 +72,7 @@ public class MainActivity extends AppCompatActivity {
         mStore = FirebaseFirestore.getInstance();
 
         // Get the username
-        if (mAuth.getCurrentUser() != null) {
-            currentUsername = UserController.getCurrentUserId();
-        }
+        currentUsername = UserController.getCurrentUserId();
 
         resetTodayHabits();     // TODO bug: the app does not wait until the changes are applied. Possible solution: Set up data changed listener
 
