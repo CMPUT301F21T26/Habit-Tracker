@@ -20,12 +20,14 @@ import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentTodayHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.User;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -73,76 +75,29 @@ public class TodayHabitFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mAuth = FirebaseAuth.getInstance();
-        username = mAuth.getCurrentUser().getDisplayName();
         mStore = FirebaseFirestore.getInstance();
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
-        // TODO refactor this later
-        // get todayHabits subcollection, retrieving all habit documents
-        // add each to a list of today habits
-        // display in a list
-        mStore.collection("users").document(username).collection("habits")
-                .whereArrayContains("daysList", dayToday)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                // each document is retrieved, and if its not the placeholder it converted to a habit
-                                // then it is added to habitList
-                                if (!document.getId().equals("placeholder")) {
-                                    Log.d(TAG, document.getId() + " => " + document.getData());
 
-                                    habit = document.toObject(Habit.class);
-                                    todayHabitList.add(habit);
+        user = UserController.getCurrentUser();
+        todayHabitList = (ArrayList<Habit>) user.getTodayHabits();
 
-                                }
-                            }
-                            listener = new HabitAdapter.RecyclerViewClickListener() {
-                                @Override
-                                public void onClick(View view, int position) {
-                                    // use position in recycler view to retrieve which habit is clicked
-                                    // pass this string to view habit fragment
-                                    // view habit fragment will use this string to get data from database
-                                    Habit habit = todayHabitList.get(position);
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString("habitId", habit.getHabitId());
-                                    navController.navigate(R.id.viewHabitFragment, bundle);
-                                }
-                            };
-                            // feed todayHabitList to the adapter
-                            habitAdapter = new HabitAdapter(todayHabitList, getActivity(), listener, username);
-
-                            // display today habits
-                            mRecyclerView.setLayoutManager(mLayoutManager);
-                            mRecyclerView.setAdapter(habitAdapter);
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
-                        }
-                    }
-                });
-
-        /*
-        // get user object (deprecated)
-        DocumentReference userRef = mStore.collection("users").document(username);
-        userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        listener = new HabitAdapter.RecyclerViewClickListener() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                user = documentSnapshot.toObject(User.class);
-
-                Log.d(TAG, "Got user: " + user.getUsername());
-
-                habitAdapter = new HabitAdapter((ArrayList<Habit>) user.getTodayHabits());
-
-                mRecyclerView.setLayoutManager(mLayoutManager);
-                mRecyclerView.setAdapter(habitAdapter);
+            public void onClick(View view, int position) {
+                Habit habit = todayHabitList.get(position);     // retrieve habit in this pos
+                Bundle bundle = new Bundle();
+                bundle.putString("habitId", habit.getHabitId());        // pass habit id
+                navController.navigate(R.id.viewHabitFragment, bundle);
             }
-        });
-        */
+        };
 
+        // feed todayHabitList to the adapter
+        habitAdapter = new HabitAdapter(todayHabitList, getActivity(), listener, user.getUid());
 
-
+        // display today habits
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(habitAdapter);
     }
 
     @Override
