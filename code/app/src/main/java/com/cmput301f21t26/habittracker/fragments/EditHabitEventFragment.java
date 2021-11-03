@@ -147,7 +147,7 @@ public class EditHabitEventFragment extends Fragment {
 
             hEvent.setComment(comment);
 
-            UserController.updateHabitEventInDb(habit.getHabitId(), hEvent, user -> {
+            UserController.updateHabitEventInDb(hEvent, user -> {
                 NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                 navController.navigate(action);
             });
@@ -157,7 +157,7 @@ public class EditHabitEventFragment extends Fragment {
     private View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            UserController.removeHabitEventFromDb(habit.getHabitId(), hEvent, user -> {
+            UserController.removeHabitEventFromDb(hEvent, user -> {
                 NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                 navController.navigate(action);
             });

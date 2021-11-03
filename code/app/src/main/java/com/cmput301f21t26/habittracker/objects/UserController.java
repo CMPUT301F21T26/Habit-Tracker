@@ -193,42 +193,39 @@ public class UserController {
      * Remove the given habit event associated to the parent habit.
      * Call callback function after the removal.
      *
-     * @param parentHabitId habit that owns the given habit event
      * @param hEvent habit event to be removed
      * @param callback callback function to be called after the removal
      */
-    public static void removeHabitEventFromDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+    public static void removeHabitEventFromDb(HabitEvent hEvent, UserCallback callback) {
         assert user != null;
 
-        user.removeHabitEventFromDb(parentHabitId, hEvent, callback);
+        user.removeHabitEventFromDb(hEvent, callback);
     }
 
     /**
      * Store habit event in a collection inside parent habit document
      * Call callback function after storing
      *
-     * @param parentHabitId habit that owns the given habit event
      * @param hEvent habit event to store
      * @param callback callback function to be called after storing habit event
      */
-    public static void storeHabitEventInDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+    public static void storeHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
         assert user != null;
 
-        user.storeHabitEventInDb(parentHabitId, hEvent, callback);
+        user.storeHabitEventInDb(hEvent, callback);
     }
 
     /**
      * Update an existing habit event with a given habit event in db.
      * Call callback function after the update.
      *
-     * @param parentHabitId habit that owns the given habit event
      * @param hEvent habit event to update
      * @param callback callback function to be called after the update
      */
-    public static void updateHabitEventInDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+    public static void updateHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
         assert user != null;
 
-        user.updateHabitEventInDb(parentHabitId, hEvent, callback);
+        user.updateHabitEventInDb(hEvent, callback);
     }
 
 }

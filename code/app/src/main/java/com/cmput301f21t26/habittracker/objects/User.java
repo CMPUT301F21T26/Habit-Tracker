@@ -169,6 +169,10 @@ public class User extends Observable implements Serializable {
         return permissions;
     }
 
+    public Map<String, List<HabitEvent>> getHabitEventsMap() {
+        return habitEventsMap;
+    }
+
     public void addFollowing(String uid) {
         followings.add(uid);
     }
@@ -586,13 +590,12 @@ public class User extends Observable implements Serializable {
      * Store a given habit event in an input parent habit's collection.
      * Call callback function after successful storing.
      *
-     * @param parentHabitId habit that owns the given habit event
      * @param hEvent    habit event to be stored
      * @param callback  callback function to be called after storing habit event
      */
-    public void storeHabitEventInDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+    public void storeHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
         final DocumentReference userRef = mStore.collection("users").document(getUid());
-        final DocumentReference habitsRef = userRef.collection("habits").document(parentHabitId);
+        final DocumentReference habitsRef = userRef.collection("habits").document(hEvent.getParentHabitId());
 
         habitsRef.collection("habitEvents")
                 .document(hEvent.getHabitEventId())
@@ -605,14 +608,13 @@ public class User extends Observable implements Serializable {
      * Remove the given habit event associated to the parent habit.
      * Call callback function after the removal.
      *
-     * @param parentHabitId habit that owns the given habit event
      * @param hEvent habit event to be removed
      * @param callback callback function to be called after the removal
      */
-    public void removeHabitEventFromDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+    public void removeHabitEventFromDb(HabitEvent hEvent, UserCallback callback) {
 
         final DocumentReference userRef = mStore.collection("users").document(username);
-        final DocumentReference habitRef = userRef.collection("habits").document(parentHabitId);
+        final DocumentReference habitRef = userRef.collection("habits").document(hEvent.getParentHabitId());
 
         habitRef.collection("habitEvents")
                 .document(hEvent.getHabitEventId())
@@ -625,13 +627,12 @@ public class User extends Observable implements Serializable {
      * Update an existing habit event with a given habit event in db.
      * Call callback function after the update.
      *
-     * @param parentHabitId habit that owns the given habit event
      * @param hEvent habit event to update
      * @param callback callback function to be called after the update
      */
-    public void updateHabitEventInDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+    public void updateHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
         final DocumentReference userRef = mStore.collection("users").document(username);
-        final DocumentReference habitRef = userRef.collection("habits").document(parentHabitId);
+        final DocumentReference habitRef = userRef.collection("habits").document(hEvent.getParentHabitId());
 
         habitRef.collection("habitEvents")
                 .document(hEvent.getHabitEventId())
