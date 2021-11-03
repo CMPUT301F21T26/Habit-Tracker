@@ -31,6 +31,7 @@ import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
 import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitBinding;
 import com.cmput301f21t26.habittracker.databinding.FragmentViewHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -43,6 +44,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -171,10 +173,11 @@ public class EditHabitFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // update DB
-                            deleteHabitDB();
-                            // leave
-                            navController.popBackStack();
-                            navController.popBackStack();
+                            UserController.removeHabitFromDb(habit, cbUser -> {
+                                // go to previous fragment user was in
+                                navController.popBackStack();       // this goes back to view habit fragment
+                                navController.popBackStack();
+                            });
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -312,27 +315,14 @@ public class EditHabitFragment extends Fragment {
                 habit.setStartDate(date);
                 habit.setPrivate(isPrivate);
 
-                storeHabitInDb(habit);
-
-                // go to previous fragment user was in
-                navController.popBackStack();       // this goes back to view habit fragment
-                navController.popBackStack();
+                UserController.updateHabitInDb(habit, cbUser -> {
+                    // go to previous fragment user was in
+                    navController.popBackStack();       // this goes back to view habit fragment
+                    navController.popBackStack();
+                });
             }
         }
     };
-
-    public void storeHabitInDb(Habit habit){
-        mStore.collection("users").document(username).collection("habits")
-            .document(habit.getHabitId())
-            .set(habit);
-    }
-
-    private void deleteHabitDB(){
-        //delete the habit, no need to check for subcollections since habit events will be stored in an array
-        mStore.collection("users").document(username).collection("habits")
-            .document(habit.getHabitId())
-            .delete();
-    }
 
     /**
      * Checks all the fields and makes sure
