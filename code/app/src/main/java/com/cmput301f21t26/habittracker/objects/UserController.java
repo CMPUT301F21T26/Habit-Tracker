@@ -140,6 +140,13 @@ public class UserController {
         user.updateHabitInDb(habit, callback);
     }
 
+    /**
+     * Store habit event in a collection inside parent habit document
+     *
+     * @param parentHabit habit that owns the habit event
+     * @param hEvent habit event to store
+     * @param callback callback function to be called after storing habit event
+     */
     public static void storeHabitEventInDb(Habit parentHabit, HabitEvent hEvent, UserCallback callback) {
         assert user != null;
 
