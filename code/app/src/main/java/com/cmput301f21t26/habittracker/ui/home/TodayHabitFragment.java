@@ -65,7 +65,7 @@ public class TodayHabitFragment extends Fragment {
         };
 
         // feed todayHabitList to the adapter
-        habitAdapter = new HabitAdapter(todayHabitList, getActivity(), rvListener, UserController.getCurrentUserId());
+        habitAdapter = new HabitAdapter(todayHabitList, getActivity(), rvListener);
 
         // display today habits
         mRecyclerView.setLayoutManager(mLayoutManager);

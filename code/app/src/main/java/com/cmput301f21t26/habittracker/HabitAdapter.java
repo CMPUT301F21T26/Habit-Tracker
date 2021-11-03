@@ -35,7 +35,6 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     private final ArrayList<Habit> habitList;
     private int mVisibility = View.VISIBLE;
     private RecyclerViewClickListener listener;
-    private final String userid;
     private Context mContext;
 
     /**
@@ -80,11 +79,10 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
      * @param habitList ArrayList<Habit> contains the Habit object to populate views to be
      *                  used by RecyclerView
      */
-    public HabitAdapter(ArrayList<Habit> habitList, Activity activity, RecyclerViewClickListener listener, String userid) {
+    public HabitAdapter(ArrayList<Habit> habitList, Activity activity, RecyclerViewClickListener listener) {
         this.activity = activity;
         this.habitList = habitList;
         this.listener = listener;
-        this.userid = userid;
 
         UserController.addObserverToCurrentUser(this);
     }
