@@ -27,12 +27,14 @@ import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitBinding;
 import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitEventBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -40,11 +42,10 @@ import java.util.Locale;
 public class EditHabitEventFragment extends Fragment {
 
     private final String TAG = "EditHabitEventFragment";
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore mStore;
-    private String username;
 
     private FragmentEditHabitEventBinding binding;
+    private NavController navController;
+
     private Button delBtn;
     private Button editConfirmBtn;
     private TextInputEditText commentET;
@@ -52,8 +53,6 @@ public class EditHabitEventFragment extends Fragment {
     private TextView habitEventTitleTV;
     private TextView habitEventLocationTV;
     private EditText habitEventCommentET;
-
-    private NavController navController;
 
     private Habit habit;
     private HabitEvent hEvent;
@@ -66,10 +65,6 @@ public class EditHabitEventFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        mAuth = FirebaseAuth.getInstance();
-        mStore = FirebaseFirestore.getInstance();
-        username = mAuth.getCurrentUser().getDisplayName();
 
         habit = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabit();
         hEvent = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabitEvent();
@@ -156,62 +151,26 @@ public class EditHabitEventFragment extends Fragment {
     private View.OnClickListener editConfirmOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            String comment = commentET.getText().toString();
 
-            hEvent.setComment(comment);
+            String comment = commentET.getText().toString();
             // TODO get location, photograph from the user
 
+            hEvent.setComment(comment);
 
-            DocumentReference userRef = mStore.collection("users").document(username);
-            DocumentReference habitRef = userRef.collection("habits").document(habit.getHabitId());
-            habitRef.collection("habitEvents")
-                    .document(hEvent.getHabitEventId())
-                    .update(
-                            "comment", comment,
-                            "location", null
-                            // TODO photograph
-                    )
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                            Log.d(TAG, "Habit event successfully updated!");
-
-                            NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
-                            navController.navigate(action);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error updating habit event", e);
-                        }
-                    });
+            UserController.updateHabitEventInDb(habit.getHabitId(), hEvent, user -> {
+                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                navController.navigate(action);
+            });
         }
     };
 
     private View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            DocumentReference userRef = mStore.collection("users").document(username);
-            DocumentReference habitRef = userRef.collection("habits").document(habit.getHabitId());
-            habitRef.collection("habitEvents")
-                    .document(hEvent.getHabitEventId())
-                    .delete()
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "Habit event succesfully deleted!");
-
-                            NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
-                            navController.navigate(action);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error deleting habit event", e);
-                        }
-                    });
+            UserController.removeHabitEventFromDb(habit.getHabitId(), hEvent, user -> {
+                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                navController.navigate(action);
+            });
         }
     };
 }
