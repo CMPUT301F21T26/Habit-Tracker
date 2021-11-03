@@ -3,6 +3,8 @@ package com.cmput301f21t26.habittracker.objects;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Observer;
 
@@ -11,6 +13,7 @@ public class UserController {
     private static User user;
     private static ListenerRegistration userSnapshotListener;
     private static ListenerRegistration habitsSnapshotListener;
+    private static Map<String, ListenerRegistration> habitEventsSnapshotListenerMap;
 
     /**
      * Initialize current user
@@ -22,6 +25,7 @@ public class UserController {
         user = new User(uid);
         userSnapshotListener = user.getUserSnapshotListener();
         habitsSnapshotListener = user.getHabitsSnapshotListener();
+        habitEventsSnapshotListenerMap = new HashMap<>();
 
         user.readUserDataFromDb(callback);
     }
@@ -79,6 +83,13 @@ public class UserController {
             // only detach when user exists
             userSnapshotListener.remove();
             habitsSnapshotListener.remove();
+            for (String habitId : habitEventsSnapshotListenerMap.keySet()) {
+                habitEventsSnapshotListenerMap.get(habitId).remove();
+            }
         }
+    }
+
+    public static void addHabit(Habit habit, UserCallback callback) {
+        return;
     }
 }
