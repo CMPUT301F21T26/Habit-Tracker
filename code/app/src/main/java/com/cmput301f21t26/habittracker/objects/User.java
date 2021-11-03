@@ -600,4 +600,72 @@ public class User extends Observable implements Serializable {
                 .addOnSuccessListener(unused -> callback.onCallback(User.this))
                 .addOnFailureListener(e -> Log.d("addHabitEvent", "Adding habit event failed " + e.toString()));
     }
+
+    /**
+     * Update user's dateLastAccessed to now.
+     *
+     * @param callback callback function to be called after the update
+     */
+    public void updateUserLastAccessedDateInDb(UserCallback callback) {
+
+        mStore.collection("users").document(getUid())
+                .update("dateLastAccessed", Calendar.getInstance().getTime())
+                .addOnSuccessListener(unused -> callback.onCallback(User.this))
+                .addOnFailureListener(e -> Log.w("updateUser", "Error updating user dateLastAccessed", e));
+    }
+
+    /**
+     * Reset doneForToday of all habits to false if the current date is
+     * at least one day larger than user's dateLastAccessed
+     *
+     * @param callback callback function to be called after the update
+     */
+    public void resetTodayHabitsInDb(UserCallback callback) {
+
+        Calendar calNow = Calendar.getInstance();
+        int yearNow = calNow.get(Calendar.YEAR);
+        int monthNow = calNow.get(Calendar.MONTH);
+        int weekNow = calNow.get(Calendar.WEEK_OF_MONTH);
+        int dayNow = calNow.get(Calendar.DAY_OF_WEEK);
+
+        Calendar calLastAccessed = Calendar.getInstance();
+        calLastAccessed.setTime(dateLastAccessed);
+        int yearLastAccessed = calLastAccessed.get(Calendar.YEAR);
+        int monthLastAccessed = calLastAccessed.get(Calendar.MONTH);
+        int weekLastAccessed = calLastAccessed.get(Calendar.WEEK_OF_MONTH);
+        int dayLastAccessed = calLastAccessed.get(Calendar.DAY_OF_WEEK);
+
+
+        final DocumentReference userRef = mStore.collection("users").document(getUid());
+        final CollectionReference habitsRef = userRef.collection("habits");
+
+        // get a new batch write
+        WriteBatch batch = mStore.batch();
+        habitsRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+
+                    if ( dayNow > dayLastAccessed
+                            || weekNow > weekLastAccessed
+                            || monthNow > monthLastAccessed
+                            || yearNow > yearLastAccessed ) {
+
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // reset doneForHabit of all habits to false
+                            DocumentReference habitRef = habitsRef.document(document.getId());
+                            batch.update(habitRef, "doneForToday", false);
+                        }
+                    }
+
+                    // commit batch then call callback function
+                    batch.commit().addOnCompleteListener(task1 -> callback.onCallback(User.this));
+
+                } else {
+                    Log.d("updateTodayHabits", "Error getting today habits: ", task.getException());
+                }
+            }
+        });
+    }
+
 }

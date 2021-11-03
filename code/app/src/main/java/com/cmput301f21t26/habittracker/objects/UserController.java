@@ -3,6 +3,7 @@ package com.cmput301f21t26.habittracker.objects;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +33,7 @@ public class UserController {
                 // add snapshot listeners for habitEvents collection associated to the existing habits
                 habitEventsSnapshotListenerMap.put(habit.getHabitId(), user.getHabitEventsSnapshotListener(habit.getHabitId()));
             }
-            callback.onCallback(user);
+            resetHabitsIsDone(callback);
         });
     }
 
@@ -159,7 +160,7 @@ public class UserController {
      * @param isDone boolean
      * @param callback callback function to be called after the update
      */
-    public static void updateDoneForToday(Habit todayHabit, boolean isDone, UserCallback callback) {
+    public static void updateDoneForTodayInDb(Habit todayHabit, boolean isDone, UserCallback callback) {
         assert user != null;
 
         todayHabit.setDoneForToday(isDone);
@@ -188,5 +189,17 @@ public class UserController {
      */
     public static Habit getHabit(String habitId) {
         return user.getHabit(habitId);
+    }
+
+    /**
+     * Reset doneForToday of all habits to false if the current date is
+     * at least one day larger than user's dateLastAccessed
+     * Update user's dateLastAccessed to now.
+     *
+     * @param callback callback function to be called after the update
+     */
+    private static void resetHabitsIsDone(UserCallback callback) {
+        assert user != null;
+        user.resetTodayHabitsInDb(user -> user.updateUserLastAccessedDateInDb(callback));
     }
 }
