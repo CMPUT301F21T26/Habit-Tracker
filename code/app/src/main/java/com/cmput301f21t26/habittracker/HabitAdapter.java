@@ -125,38 +125,40 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         holder.getDoneTodayCB().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
-                habit.setDoneForToday(isChecked);
-                updateDoneTodayInDb(habit, isChecked);
+                UserController.updateDoneForToday(habit, isChecked, user -> {
 
-                if (isChecked) {
+                    if (isChecked) {
 
-                    HabitEvent hEvent = new HabitEvent();
+                        HabitEvent hEvent = new HabitEvent();
 
-                    // Get the date for use in title
-                    String datePattern = "yyyy-MM-dd";
-                    SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
-                    String habitEventDateFormat = format.format(hEvent.getHabitEventDate());
-                    // Set the title of the habit event
-                    hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
+                        // Get the date for use in title
+                        String datePattern = "yyyy-MM-dd";
+                        SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
+                        String habitEventDateFormat = format.format(hEvent.getHabitEventDate());
+                        // Set the title of the habit event
+                        hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
 
-                    UserController.storeHabitEventInDb(habit, hEvent, new UserCallback() {
-                        @Override
-                        public void onCallback(User user) {
-                            // show snackbar after storing an habit event in db
-                            Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
-                                    "Empty habit event is created", Snackbar.LENGTH_SHORT);
-                            snackbar.setAnchorView(activity.findViewById(R.id.addHabitButton));
-                            snackbar.setAction("EDIT", view -> {
+                        UserController.storeHabitEventInDb(habit, hEvent, new UserCallback() {
+                            @Override
+                            public void onCallback(User user) {
+                                // show snackbar after storing an habit event in db
+                                Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
+                                        "Empty habit event is created", Snackbar.LENGTH_SHORT);
+                                snackbar.setAnchorView(activity.findViewById(R.id.addHabitButton));
+                                snackbar.setAction("EDIT", view -> {
 
-                                NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_activity_main);
-                                @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
+                                    NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_activity_main);
+                                    @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
 
-                                navController.navigate(direction);
-                            });
-                            snackbar.show();
-                        };
-                    });
-                }
+                                    navController.navigate(direction);
+                                });
+                                snackbar.show();
+                            };
+                        });
+                    }
+
+                });
+
             }
         });
 
@@ -216,27 +218,6 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         }
 
         return planMsgStr;
-    }
-
-    private void updateDoneTodayInDb(Habit habit, boolean isDoneToday) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference habitsRef = db.collection("users").document(userid).collection("habits");
-        int dayToday = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;        // Calendar starts the first day as 1, not 0.
-
-        habitsRef.document(habit.getHabitId())
-                .update("doneForToday", isDoneToday)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Habit doneForToday successfully updated!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating habit doneForToday", e);
-                    }
-                });
     }
 
     @Override
