@@ -8,6 +8,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
@@ -21,12 +22,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.robotium.solo.Solo;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests the login and signup pages;
@@ -34,7 +35,8 @@ import org.junit.Test;
  * and that the login and signup fragments
  * show up correctly.
  */
-public class SignUpAndLoginTest {
+public class SignupTest {
+    private static Solo soloStatic;
     private Solo solo;
 
     private String username;
@@ -54,6 +56,7 @@ public class SignUpAndLoginTest {
 
     @Rule
     public ActivityTestRule<LoginSignupActivity> rule = new ActivityTestRule<>(LoginSignupActivity.class);
+
 
     /**
      * Checks if the fragment is displayed
@@ -109,13 +112,21 @@ public class SignUpAndLoginTest {
                 });
     }
 
+
+    @AfterClass
+    public static void tearDown() {
+        for (int i = 0; i < 5; i++) {
+            deleteUser();
+        }
+    }
+
     @Before
     public void initStrings() {
         // Specify a valid string.
-        username = "EspressoTester";
-        firstName = "Espresso";
-        lastName = "Grande";
-        email = "NoImNot@Basic.com";
+        username = "EspressoTester2";
+        firstName = "Espresso2";
+        lastName = "Grande2";
+        email = "NoImNot2@Basic.com";
         password = "starbucksLuvr";
         confirmPass = "starbucksLuvr";
 
@@ -128,14 +139,9 @@ public class SignUpAndLoginTest {
 
         // Wait for splash screen to end
         solo.waitForActivity(LoginSignupActivity.class);
-
-
     }
 
-    @AfterClass
-    public static void tearDown() {
-        deleteUser();
-    }
+
 
     @Test
     public void testSignupPageShows() {
@@ -182,75 +188,6 @@ public class SignUpAndLoginTest {
 
     }
 
-
-    @Test
-    public void testLoginPageShows() {
-        // Check that the main login/signup page is displayed
-        assertFragmentShown(mainLoginSignupFragment);
-
-        // Click login button
-        solo.clickOnButton("LOGIN");
-
-        // Check if the login fragment shows up
-        assertFragmentShown(loginFragment);
-    }
-
-    @Test
-    public void testLoginFieldsEntered() {
-        // Go to login page
-        testLoginPageShows();
-
-        // Enter username only
-        solo.enterText((EditText) solo.getView(R.id.usernameET), username);
-
-        // Click login button; Fragments shouldn't change since there are empty fields
-        solo.clickOnButton("LOGIN");
-        assertFragmentShown(loginFragment);
-
-        // Enter password only
-        solo.waitForText(username, 1, 2000);
-        solo.clearEditText((EditText) solo.getView(R.id.usernameET));
-        solo.enterText((EditText) solo.getView(R.id.passwordET), password);
-
-        // Click login button; Fragments shouldn't change since there are empty fields
-        solo.clickOnButton("LOGIN");
-        assertFragmentShown(loginFragment);
-
-        // Enter username
-        solo.enterText((EditText) solo.getView(R.id.usernameET), username);
-
-        // Click login button; MainActivity and its main fragment should be shown
-        solo.clickOnButton("LOGIN");
-        solo.waitForActivity("MainActivity", 2000);
-        solo.assertCurrentActivity("Incorrect activity", MainActivity.class);
-
-    }
-
-    // Logs in user
-    public void login() {
-        testLoginPageShows();
-
-        // Enter fields
-        solo.enterText((EditText) solo.getView(R.id.usernameET), username);
-        solo.enterText((EditText) solo.getView(R.id.passwordET), password);
-
-        // Click login button; MainActivity and its main fragment should be shown
-        solo.clickOnButton("LOGIN");
-        solo.waitForActivity("MainActivity", 2000);
-        solo.assertCurrentActivity("Incorrect activity", MainActivity.class);
-
-    }
-
-    @Test
-    public void testSignout(){
-        login();
-
-        // Test the sign out button
-        solo.clickOnMenuItem("Sign Out");
-
-        // The main login/signup page should be shown
-        assertFragmentShown(mainLoginSignupFragment);
-    }
 
 
 }
