@@ -515,7 +515,7 @@ public class User extends Observable implements Serializable {
     }
 
     /**
-     * Store a given habit in the database then call callback function
+     * Store a given habit in the database then call the callback function
      *
      * @param habit habit to store in database
      * @param callback callback function to be called after storing habit in db
@@ -528,6 +528,12 @@ public class User extends Observable implements Serializable {
                 .addOnFailureListener(e -> Log.w("addHabit", "Adding habit failed", e));
     }
 
+    /**
+     * Remove a given habit from the database then call the callback function
+     *
+     * @param habit habit to be removed from db
+     * @param callback callback function to be called after the removal
+     */
     public void removeHabitFromDb(Habit habit, UserCallback callback) {
         mStore.collection("users").document(getUid()).collection("habits")
                 .document(habit.getHabitId())
@@ -536,6 +542,12 @@ public class User extends Observable implements Serializable {
                 .addOnFailureListener(e -> Log.w("removeHabit", "Removing habit failed", e));
     }
 
+    /**
+     * Update a given habit in the database then call the callback function
+     *
+     * @param habit habit to be updated
+     * @param callback callback function to be called after the update
+     */
     public void updateHabitInDb(Habit habit, UserCallback callback) {
         mStore.collection("users").document(getUid()).collection("habits")
                 .document(habit.getHabitId())
