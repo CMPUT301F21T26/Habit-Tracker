@@ -3,7 +3,6 @@ package com.cmput301f21t26.habittracker.objects;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.ListenerRegistration;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -168,19 +167,6 @@ public class UserController {
     }
 
     /**
-     * Store habit event in a collection inside parent habit document
-     *
-     * @param parentHabit habit that owns the habit event
-     * @param hEvent habit event to store
-     * @param callback callback function to be called after storing habit event
-     */
-    public static void storeHabitEventInDb(Habit parentHabit, HabitEvent hEvent, UserCallback callback) {
-        assert user != null;
-
-        user.storeHabitEventInDb(parentHabit, hEvent, callback);
-    }
-
-    /**
      * Given a habit id, return the habit object from the habits list.
      * Return null if no such habit is in the list.
      *
@@ -202,4 +188,47 @@ public class UserController {
         assert user != null;
         user.resetTodayHabitsInDb(user -> user.updateUserLastAccessedDateInDb(callback));
     }
+
+    /**
+     * Remove the given habit event associated to the parent habit.
+     * Call callback function after the removal.
+     *
+     * @param parentHabitId habit that owns the given habit event
+     * @param hEvent habit event to be removed
+     * @param callback callback function to be called after the removal
+     */
+    public static void removeHabitEventFromDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+        assert user != null;
+
+        user.removeHabitEventFromDb(parentHabitId, hEvent, callback);
+    }
+
+    /**
+     * Store habit event in a collection inside parent habit document
+     * Call callback function after storing
+     *
+     * @param parentHabitId habit that owns the given habit event
+     * @param hEvent habit event to store
+     * @param callback callback function to be called after storing habit event
+     */
+    public static void storeHabitEventInDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+        assert user != null;
+
+        user.storeHabitEventInDb(parentHabitId, hEvent, callback);
+    }
+
+    /**
+     * Update an existing habit event with a given habit event in db.
+     * Call callback function after the update.
+     *
+     * @param parentHabitId habit that owns the given habit event
+     * @param hEvent habit event to update
+     * @param callback callback function to be called after the update
+     */
+    public static void updateHabitEventInDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+        assert user != null;
+
+        user.updateHabitEventInDb(parentHabitId, hEvent, callback);
+    }
+
 }

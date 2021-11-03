@@ -569,9 +569,9 @@ public class User extends Observable implements Serializable {
         batch.commit().addOnSuccessListener(unused -> callback.onCallback(User.this));
     }
     /**
-     * Update a given habit in the database then call the callback function
+     * Update an existing habit to a given habit in the database then call the callback function
      *
-     * @param habit habit to be updated
+     * @param habit updated habit to store
      * @param callback callback function to be called after the update
      */
     public void updateHabitInDb(Habit habit, UserCallback callback) {
@@ -586,19 +586,58 @@ public class User extends Observable implements Serializable {
      * Store a given habit event in an input parent habit's collection.
      * Call callback function after successful storing.
      *
-     * @param parentHabit   parent habit of habit event
+     * @param parentHabitId habit that owns the given habit event
      * @param hEvent    habit event to be stored
      * @param callback  callback function to be called after storing habit event
      */
-    public void storeHabitEventInDb(Habit parentHabit, HabitEvent hEvent, UserCallback callback) {
+    public void storeHabitEventInDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
         final DocumentReference userRef = mStore.collection("users").document(getUid());
-        final DocumentReference habitsRef = userRef.collection("habits").document(parentHabit.getHabitId());
+        final DocumentReference habitsRef = userRef.collection("habits").document(parentHabitId);
 
         habitsRef.collection("habitEvents")
                 .document(hEvent.getHabitEventId())
                 .set(hEvent)
                 .addOnSuccessListener(unused -> callback.onCallback(User.this))
                 .addOnFailureListener(e -> Log.d("addHabitEvent", "Adding habit event failed " + e.toString()));
+    }
+
+    /**
+     * Remove the given habit event associated to the parent habit.
+     * Call callback function after the removal.
+     *
+     * @param parentHabitId habit that owns the given habit event
+     * @param hEvent habit event to be removed
+     * @param callback callback function to be called after the removal
+     */
+    public void removeHabitEventFromDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+
+        final DocumentReference userRef = mStore.collection("users").document(username);
+        final DocumentReference habitRef = userRef.collection("habits").document(parentHabitId);
+
+        habitRef.collection("habitEvents")
+                .document(hEvent.getHabitEventId())
+                .delete()
+                .addOnSuccessListener(unused -> callback.onCallback(User.this))
+                .addOnFailureListener(e -> Log.w("deleteHabitEvent", "Error deleting habit event", e));
+    }
+
+    /**
+     * Update an existing habit event with a given habit event in db.
+     * Call callback function after the update.
+     *
+     * @param parentHabitId habit that owns the given habit event
+     * @param hEvent habit event to update
+     * @param callback callback function to be called after the update
+     */
+    public void updateHabitEventInDb(String parentHabitId, HabitEvent hEvent, UserCallback callback) {
+        final DocumentReference userRef = mStore.collection("users").document(username);
+        final DocumentReference habitRef = userRef.collection("habits").document(parentHabitId);
+
+        habitRef.collection("habitEvents")
+                .document(hEvent.getHabitEventId())
+                .set(hEvent, SetOptions.merge())
+                .addOnSuccessListener(unused -> callback.onCallback(User.this))
+                .addOnFailureListener(e -> Log.w("updateHabitEvent", "Updating habit event failed", e));
     }
 
     /**
@@ -667,5 +706,4 @@ public class User extends Observable implements Serializable {
             }
         });
     }
-
 }
