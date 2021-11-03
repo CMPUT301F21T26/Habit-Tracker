@@ -11,8 +11,10 @@ import java.util.Observable;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -268,8 +270,6 @@ public class User extends Observable implements Serializable {
 
 
         }).addOnFailureListener(e -> Log.w("readUserData", "Reading user data failed" + e.toString()));
-
-
     }
 
     public void readHabitsFromDb(UserCallback callback) {
@@ -402,7 +402,7 @@ public class User extends Observable implements Serializable {
      * @param parentHabitId parent habit id
      * @return  a snapshot listener for habitEvents collection
      */
-    private ListenerRegistration getHabitEventsSnapshotListener(String parentHabitId) {
+    public ListenerRegistration getHabitEventsSnapshotListener(String parentHabitId) {
 
         final DocumentReference userRef = mStore.collection("users").document(getUid());
         final DocumentReference parentHabitRef = userRef.collection("habits").document(parentHabitId);
@@ -500,14 +500,17 @@ public class User extends Observable implements Serializable {
     }
 
     /**
-     * Store a given habit in the database
+     * Store a given habit in the database then call callback function
      *
      * @param habit habit to store in database
+     * @param callback callback function to be called after storing habit in db
      */
-    public void storeHabitInDb(Habit habit){
+    public void storeHabitInDb(Habit habit, UserCallback callback) {
         mStore.collection("users").document(username).collection("habits")
                 .document(habit.getHabitId())
-                .set(habit);
+                .set(habit)
+                .addOnSuccessListener(unused -> callback.onCallback(User.this))
+                .addOnFailureListener(e -> Log.w("addHabit", "Adding habit failed", e))
     }
 
     /**
