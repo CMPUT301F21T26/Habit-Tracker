@@ -108,7 +108,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         // Changes the checkbox visibility depending on mVisibility
-        holder.itemView.findViewById(R.id.habitCheckbox).setVisibility(mVisibility);
+        holder.getDoneTodayCB().setVisibility(mVisibility);
 
         Habit habit = habitList.get(position);
 
