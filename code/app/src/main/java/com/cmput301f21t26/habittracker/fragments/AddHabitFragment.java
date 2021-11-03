@@ -28,6 +28,8 @@ import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.User;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -60,14 +62,14 @@ public class AddHabitFragment extends Fragment {
     private FragmentAddHabitBinding binding;
     private SwitchCompat privacySwitch;
     private FirebaseFirestore mStore;
-    private FirebaseAuth mAuth;
-    private String username;
     private TextView dateFormatMessageTV;
     private EditText habitTitleET;
     private EditText habitReasoningET;
 
+    private User user;
+
     /**
-     * Required empty constructor
+     * No-argument empty constructor
      */
     public AddHabitFragment() { }
 
@@ -85,10 +87,11 @@ public class AddHabitFragment extends Fragment {
         habitTitleET = binding.habitTitleET;
         habitReasoningET = binding.habitReasoningET;
         mStore = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        username = mAuth.getCurrentUser().getDisplayName();
         defaultDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         setHasOptionsMenu(true);
+
+        user = UserController.getCurrentUser();
+
         return binding.getRoot();
     }
 
@@ -142,8 +145,8 @@ public class AddHabitFragment extends Fragment {
 
             if (checkFieldsFilled()) {
 
-                Habit newHabit = null;
-                boolean isPrivate = false;
+                Habit newHabit;
+                boolean isPrivate;
 
                 // make sure user clicks on confirm button before storing data into firebase
                 final String title = habitTitleET.getText().toString();
@@ -172,27 +175,18 @@ public class AddHabitFragment extends Fragment {
                     }
                 }
 
-                if(privacySwitch.isChecked()){
-                    isPrivate = true;
-                }
+                isPrivate = privacySwitch.isChecked();
+
                 newHabit = new Habit(title, reason, date, daysList);
                 newHabit.setPrivate(isPrivate);
 
-                storeHabitInDb(newHabit);
+                user.storeHabitInDb(newHabit);
 
                 // Goes back to previous fragment user was in
                 navController.popBackStack();
-
             }
-
         }
     };
-
-    public void storeHabitInDb(Habit habit){
-        mStore.collection("users").document(username).collection("habits")
-                .document(habit.getHabitId())
-                .set(habit);
-    }
 
     /**
      * Hides menu items in add habit fragment

@@ -305,12 +305,20 @@ public class User extends Observable implements Serializable {
                                     break;
                             }
                         }
-
                         setChanged();
                         notifyObservers();
                     }
                 });
-
     }
 
+
+    /** Store the given habit in the database
+     *
+     * @param habit habit to store in database
+     */
+    public void storeHabitInDb(Habit habit){
+        mStore.collection("users").document(username).collection("habits")
+                .document(habit.getHabitId())
+                .set(habit);
+    }
 }
