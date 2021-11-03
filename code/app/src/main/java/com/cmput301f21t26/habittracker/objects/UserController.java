@@ -71,4 +71,14 @@ public class UserController {
         }
     }
 
+    /**
+     * Detach all snapshot listeners attached to user
+     */
+    public static void detachSnapshotListeners() {
+        if (user != null) {
+            // only detach when user exists
+            userSnapshotListener.remove();
+            habitsSnapshotListener.remove();
+        }
+    }
 }
