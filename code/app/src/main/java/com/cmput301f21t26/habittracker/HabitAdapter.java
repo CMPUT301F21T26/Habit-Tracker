@@ -47,8 +47,6 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     private final String userid;
     private Context mContext;
 
-    private User user;
-
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder)
@@ -96,7 +94,6 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         this.habitList = habitList;
         this.listener = listener;
         this.userid = userid;
-        this.user = UserController.getCurrentUser();
 
         UserController.addObserverToCurrentUser(this);
     }
@@ -142,7 +139,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                     // Set the title of the habit event
                     hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
 
-                    user.storeHabitEventInDb(habit, hEvent, new UserCallback() {
+                    UserController.storeHabitEventInDb(habit, hEvent, new UserCallback() {
                         @Override
                         public void onCallback(User user) {
                             // show snackbar after storing an habit event in db
