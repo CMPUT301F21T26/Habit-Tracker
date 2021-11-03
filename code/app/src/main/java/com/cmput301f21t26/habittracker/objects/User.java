@@ -376,7 +376,7 @@ public class User extends Observable implements Serializable {
     }
 
     /**
-     * Store the given habit in the database
+     * Store a given habit in the database
      *
      * @param habit habit to store in database
      */
@@ -384,5 +384,23 @@ public class User extends Observable implements Serializable {
         mStore.collection("users").document(username).collection("habits")
                 .document(habit.getHabitId())
                 .set(habit);
+    }
+
+    /**
+     * Store a given habit event in an input parent habit's collection.
+     * Call callback function after successful storing.
+     *
+     * @param parentHabit   parent habit of habit event
+     * @param hEvent    habit event to be stored
+     * @param callback  callback function to be called after storing habit event
+     */
+    public void storeHabitEventInDb(Habit parentHabit, HabitEvent hEvent, UserCallback callback) {
+        final DocumentReference userRef = mStore.collection("users").document(getUid());
+        final CollectionReference habitsRef = userRef.collection(parentHabit.getHabitId());
+
+        habitsRef.document(hEvent.getHabitEventId())
+                .set(hEvent)
+                .addOnSuccessListener(unused -> callback.onCallback(User.this))
+                .addOnFailureListener(e -> Log.d("addHabitEvent", "Adding habit event failed " + e.toString()));
     }
 }

@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.User;
+import com.cmput301f21t26.habittracker.objects.UserCallback;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -133,8 +134,6 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                 if (isChecked) {
 
                     HabitEvent hEvent = new HabitEvent();
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    CollectionReference habitsRef = db.collection("users").document(userid).collection("habits");
 
                     // Get the date for use in title
                     String datePattern = "yyyy-MM-dd";
@@ -143,35 +142,26 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                     // Set the title of the habit event
                     hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
 
-                    // add empty habit event
-                    habitsRef.document(habit.getHabitId()).collection("habitEvents")
-                            .document(hEvent.getHabitEventId())
-                            .set(hEvent)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void unused) {
+                    user.storeHabitEventInDb(habit, hEvent, new UserCallback() {
+                        @Override
+                        public void onCallback(User user) {
+                            // show snackbar after storing an habit event in db
+                            Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
+                                    "Empty habit event is created", Snackbar.LENGTH_SHORT);
+                            snackbar.setAnchorView(activity.findViewById(R.id.addHabitButton));
+                            snackbar.setAction("EDIT", view -> {
 
-                                    Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
-                                            "Empty habit event is created", Snackbar.LENGTH_SHORT);
-                                    snackbar.setAnchorView(activity.findViewById(R.id.addHabitButton));
-                                    snackbar.setAction("EDIT", new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_activity_main);
-                                            @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
+                                NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_activity_main);
+                                @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
 
-                                            navController.navigate(direction);
-                                        }
-                                    });
-                                    snackbar.show();
-                                }
+                                navController.navigate(direction);
                             });
+                            snackbar.show();
+                        };
+                    });
                 }
             }
         });
-
-
-
 
         // TODO update progress bar
     }
