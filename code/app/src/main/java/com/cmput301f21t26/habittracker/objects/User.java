@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 
-import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -24,8 +23,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import org.w3c.dom.Document;
 
 /**
  * Class that interacts with the database as well as other User objects.
@@ -267,6 +264,7 @@ public class User extends Observable implements Serializable {
 
     /**
      * Returns snapshot listener for user's habits collection.
+     * The listener notifies the observers when a habit is added, deleted, or editted.
      *
      * @return snapshot listener for user's habits collection
      */
@@ -286,20 +284,30 @@ public class User extends Observable implements Serializable {
                             return;
                         }
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                            Habit habit = dc.getDocument().toObject(Habit.class);
+                            int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+
                             switch (dc.getType()) {
                                 case ADDED:
-                                    Habit habit = dc.getDocument().toObject(Habit.class);
                                     addHabit(habit);
 
-                                    int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
                                     if (habit.getDaysList().contains(today)) {
                                         addTodayHabit(habit);
                                     }
+                                    Log.d("habitAdded", "habit was added " + habit.getTitle());
                                     break;
                                 case MODIFIED:
-                                    // TODO modified and removed
+                                    editHabit(habit);
+                                    if (habit.getDaysList().contains(today)) {
+                                        editTodayHabit(habit);
+                                    }
                                     break;
                                 case REMOVED:
+                                    removeHabit(habit);
+                                    if (habit.getDaysList().contains(today)) {
+                                        removeTodayHabit(habit);
+                                    }
                                     break;
                             }
                         }
@@ -309,6 +317,63 @@ public class User extends Observable implements Serializable {
                 });
     }
 
+    /**
+     * Remove a habit from all habits list
+     *
+     * @param habit habit to remove
+     */
+    private void removeHabit(Habit habit) {
+        for (int i=0; i<habits.size(); i++) {
+            if (habits.get(i).getHabitId().equals(habit.getHabitId())) {
+                habits.remove(i);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Remove a habit from today habits list
+     *
+     * @param habit today habit to remove
+     */
+    public void removeTodayHabit(Habit habit) {
+        for (int i=0; i<todayHabits.size(); i++) {
+            if (todayHabits.get(i).getHabitId().equals(habit.getHabitId())) {
+                todayHabits.remove(i);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Update a habit in all habits list
+     *
+     * @param habit habit to update
+     */
+    public void editHabit(Habit habit) {
+        for (int i=0; i<habits.size(); i++) {
+            if (habits.get(i).getHabitId().equals(habit.getHabitId())) {
+                // update with new habit
+                habits.set(i, habit);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Update a habit in today habits list
+     *
+     * @param habit today habit to update
+     */
+    public void editTodayHabit(Habit habit) {
+        for (int i=0; i<todayHabits.size(); i++) {
+            if (todayHabits.get(i).getHabitId().equals(habit.getHabitId())) {
+                // update with new habit
+                todayHabits.set(i, habit);
+                return;
+            }
+        }
+    }
 
     /**
      * Store the given habit in the database
