@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.cmput301f21t26.habittracker.objects.User;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -31,8 +33,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
 
-public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> {
+public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> implements Observer {
 
     private final String TAG = "HabitAdapter";
     private final Activity activity;
@@ -41,6 +45,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     private RecyclerViewClickListener listener;
     private final String userid;
     private Context mContext;
+
+    private User user;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -89,6 +95,9 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         this.habitList = habitList;
         this.listener = listener;
         this.userid = userid;
+        this.user = UserController.getCurrentUser();
+
+        UserController.addObserverToCurrentUser(this);
     }
 
     // Create new views (invoked by the layout manager)
@@ -241,5 +250,10 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                         Log.w(TAG, "Error updating habit doneForToday", e);
                     }
                 });
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        notifyDataSetChanged();
     }
 }
