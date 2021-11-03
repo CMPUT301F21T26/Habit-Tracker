@@ -50,16 +50,16 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG = "MainActivity";
-    private static BottomNavigationView navView;
+
     private ActivityMainBinding binding;
     private NavController navController = null;
+
+    private static BottomNavigationView navView;
     private Button addHabitButton;
     private Toolbar toolbar;
     private ImageView redCircle;
     private ImageView searchIcon;
     private FirebaseAuth mAuth;
-    private FirebaseFirestore mStore;
-    private String currentUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +69,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
-        mStore = FirebaseFirestore.getInstance();
 
         // Get the username
-        currentUsername = UserController.getCurrentUserId();
-
-        resetTodayHabits();     // TODO bug: the app does not wait until the changes are applied. Possible solution: Set up data changed listener
 
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
@@ -279,100 +275,5 @@ public class MainActivity extends AppCompatActivity {
         navView.setVisibility(View.VISIBLE);
         addHabitButton.setVisibility(View.VISIBLE);
         extendBottomNav.setVisibility(View.VISIBLE);
-
     }
-
-     private void resetTodayHabits() {
-         Calendar calNow = Calendar.getInstance();
-         int yearNow = calNow.get(Calendar.YEAR);
-         int monthNow = calNow.get(Calendar.MONTH);
-         int weekNow = calNow.get(Calendar.WEEK_OF_MONTH);
-         int dayNow = calNow.get(Calendar.DAY_OF_WEEK);
-
-         Calendar calLastAccessed = Calendar.getInstance();
-
-         DocumentReference userRef = mStore.collection("users").document(currentUsername);
-         CollectionReference habitsRef = userRef.collection("habits");
-
-         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Date dateLastAccessed;
-                            int yearLastAccessed;
-                            int monthLastAccessed;
-                            int weekLastAccessed;
-                            int dayLastAccessed;
-
-                            dateLastAccessed = document.getDate("dateLastAccessed");
-                            calLastAccessed.setTime(Objects.requireNonNull(dateLastAccessed));
-                            yearLastAccessed = calLastAccessed.get(Calendar.YEAR);
-                            monthLastAccessed = calLastAccessed.get(Calendar.MONTH);
-                            weekLastAccessed = calLastAccessed.get(Calendar.WEEK_OF_MONTH);
-                            dayLastAccessed = calLastAccessed.get(Calendar.DAY_OF_WEEK);
-
-                            if ( dayNow > dayLastAccessed
-                                    || weekNow > weekLastAccessed
-                                    || monthNow > monthLastAccessed
-                                    || yearNow > yearLastAccessed ) {
-
-                                // reset today habits
-
-                                // get a new batch write
-                                WriteBatch batch = mStore.batch();
-                                habitsRef.whereArrayContains("daysList", dayNow-1).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                                // update doneForHabit of all habits
-                                                DocumentReference habitRef = habitsRef.document(document.getId());
-                                                batch.update(habitRef, "doneForToday", false);
-                                            }
-
-                                            // commit batch
-                                            batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    Log.d(TAG, "Today habits reset successful");
-                                                }
-                                            });
-
-                                            updateUserLastAccessedDate();
-
-                                        } else {
-                                            Log.d(TAG, "Error getting habits: ", task.getException());
-                                        }
-                                    }
-                                });
-                            }
-                        } else {
-                            Log.d(TAG, "No such user");
-                        }
-                    } else {
-                        Log.d(TAG, "get failed with ", task.getException());
-                    }
-                }
-            });
-    }
-
-    private void updateUserLastAccessedDate() {
-        mStore.collection("users").document(currentUsername)
-                .update("dateLastAccessed", Calendar.getInstance().getTime())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "User dateLastAccessed successfully updated!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating user dateLastAccessed", e);
-                    }
-                });
-    }
-
 }
