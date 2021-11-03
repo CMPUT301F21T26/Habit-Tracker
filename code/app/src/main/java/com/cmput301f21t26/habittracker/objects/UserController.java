@@ -89,7 +89,25 @@ public class UserController {
         }
     }
 
-    public static void addHabit(Habit habit, UserCallback callback) {
-        return;
+    /**
+     * Store habit in db and a snapshot listener for habit events collection associated to it
+     * @param habit habit to store
+     * @param callback callback function to be called after storing habit in db
+     */
+    public static void storeHabitInDb(Habit habit, UserCallback callback) {
+        assert user != null;
+
+        user.storeHabitInDb(habit, user -> {
+            // add snapshot listener for habit events collection associated to the given habit
+            habitEventsSnapshotListenerMap.put(habit.getHabitId(), user.getHabitEventsSnapshotListener(habit.getHabitId()));
+
+            callback.onCallback(user);
+        });
+    }
+
+    public static void storeHabitEventInDb(Habit parentHabit, HabitEvent hEvent, UserCallback callback) {
+        assert user != null;
+
+        user.storeHabitEventInDb(parentHabit, hEvent, callback);
     }
 }
