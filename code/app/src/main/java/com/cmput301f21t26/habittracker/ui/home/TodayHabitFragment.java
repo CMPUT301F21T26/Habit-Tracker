@@ -32,8 +32,6 @@ public class TodayHabitFragment extends Fragment {
 
     private final String TAG = "TodayHabitFragment";
 
-    private User user;
-
     private FirebaseFirestore mStore;
 
     private FragmentTodayHabitBinding binding;
@@ -51,7 +49,6 @@ public class TodayHabitFragment extends Fragment {
 
         binding = FragmentTodayHabitBinding.inflate(inflater, container, false);
 
-        todayHabitList = new ArrayList<>();
         mRecyclerView = binding.todayHabitRV;
         mLayoutManager = new LinearLayoutManager(getActivity());
 
@@ -66,8 +63,7 @@ public class TodayHabitFragment extends Fragment {
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
-        user = UserController.getCurrentUser();
-        todayHabitList = (ArrayList<Habit>) user.getTodayHabits();
+        todayHabitList = (ArrayList<Habit>) UserController.getCurrentUser().getTodayHabits();
 
         rvListener = new HabitAdapter.RecyclerViewClickListener() {
             @Override
@@ -80,7 +76,7 @@ public class TodayHabitFragment extends Fragment {
         };
 
         // feed todayHabitList to the adapter
-        habitAdapter = new HabitAdapter(todayHabitList, getActivity(), rvListener, user.getUid());
+        habitAdapter = new HabitAdapter(todayHabitList, getActivity(), rvListener, UserController.getCurrentUserId());
 
         // display today habits
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -94,7 +90,7 @@ public class TodayHabitFragment extends Fragment {
     }
 
     private void setDoneForToday(Habit habit, boolean isDone) {
-        CollectionReference habitsRef = mStore.collection("users").document(user.getUid()).collection("habits");
+        CollectionReference habitsRef = mStore.collection("users").document(UserController.getCurrentUserId()).collection("habits");
         habitsRef.document(habit.getHabitId())
                 .update("doneForToday", isDone)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
