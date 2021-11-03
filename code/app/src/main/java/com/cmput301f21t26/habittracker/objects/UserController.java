@@ -27,7 +27,13 @@ public class UserController {
         habitsSnapshotListener = user.getHabitsSnapshotListener();
         habitEventsSnapshotListenerMap = new HashMap<>();
 
-        user.readUserDataFromDb(callback);
+        user.readUserDataFromDb(user -> {
+            for (Habit habit : user.getHabits()) {
+                // add snapshot listeners for habitEvents collection associated to the existing habits
+                habitEventsSnapshotListenerMap.put(habit.getHabitId(), user.getHabitEventsSnapshotListener(habit.getHabitId()));
+            }
+            callback.onCallback(user);
+        });
     }
 
     public static String getCurrentUserId() {
@@ -138,6 +144,13 @@ public class UserController {
         assert user != null;
 
         user.updateHabitInDb(habit, callback);
+    }
+
+    public static void updateDoneForToday(Habit todayHabit, boolean isDone, UserCallback callback) {
+        assert user != null;
+
+        todayHabit.setDoneForToday(isDone);
+        user.updateHabitInDb(todayHabit, callback);
     }
 
     /**
