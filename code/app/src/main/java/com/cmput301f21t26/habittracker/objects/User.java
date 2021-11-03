@@ -164,12 +164,77 @@ public class User extends Observable implements Serializable {
         todayHabits.add(habit);
     }
 
+    /**
+     * Add habit event associated with the given parent habit in a map
+     *
+     * @param parentHabitId String id of parent habit associated with the habit event
+     * @param hEvent habit event to add
+     */
     public void addHabitEvent(String parentHabitId, HabitEvent hEvent) {
+        if (!habitEventsMap.containsKey(parentHabitId)) {
+            habitEventsMap.put(parentHabitId, new ArrayList<HabitEvent>());
+        }
         List<HabitEvent> habitEventsList = habitEventsMap.get(parentHabitId);
         if (habitEventsList == null) {
             habitEventsList = new ArrayList<>();
         }
         habitEventsList.add(hEvent);
+    }
+
+    /**
+     * Delete habit event from the associated parent habit
+     *
+     * @param parentHabitId String id of habit parent to habit event
+     * @param hEvent habit event to delete
+     * @throws IllegalArgumentException if parent habit id does not exist
+     * @throws NullPointerException when attempt to access null habit event list
+     * @throws RuntimeException when the habit event list is empty
+     */
+    public void removeHabitEvent(String parentHabitId, HabitEvent hEvent) {
+        if (!habitEventsMap.containsKey(parentHabitId)) {
+            throw new IllegalArgumentException("Parent habit id does not exist");
+        }
+        List<HabitEvent> habitEventsList = habitEventsMap.get(parentHabitId);
+        if (habitEventsList == null) {
+            throw new NullPointerException("Cannot delete habit event from a null habit events list");
+        }
+        if (habitEventsList.size() <= 0) {
+            throw new RuntimeException("Cannot delete habit event from an empty list");
+        }
+        for (int i=0; i<habitEventsList.size(); i++) {
+            if (hEvent.getHabitEventId().equals(habitEventsList.get(i).getHabitEventId())) {
+                habitEventsList.remove(i);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Update habit event from the associated parent habit
+     *
+     * @param parentHabitId String id of habit parent to habit event
+     * @param hEvent habit event to update
+     * @throws IllegalArgumentException if parent habit id does not exist
+     * @throws NullPointerException when attempt to access null habit event list
+     * @throws RuntimeException when the habit event list is empty
+     */
+    public void updateHabitEvent(String parentHabitId, HabitEvent hEvent) {
+        if (!habitEventsMap.containsKey(parentHabitId)) {
+            throw new IllegalArgumentException("Parent habit id does not exist");
+        }
+        List<HabitEvent> habitEventsList = habitEventsMap.get(parentHabitId);
+        if (habitEventsList == null) {
+            throw new NullPointerException("Cannot delete habit event from a null habit events list");
+        }
+        if (habitEventsList.size() <= 0) {
+            throw new RuntimeException("Cannot delete habit event from an empty list");
+        }
+        for (int i=0; i<habitEventsList.size(); i++) {
+            if (hEvent.getHabitEventId().equals(habitEventsList.get(i).getHabitEventId())) {
+                habitEventsList.set(i, hEvent);
+                return;
+            }
+        }
     }
 
     /**
@@ -310,7 +375,7 @@ public class User extends Observable implements Serializable {
                                     Log.d("habitAdded", "habit was added " + habit.getTitle());
                                     break;
                                 case MODIFIED:
-                                    editHabit(habit);
+                                    updateHabit(habit);
                                     if (habit.getDaysList().contains(today)) {
                                         editTodayHabit(habit);
                                     }
@@ -327,6 +392,51 @@ public class User extends Observable implements Serializable {
                         }
                         setChanged();
                         notifyObservers();
+                    }
+                });
+    }
+
+    /**
+     * Returns a snapshot listener for habitEvents collection in the parent habit
+     *
+     * @param parentHabitId parent habit id
+     * @return  a snapshot listener for habitEvents collection
+     */
+    private ListenerRegistration getHabitEventsSnapshotListener(String parentHabitId) {
+
+        final DocumentReference userRef = mStore.collection("users").document(getUid());
+        final DocumentReference parentHabitRef = userRef.collection("habits").document(parentHabitId);
+
+        return parentHabitRef.collection("habitEvents")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
+                        if (error != null) {
+                            Log.w("habitEventUpdate", "listen:error", error);
+                            return;
+                        }
+
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                            HabitEvent hEvent = dc.getDocument().toObject(HabitEvent.class);
+
+                            switch(dc.getType()) {
+                                case ADDED:
+                                    addHabitEvent(parentHabitId, hEvent);
+                                    break;
+                                case MODIFIED:
+                                    updateHabitEvent(parentHabitId, hEvent);
+                                    break;
+                                case REMOVED:
+                                    removeHabitEvent(parentHabitId, hEvent);
+                                    break;
+                                default:
+                                    Log.d("habitAdded", "Unexpected type: " + dc.getType());
+                            }
+
+                            setChanged();
+                            notifyObservers();
+                        }
                     }
                 });
     }
@@ -364,7 +474,7 @@ public class User extends Observable implements Serializable {
      *
      * @param habit habit to update
      */
-    public void editHabit(Habit habit) {
+    public void updateHabit(Habit habit) {
         for (int i=0; i<habits.size(); i++) {
             if (habits.get(i).getHabitId().equals(habit.getHabitId())) {
                 // update with new habit
