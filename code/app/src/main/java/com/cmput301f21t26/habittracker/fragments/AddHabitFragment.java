@@ -55,8 +55,6 @@ public class AddHabitFragment extends Fragment {
     private EditText habitTitleET;
     private EditText habitReasoningET;
 
-    private User user;
-
     /**
      * No-argument empty constructor
      */
@@ -76,8 +74,6 @@ public class AddHabitFragment extends Fragment {
         habitReasoningET = binding.habitReasoningET;
         defaultDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         setHasOptionsMenu(true);
-
-        user = UserController.getCurrentUser();
 
         return binding.getRoot();
     }
