@@ -12,7 +12,9 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -137,6 +139,10 @@ public class User extends Observable implements Serializable {
         return habits;
     }
 
+    public List<Habit> getTodayHabits() {
+        return todayHabits;
+    }
+
     public List<Permission> getPermissions() {
         return permissions;
     }
@@ -157,6 +163,12 @@ public class User extends Observable implements Serializable {
         todayHabits.add(habit);
     }
 
+    /**
+     * Gets user data and all data inside the user's subcollections.
+     * The callback function is then called.
+     *
+     * @param callback callback function to be called after reading data from db
+     */
     public void readUserDataFromDb(UserCallback callback) {
 
         final DocumentReference userRef = mStore.collection("users").document(getUid());
@@ -170,17 +182,45 @@ public class User extends Observable implements Serializable {
             pictureURL = documentSnapshot.getString("pictureURL");
             dateLastAccessed = documentSnapshot.getDate("dateLastAccessed");
 
-            habits = (List<Habit>) documentSnapshot.get("habits");
+            this.habits = new ArrayList<>();
+            this.todayHabits = new ArrayList<>();
+
+            readHabitsFromDb(callback);
+
+
             // followings = (List<String>) documentSnapshot.get("followings");
             // followers = (List<String>) documentSnapshot.get("followers");
             // TODO permissions
-
-            callback.onCallback(User.this);
 
 
         }).addOnFailureListener(e -> Log.w("readUserData", "Reading user data failed" + e.toString()));
 
 
+    }
+
+    public void readHabitsFromDb(UserCallback callback) {
+
+        final DocumentReference userRef = mStore.collection("users").document(getUid());
+        final CollectionReference habitsRef = userRef.collection("habits");
+
+        habitsRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+
+                    Habit habit = document.toObject(Habit.class);
+                    addHabit(habit);
+
+                    int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+                    if (habit.getDaysList().contains(today)) {
+                        addTodayHabit(habit);
+                    }
+                }
+                callback.onCallback(User.this);
+                setChanged();
+                notifyObservers();
+            }
+        }).addOnFailureListener(e -> Log.w("readHabitData", "Reading user habits failed" + e.toString()));
     }
 
     /**
@@ -211,7 +251,9 @@ public class User extends Observable implements Serializable {
                 pictureURL = snapshot.getString("pictureURL");
                 dateLastAccessed = snapshot.getDate("dateLastAccessed");
 
-                habits = (List<Habit>) snapshot.get("habits");
+                // TODO is it necessary to make new lists?
+                // habits = new ArrayList<>();
+                // todayHabits = new ArrayList<>();
                 // followings = (List<String>) snapshot.get("followings");
                 // followers = (List<String>) snapshot.get("followers");
                 // TODO permissions
