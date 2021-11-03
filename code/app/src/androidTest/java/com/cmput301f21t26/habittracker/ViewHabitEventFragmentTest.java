@@ -17,8 +17,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import io.victoralbertos.device_animation_test_rule.DeviceAnimationTestRule;
-
 public class ViewHabitEventFragmentTest {
 
     @Rule
