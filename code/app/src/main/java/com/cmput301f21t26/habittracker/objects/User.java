@@ -11,10 +11,8 @@ import java.util.Observable;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -27,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 /**
  * Class that interacts with the database as well as other User objects.
@@ -377,7 +376,7 @@ public class User extends Observable implements Serializable {
                                 case MODIFIED:
                                     updateHabit(habit);
                                     if (habit.getDaysList().contains(today)) {
-                                        editTodayHabit(habit);
+                                        updateTodayHabit(habit);
                                     }
                                     break;
                                 case REMOVED:
@@ -489,7 +488,7 @@ public class User extends Observable implements Serializable {
      *
      * @param habit today habit to update
      */
-    public void editTodayHabit(Habit habit) {
+    public void updateTodayHabit(Habit habit) {
         for (int i=0; i<todayHabits.size(); i++) {
             if (todayHabits.get(i).getHabitId().equals(habit.getHabitId())) {
                 // update with new habit
@@ -506,11 +505,27 @@ public class User extends Observable implements Serializable {
      * @param callback callback function to be called after storing habit in db
      */
     public void storeHabitInDb(Habit habit, UserCallback callback) {
-        mStore.collection("users").document(username).collection("habits")
+        mStore.collection("users").document(getUid()).collection("habits")
                 .document(habit.getHabitId())
                 .set(habit)
                 .addOnSuccessListener(unused -> callback.onCallback(User.this))
-                .addOnFailureListener(e -> Log.w("addHabit", "Adding habit failed", e))
+                .addOnFailureListener(e -> Log.w("addHabit", "Adding habit failed", e));
+    }
+
+    public void removeHabitFromDb(Habit habit, UserCallback callback) {
+        mStore.collection("users").document(getUid()).collection("habits")
+                .document(habit.getHabitId())
+                .delete()
+                .addOnSuccessListener(unused -> callback.onCallback(User.this))
+                .addOnFailureListener(e -> Log.w("removeHabit", "Removing habit failed", e));
+    }
+
+    public void updateHabitInDb(Habit habit, UserCallback callback) {
+        mStore.collection("users").document(getUid()).collection("habits")
+                .document(habit.getHabitId())
+                .set(habit, SetOptions.merge())        // update the document, instead of overwriting it
+                .addOnSuccessListener(unused -> callback.onCallback(User.this))
+                .addOnFailureListener(e -> Log.w("updateHabit", "Updating habit failed", e));
     }
 
     /**
