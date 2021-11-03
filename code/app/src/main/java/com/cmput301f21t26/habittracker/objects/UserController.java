@@ -165,4 +165,15 @@ public class UserController {
 
         user.storeHabitEventInDb(parentHabit, hEvent, callback);
     }
+
+    /**
+     * Given a habit id, return the habit object from the habits list.
+     * Return null if no such habit is in the list.
+     *
+     * @param habitId String habit id
+     * @return Habit if habit exists. Otherwise, return null
+     */
+    public static Habit getHabit(String habitId) {
+        return user.getHabit(habitId);
+    }
 }

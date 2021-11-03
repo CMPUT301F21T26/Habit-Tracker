@@ -141,6 +141,22 @@ public class User extends Observable implements Serializable {
         return habits;
     }
 
+    /**
+     * Given a habit id, return the habit object from the habits list.
+     * Return null if no such habit is in the list.
+     *
+     * @param habitId String habit id
+     * @return Habit if habit exists. Otherwise, return null
+     */
+    public Habit getHabit(String habitId) {
+        for (int i=0; i<habits.size(); i++) {
+            if (habitId.equals(habits.get(i).getHabitId())) {
+                return habits.get(i);
+            }
+        }
+        return null;
+    }
+
     public List<Habit> getTodayHabits() {
         return todayHabits;
     }
