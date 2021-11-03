@@ -118,7 +118,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
 
                     if (isChecked) {
 
-                        HabitEvent hEvent = new HabitEvent();
+                        HabitEvent hEvent = new HabitEvent(habit.getHabitId());
 
                         // Get the date for use in title
                         String datePattern = "yyyy-MM-dd";
@@ -127,7 +127,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                         // Set the title of the habit event
                         hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
 
-                        UserController.storeHabitEventInDb(habit.getHabitId(), hEvent, new UserCallback() {
+                        UserController.storeHabitEventInDb(hEvent, new UserCallback() {
                             @Override
                             public void onCallback(User user) {
                                 // show snackbar after storing an habit event in db
