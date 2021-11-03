@@ -105,6 +105,41 @@ public class UserController {
         });
     }
 
+    /**
+     * Remove the given habit from db and corresponding snapshot listener for habit events collection
+     *
+     * @param habit habit to remove from db
+     * @param callback callback function to be called after removal
+     * @throws IllegalArgumentException if habit does not exist in the snapshot map
+     */
+    public static void removeHabitFromDb(Habit habit, UserCallback callback) {
+        assert user != null;
+
+        if (!habitEventsSnapshotListenerMap.containsKey(habit.getHabitId())) {
+            throw new IllegalArgumentException("Habit does not exist");
+        }
+
+        user.removeHabitFromDb(habit, user -> {
+            // remove snapshot listener for habit events collection associated to the given habit
+            habitEventsSnapshotListenerMap.get(habit.getHabitId()).remove();
+            habitEventsSnapshotListenerMap.remove(habit.getHabitId());
+
+            callback.onCallback(user);
+        });
+    }
+
+    /**
+     * Update the given habit in db
+     *
+     * @param habit habit to be updated
+     * @param callback callback function to be called after the update
+     */
+    public static void updateHabitInDb(Habit habit, UserCallback callback) {
+        assert user != null;
+
+        user.updateHabitInDb(habit, callback);
+    }
+
     public static void storeHabitEventInDb(Habit parentHabit, HabitEvent hEvent, UserCallback callback) {
         assert user != null;
 
