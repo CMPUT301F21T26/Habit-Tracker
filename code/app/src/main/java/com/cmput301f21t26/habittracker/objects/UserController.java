@@ -10,6 +10,7 @@ public class UserController {
 
     private static User user;
     private static ListenerRegistration userSnapshotListener;
+    private static ListenerRegistration habitsSnapshotListener;
 
     /**
      * Initialize current user
@@ -20,10 +21,9 @@ public class UserController {
 
         user = new User(uid);
         userSnapshotListener = user.getUserSnapshotListener();
+        habitsSnapshotListener = user.getHabitsSnapshotListener();
 
-        user.readUserDataFromDb(user -> {
-            callback.onCallback(user);
-        });
+        user.readUserDataFromDb(callback);
     }
 
     public static String getCurrentUserId() {
