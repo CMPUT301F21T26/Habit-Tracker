@@ -54,9 +54,9 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         public ViewHolder(View view) {
             super(view);
 
-            titleTV = (TextView) view.findViewById(R.id.habitTitleTV);
-            planTV = (TextView) view.findViewById(R.id.habitPlanTV);
-            doneTodayCB = (CheckBox) view.findViewById(R.id.habitCheckbox);
+            titleTV = view.findViewById(R.id.habitTitleTV);
+            planTV = view.findViewById(R.id.habitPlanTV);
+            doneTodayCB = view.findViewById(R.id.habitCheckbox);
             view.setOnClickListener(this);
         }
 
@@ -242,5 +242,4 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                     }
                 });
     }
-
 }

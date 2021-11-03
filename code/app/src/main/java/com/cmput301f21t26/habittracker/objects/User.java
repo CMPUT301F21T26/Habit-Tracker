@@ -282,11 +282,9 @@ public class User extends Observable implements Serializable {
                             Log.w("habitUpdate", "Listening for habit collection update failed.", error);
                             return;
                         }
-
                         if (snapshots == null) {
                             return;
                         }
-
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             switch (dc.getType()) {
                                 case ADDED:
@@ -312,7 +310,8 @@ public class User extends Observable implements Serializable {
     }
 
 
-    /** Store the given habit in the database
+    /**
+     * Store the given habit in the database
      *
      * @param habit habit to store in database
      */

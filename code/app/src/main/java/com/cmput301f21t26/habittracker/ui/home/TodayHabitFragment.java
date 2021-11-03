@@ -21,30 +21,19 @@ import com.cmput301f21t26.habittracker.databinding.FragmentTodayHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class TodayHabitFragment extends Fragment {
 
     private final String TAG = "TodayHabitFragment";
-    private String username;
-    private User user;
-    private Habit habit;
-    private int dayToday;
 
-    private FirebaseAuth mAuth;
+    private User user;
+
     private FirebaseFirestore mStore;
 
     private FragmentTodayHabitBinding binding;
@@ -53,7 +42,7 @@ public class TodayHabitFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-    private HabitAdapter.RecyclerViewClickListener listener;
+    private HabitAdapter.RecyclerViewClickListener rvListener;
 
     private NavController navController;
 
@@ -66,7 +55,6 @@ public class TodayHabitFragment extends Fragment {
         mRecyclerView = binding.todayHabitRV;
         mLayoutManager = new LinearLayoutManager(getActivity());
 
-        dayToday = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;        // Calendar starts the first day as 1, not 0.
         return binding.getRoot();
     }
 
@@ -74,7 +62,6 @@ public class TodayHabitFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAuth = FirebaseAuth.getInstance();
         mStore = FirebaseFirestore.getInstance();
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
@@ -82,7 +69,7 @@ public class TodayHabitFragment extends Fragment {
         user = UserController.getCurrentUser();
         todayHabitList = (ArrayList<Habit>) user.getTodayHabits();
 
-        listener = new HabitAdapter.RecyclerViewClickListener() {
+        rvListener = new HabitAdapter.RecyclerViewClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Habit habit = todayHabitList.get(position);     // retrieve habit in this pos
@@ -93,7 +80,7 @@ public class TodayHabitFragment extends Fragment {
         };
 
         // feed todayHabitList to the adapter
-        habitAdapter = new HabitAdapter(todayHabitList, getActivity(), listener, user.getUid());
+        habitAdapter = new HabitAdapter(todayHabitList, getActivity(), rvListener, user.getUid());
 
         // display today habits
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -107,7 +94,7 @@ public class TodayHabitFragment extends Fragment {
     }
 
     private void setDoneForToday(Habit habit, boolean isDone) {
-        CollectionReference habitsRef = mStore.collection("users").document(username).collection("habits");
+        CollectionReference habitsRef = mStore.collection("users").document(user.getUid()).collection("habits");
         habitsRef.document(habit.getHabitId())
                 .update("doneForToday", isDone)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
