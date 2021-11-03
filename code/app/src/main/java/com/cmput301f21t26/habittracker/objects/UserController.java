@@ -146,6 +146,14 @@ public class UserController {
         user.updateHabitInDb(habit, callback);
     }
 
+    /**
+     * Given the today habit, update its doneForToday field with isDone and update it in the db.
+     * Call callback function after the update.
+     *
+     * @param todayHabit target habit to be updated
+     * @param isDone boolean
+     * @param callback callback function to be called after the update
+     */
     public static void updateDoneForToday(Habit todayHabit, boolean isDone, UserCallback callback) {
         assert user != null;
 
