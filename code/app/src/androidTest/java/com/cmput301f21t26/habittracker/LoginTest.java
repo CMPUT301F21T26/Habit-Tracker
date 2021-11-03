@@ -3,6 +3,7 @@ package com.cmput301f21t26.habittracker;
 import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.longClick;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertTrue;
@@ -115,7 +116,7 @@ public class LoginTest {
 
         onView(withId(R.id.loginConfirmButton)).perform(click());
         // sleep to allow time for login to process and view to switch
-        Thread.sleep(6000);
+        Thread.sleep(3000);
     }
 
     @Test

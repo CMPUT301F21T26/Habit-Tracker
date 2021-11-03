@@ -114,7 +114,7 @@ public class SignupTest {
 
     @AfterClass
     public static void tearDown() {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 7; i++) {
             deleteUser();
         }
     }
