@@ -171,7 +171,7 @@ public class User extends Observable implements Serializable {
      * @param parentHabitId String id of parent habit associated with the habit event
      * @param hEvent habit event to add
      */
-    public void addHabitEvent(String parentHabitId, HabitEvent hEvent) {
+    private void addHabitEvent(String parentHabitId, HabitEvent hEvent) {
         if (!habitEventsMap.containsKey(parentHabitId)) {
             habitEventsMap.put(parentHabitId, new ArrayList<HabitEvent>());
         }
@@ -191,7 +191,7 @@ public class User extends Observable implements Serializable {
      * @throws NullPointerException when attempt to access null habit event list
      * @throws RuntimeException when the habit event list is empty
      */
-    public void removeHabitEvent(String parentHabitId, HabitEvent hEvent) {
+    private void removeHabitEvent(String parentHabitId, HabitEvent hEvent) {
         if (!habitEventsMap.containsKey(parentHabitId)) {
             throw new IllegalArgumentException("Parent habit id does not exist");
         }
@@ -459,7 +459,7 @@ public class User extends Observable implements Serializable {
      *
      * @param habit today habit to remove
      */
-    public void removeTodayHabit(Habit habit) {
+    private void removeTodayHabit(Habit habit) {
         for (int i=0; i<todayHabits.size(); i++) {
             if (todayHabits.get(i).getHabitId().equals(habit.getHabitId())) {
                 todayHabits.remove(i);
@@ -473,7 +473,7 @@ public class User extends Observable implements Serializable {
      *
      * @param habit habit to update
      */
-    public void updateHabit(Habit habit) {
+    private void updateHabit(Habit habit) {
         for (int i=0; i<habits.size(); i++) {
             if (habits.get(i).getHabitId().equals(habit.getHabitId())) {
                 // update with new habit
@@ -488,7 +488,7 @@ public class User extends Observable implements Serializable {
      *
      * @param habit today habit to update
      */
-    public void updateTodayHabit(Habit habit) {
+    private void updateTodayHabit(Habit habit) {
         for (int i=0; i<todayHabits.size(); i++) {
             if (todayHabits.get(i).getHabitId().equals(habit.getHabitId())) {
                 // update with new habit
