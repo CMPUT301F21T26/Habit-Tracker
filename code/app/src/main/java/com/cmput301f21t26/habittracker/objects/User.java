@@ -11,9 +11,12 @@ import java.util.Observable;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
@@ -26,6 +29,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 
 /**
  * Class that interacts with the database as well as other User objects.
@@ -543,6 +547,28 @@ public class User extends Observable implements Serializable {
     }
 
     /**
+     * Given a habit, remove all of its associated habit events from the database.
+     * Call callback function after the removal
+     *
+     * @param habit target habit
+     * @param callback callback function to be called after the removal
+     */
+    public void removeAllHabitEventsOfHabitFromDb(Habit habit, UserCallback callback) {
+        final DocumentReference userRef = mStore.collection("users").document(getUid());
+        final DocumentReference habitRef = userRef.collection("habits").document(habit.getHabitId());
+
+        WriteBatch batch = mStore.batch();
+
+        List<HabitEvent> habitEvents = habitEventsMap.get(habit.getHabitId());
+
+        for (HabitEvent hEvent : habitEvents) {
+            DocumentReference habitEventRef = habitRef.collection("habitEvents").document(hEvent.getHabitEventId());
+            batch.delete(habitEventRef);
+        }
+
+        batch.commit().addOnSuccessListener(unused -> callback.onCallback(User.this));
+    }
+    /**
      * Update a given habit in the database then call the callback function
      *
      * @param habit habit to be updated
@@ -566,9 +592,10 @@ public class User extends Observable implements Serializable {
      */
     public void storeHabitEventInDb(Habit parentHabit, HabitEvent hEvent, UserCallback callback) {
         final DocumentReference userRef = mStore.collection("users").document(getUid());
-        final CollectionReference habitsRef = userRef.collection(parentHabit.getHabitId());
+        final DocumentReference habitsRef = userRef.collection("habits").document(parentHabit.getHabitId());
 
-        habitsRef.document(hEvent.getHabitEventId())
+        habitsRef.collection("habitEvents")
+                .document(hEvent.getHabitEventId())
                 .set(hEvent)
                 .addOnSuccessListener(unused -> callback.onCallback(User.this))
                 .addOnFailureListener(e -> Log.d("addHabitEvent", "Adding habit event failed " + e.toString()));

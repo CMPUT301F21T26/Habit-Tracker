@@ -112,7 +112,8 @@ public class UserController {
     }
 
     /**
-     * Remove the given habit from db and corresponding snapshot listener for habit events collection
+     * Remove the given habit and all associated habit events from db.
+     * Then remove corresponding snapshot listener for habit events collection
      *
      * @param habit habit to remove from db
      * @param callback callback function to be called after removal
@@ -125,12 +126,16 @@ public class UserController {
             throw new IllegalArgumentException("Habit does not exist");
         }
 
-        user.removeHabitFromDb(habit, user -> {
-            // remove snapshot listener for habit events collection associated to the given habit
-            habitEventsSnapshotListenerMap.get(habit.getHabitId()).remove();
-            habitEventsSnapshotListenerMap.remove(habit.getHabitId());
+        user.removeAllHabitEventsOfHabitFromDb(habit, user1 -> {
 
-            callback.onCallback(user);
+            // remove habit document after removing all associated habit events
+            user.removeHabitFromDb(habit, user2 -> {
+                // remove snapshot listener for habit events collection associated to the given habit
+                habitEventsSnapshotListenerMap.get(habit.getHabitId()).remove();
+                habitEventsSnapshotListenerMap.remove(habit.getHabitId());
+
+                callback.onCallback(user);
+            });
         });
     }
 
