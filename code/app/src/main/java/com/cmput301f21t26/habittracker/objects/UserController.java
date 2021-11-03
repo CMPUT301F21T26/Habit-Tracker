@@ -11,18 +11,18 @@ public class UserController {
     private static User user;
     private static ListenerRegistration userSnapshotListener;
 
-    public static void registerCurrentUser() {
+    /**
+     * Initialize current user
+     */
+    public static void initCurrentUser(UserCallback callback) {
 
         String uid = getCurrentUserId();
 
         user = new User(uid);
         userSnapshotListener = user.getUserSnapshotListener();
 
-        user.readUserDataFromDb(new User.Callback() {
-            @Override
-            public void onCallback(User user) {
-                return;
-            }
+        user.readUserDataFromDb(user -> {
+            callback.onCallback(user);
         });
     }
 
@@ -30,12 +30,12 @@ public class UserController {
         return Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
     }
 
-    public static User getCurrentUser() {
-        return user;
-    }
-
     public static ListenerRegistration getCurrentUserSnapshotListener() {
         return userSnapshotListener;
+    }
+
+    public static User getCurrentUser() {
+        return user;
     }
 
     /**
@@ -70,4 +70,5 @@ public class UserController {
             user.deleteObservers();
         }
     }
+
 }

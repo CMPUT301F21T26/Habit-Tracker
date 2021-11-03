@@ -13,12 +13,17 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.w3c.dom.Document;
 
 /**
  * Class that interacts with the database as well as other User objects.
@@ -28,7 +33,7 @@ public class User extends Observable implements Serializable {
     private transient FirebaseAuth mAuth;
     private transient FirebaseFirestore mStore;
 
-    private final String username;          // User cannot change username once created
+    private String username;    // user id
     private String firstName;
     private String lastName;
     private String email;
@@ -39,6 +44,7 @@ public class User extends Observable implements Serializable {
     private List<String> followings;
     private List<String> followers;
     private List<Habit> habits;
+    private List<Habit> todayHabits;
     private List<Permission> permissions;
 
     public User(String username, String firstName, String lastName, String email, String pictureURL) {
@@ -53,10 +59,15 @@ public class User extends Observable implements Serializable {
         this.followings = new ArrayList<>();
         this.followers = new ArrayList<>();
         this.habits = new ArrayList<>();
+        this.todayHabits = new ArrayList<>();
         this.permissions = new ArrayList<>();
 
         this.mAuth = FirebaseAuth.getInstance();
         this.mStore = FirebaseFirestore.getInstance();
+    }
+
+    public User(String username) {
+        this(username, "", "", "", "");
     }
 
     public User() {
@@ -142,6 +153,36 @@ public class User extends Observable implements Serializable {
         habits.add(habit);
     }
 
+    public void addTodayHabit(Habit habit) {
+        todayHabits.add(habit);
+    }
+
+    public void readUserDataFromDb(UserCallback callback) {
+
+        final DocumentReference userRef = mStore.collection("users").document(getUid());
+
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+
+            username = documentSnapshot.getString("username");
+            firstName = documentSnapshot.getString("firstName");
+            lastName = documentSnapshot.getString("lastName");
+            email = documentSnapshot.getString("email");
+            pictureURL = documentSnapshot.getString("pictureURL");
+            dateLastAccessed = documentSnapshot.getDate("dateLastAccessed");
+
+            habits = (List<Habit>) documentSnapshot.get("habits");
+            // followings = (List<String>) documentSnapshot.get("followings");
+            // followers = (List<String>) documentSnapshot.get("followers");
+            // TODO permissions
+
+            callback.onCallback(User.this);
+
+
+        }).addOnFailureListener(e -> Log.w("readUserData", "Reading user data failed" + e.toString()));
+
+
+    }
+
     /**
      * Return the user document snapshot listener
      *
@@ -163,6 +204,7 @@ public class User extends Observable implements Serializable {
                     return;
                 }
 
+                username = snapshot.getString("username");
                 firstName = snapshot.getString("firstName");
                 lastName = snapshot.getString("lastName");
                 email = snapshot.getString("email");
@@ -170,8 +212,8 @@ public class User extends Observable implements Serializable {
                 dateLastAccessed = snapshot.getDate("dateLastAccessed");
 
                 habits = (List<Habit>) snapshot.get("habits");
-                followings = (List<String>) snapshot.get("followings");
-                followers = (List<String>) snapshot.get("followers");
+                // followings = (List<String>) snapshot.get("followings");
+                // followers = (List<String>) snapshot.get("followers");
                 // TODO permissions
 
                 setChanged();
@@ -179,6 +221,54 @@ public class User extends Observable implements Serializable {
 
             }
         });
+    }
+
+    /**
+     * Returns snapshot listener for user's habits collection.
+     *
+     * @return snapshot listener for user's habits collection
+     */
+    public ListenerRegistration getHabitsSnapshotListener() {
+
+        final DocumentReference userRef = mStore.collection("users").document(getUid());
+
+        return userRef.collection("habits")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
+                        if (error != null) {
+                            Log.w("habitUpdate", "Listening for habit collection update failed.", error);
+                            return;
+                        }
+
+                        if (snapshots == null) {
+                            return;
+                        }
+
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    Habit habit = dc.getDocument().toObject(Habit.class);
+                                    addHabit(habit);
+
+                                    int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+                                    if (habit.getDaysList().contains(today)) {
+                                        addTodayHabit(habit);
+                                    }
+                                    break;
+                                case MODIFIED:
+                                    // TODO modified and removed
+                                    break;
+                                case REMOVED:
+                                    break;
+                            }
+                        }
+
+                        setChanged();
+                        notifyObservers();
+                    }
+                });
 
     }
+
 }

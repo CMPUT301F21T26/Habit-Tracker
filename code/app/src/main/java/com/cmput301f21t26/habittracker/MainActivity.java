@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.cmput301f21t26.habittracker.objects.User;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.cmput301f21t26.habittracker.ui.home.TodayHabitFragment;
 import com.cmput301f21t26.habittracker.ui.profile.ProfileFragment;
 import com.cmput301f21t26.habittracker.ui.timeline.TimelineFragment;
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView searchIcon;
     private FirebaseAuth mAuth;
     private FirebaseFirestore mStore;
+    private User user;
     private String currentUsername;
 
     @Override
@@ -71,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Get the username
         if (mAuth.getCurrentUser() != null) {
-            currentUsername = mAuth.getCurrentUser().getDisplayName();
+            currentUsername = UserController.getCurrentUserId();
         }
 
         resetTodayHabits();     // TODO bug: the app does not wait until the changes are applied. Possible solution: Set up data changed listener
