@@ -101,4 +101,41 @@ public class UserTest {
         }
         assertTrue(correct);
     }
+
+    /**
+     * Tests removing objects from their respective lists
+     * in the user class by using the remove methods
+     */
+    @Test
+    public void testRemovingObjects() {
+        // Test removing follower
+        userTest.addFollower("UserOne");
+        userTest.addFollower("UserTwo");
+        userTest.removeFollower("UserTwo");
+        assertFalse(userTest.getFollowers().contains("UserTwo"));
+        assertTrue(userTest.getFollowers().contains("UserTwo"));
+        assertEquals(userTest.getFollowers().size(), 1);
+
+        // Test removing following
+        userTest.addFollowing("UserOne");
+        userTest.removeFollowing("UserOne");
+        assertFalse(userTest.getFollowing().contains("UserOne"));
+        assertTrue(userTest.getFollowing().isEmpty());
+
+        // Test removing habits
+        Habit habit = new Habit();
+        userTest.addHabit(habit);
+        assertTrue(userTest.getHabits().contains(habit));
+        userTest.removeHabit(habit);
+        assertTrue(userTest.getHabits().isEmpty());
+
+        // Test adding todays habits
+        Habit habit2 = new Habit();
+        Habit habit3 = new Habit("title", "reason");
+        userTest.addTodayHabit(habit2);
+        userTest.addTodayHabit(habit3);
+        userTest.removeTodayHabit(habit2);
+        assertEquals(userTest.getTodayHabits().size(), 1);
+        assertFalse(userTest.getTodayHabits().contains(habit2));
+    }
 }
