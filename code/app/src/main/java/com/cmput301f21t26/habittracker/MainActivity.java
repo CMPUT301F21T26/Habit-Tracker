@@ -227,6 +227,13 @@ public class MainActivity extends AppCompatActivity {
         finishAffinity();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        UserController.detachSnapshotListeners();
+        UserController.deleteAllObserversFromCurrentUser();
+    }
+
     /**
      * Hides the menu items.
      * MAKE SURE TO HAVE "setHasOptionsMenu(true);"
