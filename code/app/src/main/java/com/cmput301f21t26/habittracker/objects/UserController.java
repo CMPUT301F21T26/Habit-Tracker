@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.Objects;
+import java.util.Observer;
 
 public class UserController {
 
@@ -35,5 +36,38 @@ public class UserController {
 
     public static ListenerRegistration getCurrentUserSnapshotListener() {
         return userSnapshotListener;
+    }
+
+    /**
+     * Attach an input observer to the current user
+     *
+     * @param observer observer to attach to the current user
+     */
+    public static void addObserverToCurrentUser(Observer observer) {
+        if (user != null) {
+            // only add observer when the user exists
+            user.addObserver(observer);
+        }
+    }
+
+    /**
+     * Remove the input observer from the current user
+     * @param observer observer to remove
+     */
+    public static void deleteObserverFromCurrentUser(Observer observer) {
+        if (user != null) {
+            // only remove observer when the user exists
+            user.deleteObserver(observer);
+        }
+    }
+
+    /**
+     * Remove all observers from the current user
+     */
+    public static void deleteAllObserversFromCurrentUser() {
+        if (user != null) {
+            // only remove all observers when the user exists
+            user.deleteObservers();
+        }
     }
 }
