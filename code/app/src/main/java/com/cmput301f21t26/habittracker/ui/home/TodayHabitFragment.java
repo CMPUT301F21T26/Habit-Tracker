@@ -1,7 +1,6 @@
 package com.cmput301f21t26.habittracker.ui.home;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,30 +8,22 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.cmput301f21t26.habittracker.HabitAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentTodayHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
-import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
 public class TodayHabitFragment extends Fragment {
 
     private final String TAG = "TodayHabitFragment";
-
-    private FirebaseFirestore mStore;
 
     private FragmentTodayHabitBinding binding;
     private ArrayList<Habit> todayHabitList;
@@ -58,8 +49,6 @@ public class TodayHabitFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mStore = FirebaseFirestore.getInstance();
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
@@ -87,23 +76,5 @@ public class TodayHabitFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    private void setDoneForToday(Habit habit, boolean isDone) {
-        CollectionReference habitsRef = mStore.collection("users").document(UserController.getCurrentUserId()).collection("habits");
-        habitsRef.document(habit.getHabitId())
-                .update("doneForToday", isDone)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        habit.setDoneForToday(isDone);      // update locally after updating in db
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating habit", e);
-                    }
-                });
     }
 }
