@@ -75,28 +75,27 @@ public class SignupTest {
     public static void deleteUser() {
         mAuth = FirebaseAuth.getInstance();
         mStore = FirebaseFirestore.getInstance();
-        String username = "EspressoTester";
+        String username = "EspressoTester2";
 
         // TODO auth not deleting user
         FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            assert user.getDisplayName().equals(username);
-            user.delete()
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Log.d("SignUpAndLoginTest", "User deleted");
-                            }
+
+        user.delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("SignUpAndLoginTest", "User deleted");
                         }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("SignUpAndLoginTest", "User was not deleted: " + e.getMessage());
-                        }
-                    });
-        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("SignUpAndLoginTest", "User was not deleted: " + e.getMessage());
+                    }
+                });
+
         DocumentReference userRef = mStore.collection("users").document(username);
         userRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
