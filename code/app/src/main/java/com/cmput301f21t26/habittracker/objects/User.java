@@ -5,13 +5,28 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Observable;
 
 import android.net.Uri;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 
 /**
  * Class that interacts with the database as well as other User objects.
  */
-public class User implements Serializable {
+public class User extends Observable implements Serializable {
+
+    private transient FirebaseAuth mAuth;
+    private transient FirebaseFirestore mStore;
 
     private final String username;          // User cannot change username once created
     private String firstName;
@@ -21,11 +36,10 @@ public class User implements Serializable {
     private final Date creationDate;
     private Date dateLastAccessed;
 
-    private final List<String> followings;
-    private final List<String> followers;
-    private final List<Habit> habits;
-    private final List<Habit> todayHabits;
-    private final List<Permission> permissions;
+    private List<String> followings;
+    private List<String> followers;
+    private List<Habit> habits;
+    private List<Permission> permissions;
 
     public User(String username, String firstName, String lastName, String email, String pictureURL) {
         this.username = username;
@@ -39,8 +53,10 @@ public class User implements Serializable {
         this.followings = new ArrayList<>();
         this.followers = new ArrayList<>();
         this.habits = new ArrayList<>();
-        this.todayHabits = new ArrayList<>();
         this.permissions = new ArrayList<>();
+
+        this.mAuth = FirebaseAuth.getInstance();
+        this.mStore = FirebaseFirestore.getInstance();
     }
 
     public User() {
@@ -110,10 +126,6 @@ public class User implements Serializable {
         return habits;
     }
 
-    public List<Habit> getTodayHabits() {
-        return todayHabits;
-    }
-
     public List<Permission> getPermissions() {
         return permissions;
     }
@@ -130,7 +142,43 @@ public class User implements Serializable {
         habits.add(habit);
     }
 
-    public void addTodayHabit(Habit habit) {
-        todayHabits.add(habit);
+    /**
+     * Return the user document snapshot listener
+     *
+     * @return snapshot listener for user doc
+     */
+    public ListenerRegistration getUserSnapshotListener() {
+
+        final DocumentReference userRef = mStore.collection("users").document(getUid());
+
+        return userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w("userUpdate", "Listening for user update failed.", error);
+                    return;
+                }
+
+                if (snapshot == null) {
+                    return;
+                }
+
+                firstName = snapshot.getString("firstName");
+                lastName = snapshot.getString("lastName");
+                email = snapshot.getString("email");
+                pictureURL = snapshot.getString("pictureURL");
+                dateLastAccessed = snapshot.getDate("dateLastAccessed");
+
+                habits = (List<Habit>) snapshot.get("habits");
+                followings = (List<String>) snapshot.get("followings");
+                followers = (List<String>) snapshot.get("followers");
+                // TODO permissions
+
+                setChanged();
+                notifyObservers();
+
+            }
+        });
+
     }
 }
