@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
 import android.util.Log;
@@ -45,6 +47,7 @@ public class User extends Observable implements Serializable {
     private List<Habit> habits;
     private List<Habit> todayHabits;
     private List<Permission> permissions;
+    private Map<String, List<HabitEvent>> habitEventsMap;
 
     public User(String username, String firstName, String lastName, String email, String pictureURL) {
         this.username = username;
@@ -60,6 +63,7 @@ public class User extends Observable implements Serializable {
         this.habits = new ArrayList<>();
         this.todayHabits = new ArrayList<>();
         this.permissions = new ArrayList<>();
+        this.habitEventsMap = new HashMap<String, List<HabitEvent>>();
 
         this.mAuth = FirebaseAuth.getInstance();
         this.mStore = FirebaseFirestore.getInstance();
@@ -158,6 +162,14 @@ public class User extends Observable implements Serializable {
 
     public void addTodayHabit(Habit habit) {
         todayHabits.add(habit);
+    }
+
+    public void addHabitEvent(String parentHabitId, HabitEvent hEvent) {
+        List<HabitEvent> habitEventsList = habitEventsMap.get(parentHabitId);
+        if (habitEventsList == null) {
+            habitEventsList = new ArrayList<>();
+        }
+        habitEventsList.add(hEvent);
     }
 
     /**
@@ -309,6 +321,8 @@ public class User extends Observable implements Serializable {
                                         removeTodayHabit(habit);
                                     }
                                     break;
+                                default:
+                                    Log.d("habitAdded", "Unexpected type: " + dc.getType());
                             }
                         }
                         setChanged();
