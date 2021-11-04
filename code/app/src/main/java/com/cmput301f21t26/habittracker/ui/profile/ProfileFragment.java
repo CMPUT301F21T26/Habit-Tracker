@@ -1,13 +1,9 @@
 package com.cmput301f21t26.habittracker.ui.profile;
 
-import static android.content.ContentValues.TAG;
-
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -19,42 +15,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.cmput301f21t26.habittracker.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
 import com.cmput301f21t26.habittracker.objects.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.util.Collection;
+import java.util.Observable;
+import java.util.Observer;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements Observer {
     private String TAG = "ProfileFragment";
     private ProfileViewModel profileViewModel;
     private FragmentProfileBinding binding;
@@ -71,16 +48,6 @@ public class ProfileFragment extends Fragment {
     private String picturePath;
     private String profileImageUrl;
     private User userObject;
-    private User otherUser = null;
-
-    private FirebaseFirestore mStore;
-    private FirebaseAuth mAuth;
-    private FirebaseStorage mStorage;
-    private StorageReference mStorageReference;
-    private CollectionReference collectionReference;
-    private DocumentReference documentReference;
-
-
 
     // creates profile fragment for other viewing other users profile page
     public static ProfileFragment newInstance(String otherUsername) {
@@ -99,18 +66,6 @@ public class ProfileFragment extends Fragment {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        profileViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-
-            }
-        });
-
-        mStore = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        mStorage = FirebaseStorage.getInstance();
-
-
         // Initiate views
         tabLayout = view.findViewById(R.id.tabLayout);
         viewPager = view.findViewById(R.id.viewPager);
@@ -120,21 +75,11 @@ public class ProfileFragment extends Fragment {
         followersTV = view.findViewById(R.id.followersNumberTV);
         followingTV = view.findViewById(R.id.followingNumberTV);
 
-        // Get the user's username and sets the rest of the info
-        // As well as getting the user object
-        FirebaseUser user = mAuth.getCurrentUser();
-        String username = mAuth.getCurrentUser().getDisplayName();
-        if (user != null) {
-            getUserObject(username);
-        }
-
-        collectionReference = mStore.collection("users");
-        documentReference = collectionReference.document(username);
+        userObject = UserController.getCurrentUser();
+        UserController.addObserverToCurrentUser(this);
 
         return view;
     }
-
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -142,6 +87,10 @@ public class ProfileFragment extends Fragment {
 
         // Set the profile tab layout and viewpager
         setTabsAndViewPager();
+
+        // fill up user info on view created
+        setFields();
+        setProfilePicImageView();
 
         // When user clicks profile picture, change
         profilePic.setOnClickListener(new View.OnClickListener() {
@@ -175,14 +124,10 @@ public class ProfileFragment extends Fragment {
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
+            public void onTabUnselected(TabLayout.Tab tab) { }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
+            public void onTabReselected(TabLayout.Tab tab) { }
         });
 
         // Change tabs when view pager changes
@@ -197,33 +142,6 @@ public class ProfileFragment extends Fragment {
     }
 
     /**
-     * Gets the user object from the database and adds
-     * a snapshot listener to it, so whenever there is
-     * a change in the user's data, the profile fragment
-     * and its fields and profile picture are updated.
-     * @param username
-     *  The username of the user, type {@link String}
-     */
-    private void getUserObject(String username) {
-        mStore
-                .collection("users")
-                .document(username)
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {        // So then whenever there is a change in the data base, this is updated
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (documentSnapshot != null) {
-                            // Turn our document into user object
-                            userObject = documentSnapshot.toObject(User.class);
-
-                            // set our info into the textViews and profile pic
-                            setFields();
-                            setProfilePicImageView();
-                        }
-                    }
-                });
-    }
-
-    /**
      * Gets the info from the User object and sets
      * the TextViews accordingly
      */
@@ -232,10 +150,9 @@ public class ProfileFragment extends Fragment {
         fullNameTV.setText(userObject.getFirstName() + " " + userObject.getLastName());
         usernameTV.setText(userObject.getUsername());
         int followersNumber = userObject.getFollowers().size();
-        int followingNumber = userObject.getFollowers().size();
+        int followingNumber = userObject.getFollowing().size();
         followersTV.setText(String.valueOf(followersNumber));
         followingTV.setText(String.valueOf(followingNumber));
-
     }
 
     /**
@@ -261,8 +178,11 @@ public class ProfileFragment extends Fragment {
             imageUri = Uri.parse("android.resource://com.cmput301f21t26.habittracker/drawable/default_profile_pic");
             picturePath = "image/" + imageUri.hashCode() + ".jpeg";
 
-            // Store default profile picture in storage
-            changeProfilePic();
+            UserController.updateProfilePicInDb(picturePath, imageUri, user -> {
+                if (getActivity() != null) {
+                    ((MainActivity) getActivity()).setProfileIconToProfilePic(profileImageUrl);
+                }
+            });
         }
     }
 
@@ -285,57 +205,28 @@ public class ProfileFragment extends Fragment {
                             picturePath = "image/" + newImageUri.hashCode() + ".jpeg";
                             profilePic.setImageURI(newImageUri);
                             imageUri = newImageUri;
-                            changeProfilePic();
-                        }
 
-                    }
-                }
-            });
-
-    /**
-     * Changes the profile picture in profile and
-     * changes the pictureURL in the database for
-     * the current user.
-     */
-    private void changeProfilePic() {
-
-            mStorageReference = mStorage.getReference(picturePath);
-            mStorageReference
-                    .putFile(imageUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // If successful, get the download url and store it in pictureURL
-                            mStorageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Uri> task) {
-                                    profileImageUrl = task.getResult().toString();
-                                    // Now we update the user's pictureURL field
-                                    // and change the bottom navigation's profile icon to the new profile picture
-                                    documentReference.update("pictureURL", profileImageUrl)
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (getActivity() != null) {
-                                                        // ((MainActivity)getActivity()).setProfileIconToProfilePic(profileImageUrl);
-                                                    }
-                                                }
-                                            });
+                            UserController.updateProfilePicInDb(picturePath, imageUri, user -> {
+                                if (getActivity() != null) {
+                                   ((MainActivity) getActivity()).setProfileIconToProfilePic(profileImageUrl);
                                 }
                             });
                         }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "Default profile pic was not stored");
-                        }
-                    });
-    }
+                    }
+                }
+            });
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        UserController.deleteObserverFromCurrentUser(this);
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        // set our info into the textViews and profile pic
+        setFields();
+        setProfilePicImageView();
     }
 }

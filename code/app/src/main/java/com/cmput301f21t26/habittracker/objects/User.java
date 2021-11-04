@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 /**
  * Class that interacts with the database as well as other User objects.
@@ -38,6 +42,7 @@ public class User extends Observable implements Serializable {
 
     private transient FirebaseAuth mAuth;
     private transient FirebaseFirestore mStore;
+    private transient FirebaseStorage mStorage;
 
     private String username;    // user id
     private String firstName;
@@ -72,6 +77,7 @@ public class User extends Observable implements Serializable {
 
         this.mAuth = FirebaseAuth.getInstance();
         this.mStore = FirebaseFirestore.getInstance();
+        this.mStorage = FirebaseStorage.getInstance();
     }
 
     public User(String username) {
@@ -347,6 +353,7 @@ public class User extends Observable implements Serializable {
                 email = snapshot.getString("email");
                 pictureURL = snapshot.getString("pictureURL");
                 dateLastAccessed = snapshot.getDate("dateLastAccessed");
+
 
                 // TODO is it necessary to make new lists?
                 // habits = new ArrayList<>();
@@ -706,5 +713,31 @@ public class User extends Observable implements Serializable {
                 }
             }
         });
+    }
+
+    /**
+     * Update the profile picture and pictureURL in db.
+     * Call callback function after the update.
+     *
+     * @param picturePath String path to the new profile picture
+     * @param imageUri uri of the new profile picture
+     * @param callback callback function to be called after the update
+     */
+    protected void updateProfilePicInDb(String picturePath, Uri imageUri, UserCallback callback) {
+
+        final StorageReference storageRef = mStorage.getReference(picturePath);
+
+        storageRef
+                .putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // If successful, get the download url and store it in pictureURL
+                    storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        mStore.collection("users").document(getUid())
+                                .update("pictureURL", uri.toString())
+                                .addOnSuccessListener(unused -> callback.onCallback(User.this))
+                                .addOnFailureListener(e -> Log.d("updateUser", "Updating user failed"));
+                    });
+                })
+                .addOnFailureListener(e -> Log.d("storeProfilePicture", "Default profile pic was not stored"));
     }
 }

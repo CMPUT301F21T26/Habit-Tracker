@@ -1,5 +1,7 @@
 package com.cmput301f21t26.habittracker.objects;
 
+import android.net.Uri;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -228,4 +230,17 @@ public class UserController {
         user.updateHabitEventInDb(hEvent, callback);
     }
 
+    /**
+     * Update the profile picture and pictureURL in db.
+     * Call callback function after the update.
+     *
+     * @param picturePath String path to the new profile picture
+     * @param imageUri uri of the new profile picture
+     * @param callback callback function to be called after the update
+     */
+    public static void updateProfilePicInDb(String picturePath, Uri imageUri, UserCallback callback) {
+        assert user != null;
+
+        user.updateProfilePicInDb(picturePath, imageUri, callback);
+    }
 }
