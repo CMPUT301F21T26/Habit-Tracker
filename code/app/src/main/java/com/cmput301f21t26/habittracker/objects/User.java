@@ -274,7 +274,7 @@ public class User extends Observable implements Serializable {
      *
      * @param callback callback function to be called after reading data from db
      */
-    public void readUserDataFromDb(UserCallback callback) {
+    protected void readUserDataFromDb(UserCallback callback) {
 
         final DocumentReference userRef = mStore.collection("users").document(getUid());
 
@@ -301,7 +301,7 @@ public class User extends Observable implements Serializable {
         }).addOnFailureListener(e -> Log.w("readUserData", "Reading user data failed" + e.toString()));
     }
 
-    public void readHabitsFromDb(UserCallback callback) {
+    protected void readHabitsFromDb(UserCallback callback) {
 
         final DocumentReference userRef = mStore.collection("users").document(getUid());
         final CollectionReference habitsRef = userRef.collection("habits");
@@ -331,7 +331,7 @@ public class User extends Observable implements Serializable {
      *
      * @return snapshot listener for user doc
      */
-    public ListenerRegistration getUserSnapshotListener() {
+    protected ListenerRegistration getUserSnapshotListener() {
 
         final DocumentReference userRef = mStore.collection("users").document(getUid());
 
@@ -375,7 +375,7 @@ public class User extends Observable implements Serializable {
      *
      * @return snapshot listener for user's habits collection
      */
-    public ListenerRegistration getHabitsSnapshotListener() {
+    protected ListenerRegistration getHabitsSnapshotListener() {
 
         final DocumentReference userRef = mStore.collection("users").document(getUid());
 
@@ -432,7 +432,7 @@ public class User extends Observable implements Serializable {
      * @param parentHabitId parent habit id
      * @return  a snapshot listener for habitEvents collection
      */
-    public ListenerRegistration getHabitEventsSnapshotListener(String parentHabitId) {
+    protected ListenerRegistration getHabitEventsSnapshotListener(String parentHabitId) {
 
         final DocumentReference userRef = mStore.collection("users").document(getUid());
         final DocumentReference parentHabitRef = userRef.collection("habits").document(parentHabitId);
@@ -535,7 +535,7 @@ public class User extends Observable implements Serializable {
      * @param habit habit to store in database
      * @param callback callback function to be called after storing habit in db
      */
-    public void storeHabitInDb(Habit habit, UserCallback callback) {
+    protected void storeHabitInDb(Habit habit, UserCallback callback) {
         mStore.collection("users").document(getUid()).collection("habits")
                 .document(habit.getHabitId())
                 .set(habit)
@@ -549,7 +549,7 @@ public class User extends Observable implements Serializable {
      * @param habit habit to be removed from db
      * @param callback callback function to be called after the removal
      */
-    public void removeHabitFromDb(Habit habit, UserCallback callback) {
+    protected void removeHabitFromDb(Habit habit, UserCallback callback) {
         mStore.collection("users").document(getUid()).collection("habits")
                 .document(habit.getHabitId())
                 .delete()
@@ -564,7 +564,7 @@ public class User extends Observable implements Serializable {
      * @param habit target habit
      * @param callback callback function to be called after the removal
      */
-    public void removeAllHabitEventsOfHabitFromDb(Habit habit, UserCallback callback) {
+    protected void removeAllHabitEventsOfHabitFromDb(Habit habit, UserCallback callback) {
         final DocumentReference userRef = mStore.collection("users").document(getUid());
         final DocumentReference habitRef = userRef.collection("habits").document(habit.getHabitId());
 
@@ -585,7 +585,7 @@ public class User extends Observable implements Serializable {
      * @param habit updated habit to store
      * @param callback callback function to be called after the update
      */
-    public void updateHabitInDb(Habit habit, UserCallback callback) {
+    protected void updateHabitInDb(Habit habit, UserCallback callback) {
         mStore.collection("users").document(getUid()).collection("habits")
                 .document(habit.getHabitId())
                 .set(habit, SetOptions.merge())        // update the document, instead of overwriting it
@@ -600,7 +600,7 @@ public class User extends Observable implements Serializable {
      * @param hEvent    habit event to be stored
      * @param callback  callback function to be called after storing habit event
      */
-    public void storeHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
+    protected void storeHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
         final DocumentReference userRef = mStore.collection("users").document(getUid());
         final DocumentReference habitsRef = userRef.collection("habits").document(hEvent.getParentHabitId());
 
@@ -618,7 +618,7 @@ public class User extends Observable implements Serializable {
      * @param hEvent habit event to be removed
      * @param callback callback function to be called after the removal
      */
-    public void removeHabitEventFromDb(HabitEvent hEvent, UserCallback callback) {
+    protected void removeHabitEventFromDb(HabitEvent hEvent, UserCallback callback) {
 
         final DocumentReference userRef = mStore.collection("users").document(username);
         final DocumentReference habitRef = userRef.collection("habits").document(hEvent.getParentHabitId());
@@ -637,7 +637,7 @@ public class User extends Observable implements Serializable {
      * @param hEvent habit event to update
      * @param callback callback function to be called after the update
      */
-    public void updateHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
+    protected void updateHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
         final DocumentReference userRef = mStore.collection("users").document(username);
         final DocumentReference habitRef = userRef.collection("habits").document(hEvent.getParentHabitId());
 
@@ -653,7 +653,7 @@ public class User extends Observable implements Serializable {
      *
      * @param callback callback function to be called after the update
      */
-    public void updateUserLastAccessedDateInDb(UserCallback callback) {
+    protected void updateUserLastAccessedDateInDb(UserCallback callback) {
 
         mStore.collection("users").document(getUid())
                 .update("dateLastAccessed", Calendar.getInstance().getTime())
@@ -667,7 +667,7 @@ public class User extends Observable implements Serializable {
      *
      * @param callback callback function to be called after the update
      */
-    public void resetTodayHabitsInDb(UserCallback callback) {
+    protected void resetTodayHabitsInDb(UserCallback callback) {
 
         Calendar calNow = Calendar.getInstance();
         int yearNow = calNow.get(Calendar.YEAR);
