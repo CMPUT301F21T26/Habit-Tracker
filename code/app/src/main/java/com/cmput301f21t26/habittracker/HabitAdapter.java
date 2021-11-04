@@ -2,8 +2,6 @@ package com.cmput301f21t26.habittracker;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,31 +13,28 @@ import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.cmput301f21t26.habittracker.objects.User;
+import com.cmput301f21t26.habittracker.objects.UserCallback;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
 
-public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> {
+public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> implements Observer {
 
     private final String TAG = "HabitAdapter";
     private final Activity activity;
     private final ArrayList<Habit> habitList;
     private int mVisibility = View.VISIBLE;
     private RecyclerViewClickListener listener;
-    private final String userid;
     private Context mContext;
 
     /**
@@ -54,9 +49,9 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         public ViewHolder(View view) {
             super(view);
 
-            titleTV = (TextView) view.findViewById(R.id.habitTitleTV);
-            planTV = (TextView) view.findViewById(R.id.habitPlanTV);
-            doneTodayCB = (CheckBox) view.findViewById(R.id.habitCheckbox);
+            titleTV = view.findViewById(R.id.habitTitleTV);
+            planTV = view.findViewById(R.id.habitPlanTV);
+            doneTodayCB = view.findViewById(R.id.habitCheckbox);
             view.setOnClickListener(this);
         }
 
@@ -84,11 +79,12 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
      * @param habitList ArrayList<Habit> contains the Habit object to populate views to be
      *                  used by RecyclerView
      */
-    public HabitAdapter(ArrayList<Habit> habitList, Activity activity, RecyclerViewClickListener listener, String userid) {
+    public HabitAdapter(ArrayList<Habit> habitList, Activity activity, RecyclerViewClickListener listener) {
         this.activity = activity;
         this.habitList = habitList;
         this.listener = listener;
-        this.userid = userid;
+
+        UserController.addObserverToCurrentUser(this);
     }
 
     // Create new views (invoked by the layout manager)
@@ -108,7 +104,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         // Changes the checkbox visibility depending on mVisibility
-        holder.itemView.findViewById(R.id.habitCheckbox).setVisibility(mVisibility);
+        holder.getDoneTodayCB().setVisibility(mVisibility);
 
         Habit habit = habitList.get(position);
 
@@ -118,51 +114,42 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         holder.getDoneTodayCB().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
-                habit.setDoneForToday(isChecked);
-                updateDoneTodayInDb(habit, isChecked);
+                UserController.updateDoneForTodayInDb(habit, isChecked, user -> {
 
-                if (isChecked) {
+                    if (isChecked) {
 
-                    HabitEvent hEvent = new HabitEvent();
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    CollectionReference habitsRef = db.collection("users").document(userid).collection("habits");
+                        HabitEvent hEvent = new HabitEvent(habit.getHabitId());
 
-                    // Get the date for use in title
-                    String datePattern = "yyyy-MM-dd";
-                    SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
-                    String habitEventDateFormat = format.format(hEvent.getHabitEventDate());
-                    // Set the title of the habit event
-                    hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
+                        // Get the date for use in title
+                        String datePattern = "yyyy-MM-dd";
+                        SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
+                        String habitEventDateFormat = format.format(hEvent.getHabitEventDate());
+                        // Set the title of the habit event
+                        hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
 
-                    // add empty habit event
-                    habitsRef.document(habit.getHabitId()).collection("habitEvents")
-                            .document(hEvent.getHabitEventId())
-                            .set(hEvent)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void unused) {
+                        UserController.storeHabitEventInDb(hEvent, new UserCallback() {
+                            @Override
+                            public void onCallback(User user) {
+                                // show snackbar after storing an habit event in db
+                                Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
+                                        "Empty habit event is created", Snackbar.LENGTH_SHORT);
+                                snackbar.setAnchorView(activity.findViewById(R.id.addHabitButton));
+                                snackbar.setAction("EDIT", view -> {
 
-                                    Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
-                                            "Empty habit event is created", Snackbar.LENGTH_SHORT);
-                                    snackbar.setAnchorView(activity.findViewById(R.id.addHabitButton));
-                                    snackbar.setAction("EDIT", new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_activity_main);
-                                            @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
+                                    NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_activity_main);
+                                    @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
 
-                                            navController.navigate(direction);
-                                        }
-                                    });
-                                    snackbar.show();
-                                }
-                            });
-                }
+                                    navController.navigate(direction);
+                                });
+                                snackbar.show();
+                            };
+                        });
+                    }
+
+                });
+
             }
         });
-
-
-
 
         // TODO update progress bar
     }
@@ -222,25 +209,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         return planMsgStr;
     }
 
-    private void updateDoneTodayInDb(Habit habit, boolean isDoneToday) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference habitsRef = db.collection("users").document(userid).collection("habits");
-        int dayToday = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;        // Calendar starts the first day as 1, not 0.
-
-        habitsRef.document(habit.getHabitId())
-                .update("doneForToday", isDoneToday)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Habit doneForToday successfully updated!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating habit doneForToday", e);
-                    }
-                });
+    @Override
+    public void update(Observable observable, Object o) {
+        notifyDataSetChanged();
     }
-
 }

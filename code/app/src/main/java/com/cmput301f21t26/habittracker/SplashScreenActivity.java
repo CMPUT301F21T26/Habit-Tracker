@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.WindowManager;
 
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -50,16 +51,17 @@ public class SplashScreenActivity extends AppCompatActivity {
         // Delays the splash screen and then goes to either the main activity or login/signup page
         // based on auth tokens
         new Handler().postDelayed(() -> {
-            if (mAuth.getCurrentUser() != null){
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-            }
-            else{
+            if (mAuth.getCurrentUser() != null) {
+                // initialize user before moving to MainActivity
+                UserController.initCurrentUser(user -> {        // get user data then start activity
+                    Intent intent = new Intent(this, MainActivity.class);
+                    startActivity(intent);
+                });
+
+            } else {
                 Intent intent = new Intent(this, LoginSignupActivity.class);
                 startActivity(intent);
             }
-
         }, SPLASH_SCREEN_TIME);
-
     }
 }

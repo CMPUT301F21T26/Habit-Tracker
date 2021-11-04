@@ -2,17 +2,6 @@ package com.cmput301f21t26.habittracker.fragments;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
-
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,25 +13,24 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
 import com.cmput301f21t26.habittracker.MainActivity;
-import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
 import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitBinding;
-import com.cmput301f21t26.habittracker.databinding.FragmentViewHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 public class EditHabitFragment extends Fragment {
@@ -61,13 +48,12 @@ public class EditHabitFragment extends Fragment {
 
     private ArrayList<Integer> daysList;
 
+    private @NonNull FragmentEditHabitBinding binding;
+
     private Button confirmHabitButton;
     private Button deleteHabitButton;
     private ChipGroup chipGroup;
-    private @NonNull FragmentEditHabitBinding binding;
     private NavController navController;
-    private FirebaseFirestore mStore;
-    private String username;
     private EditText habitTitleET;
     private EditText habitReasoningET;
     private TextView dateFormatMessageTV;
@@ -75,9 +61,6 @@ public class EditHabitFragment extends Fragment {
     private SwitchCompat privacySwitch;
 
     private Habit habit;
-
-
-
 
     public EditHabitFragment() {
         // Required empty public constructor
@@ -87,7 +70,6 @@ public class EditHabitFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -96,10 +78,7 @@ public class EditHabitFragment extends Fragment {
 
         binding = FragmentEditHabitBinding.inflate(inflater, container, false);
 
-
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        username = mAuth.getCurrentUser().getDisplayName();
-        mStore = FirebaseFirestore.getInstance();
 
         daysList = new ArrayList<>();       // init everything to false
         chipGroup = binding.chipGroup;
@@ -113,7 +92,6 @@ public class EditHabitFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return binding.getRoot();
-
     }
 
     @Override
@@ -145,17 +123,14 @@ public class EditHabitFragment extends Fragment {
             }
         });
 
-        chooseDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                datePicker.show(requireActivity().getSupportFragmentManager(), "start date");
-            }
-        });
+        chooseDateButton.setOnClickListener(v -> datePicker.show(requireActivity().getSupportFragmentManager(), "start date"));
 
         assert getArguments() != null;
         String habitId = getArguments().getString("habitId");
         // grabs habit and updates screen with this information
-        getHabit(habitId);
+        habit = UserController.getHabit(habitId);
+        updateScreen();
+
         // make the confirm button and delete buttons clickable
         // confirm first
         confirmHabitButton.setOnClickListener(confirmOnClickListener);
@@ -171,10 +146,11 @@ public class EditHabitFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // update DB
-                            deleteHabitDB();
-                            // leave
-                            navController.popBackStack();
-                            navController.popBackStack();
+                            UserController.removeHabitFromDb(habit, cbUser -> {
+                                // go to previous fragment user was in
+                                navController.popBackStack();       // this goes back to view habit fragment
+                                navController.popBackStack();
+                            });
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -186,7 +162,6 @@ public class EditHabitFragment extends Fragment {
                     .show();
             }
         });
-
     }
 
     /**
@@ -213,31 +188,6 @@ public class EditHabitFragment extends Fragment {
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
 
-    /**
-     * Sets habit to be the habit from the database
-     * @param habitID
-     *      habitID is necessary to identify in database
-     */
-    private void getHabit(String habitID){
-
-        DocumentReference doc = mStore.collection("users").document(username).collection("habits").document(habitID);
-        doc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot!=null){
-                    habit = documentSnapshot.toObject(Habit.class);
-                    Log.d(TAG, "DocSnap data: " + habit);
-                    updateScreen();
-
-
-                } else {
-                    Log.d(TAG, "no such document");
-                }
-            }
-        });
-    }
-
     private void updateScreen(){
         Log.d(TAG, "habit is " + habit);
         // habit is retrieved, now populate the View with information
@@ -245,15 +195,15 @@ public class EditHabitFragment extends Fragment {
         habitTitleET.setText(habit.getTitle());
         habitReasoningET.setText(habit.getReason());
 
-        //todo set percentage done
+        // TODO set percentage done
 
-        //get the date and make it ready for presentation
+        // get the date and make it ready for presentation
         String datePattern = "yyyy-MM-dd";
         SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
         String date = format.format(habit.getStartDate());
         dateFormatMessageTV.setText(date);
 
-        //set days of the week
+        // set days of the week
         ArrayList<Integer> chips = habit.getDaysList();
         for (int i=0; i<chips.size(); i++){
             Chip chip = (Chip) chipGroup.getChildAt(chips.get(i));
@@ -264,7 +214,6 @@ public class EditHabitFragment extends Fragment {
         if (habit.isPrivate()) {
             privacySwitch.setChecked(habit.isPrivate());
         }
-
     }
 
     private View.OnClickListener confirmOnClickListener = new View.OnClickListener() {
@@ -278,7 +227,6 @@ public class EditHabitFragment extends Fragment {
                 final String title = habitTitleET.getText().toString();
                 final String reason = habitReasoningET.getText().toString();
                 final String dateStr = dateFormatMessageTV.getText().toString();
-
 
                 SimpleDateFormat format = new SimpleDateFormat(datePattern);
                 Date date;       // TODO add date
@@ -306,33 +254,21 @@ public class EditHabitFragment extends Fragment {
                 if(privacySwitch.isChecked()) {
                     isPrivate = true;
                 }
+
                 habit.setTitle(title);
                 habit.setDaysList(daysList);
                 habit.setReason(reason);
                 habit.setStartDate(date);
                 habit.setPrivate(isPrivate);
 
-                storeHabitInDb(habit);
-
-                // go to previous fragment user was in
-                navController.popBackStack();       // this goes back to view habit fragment
-                navController.popBackStack();
+                UserController.updateHabitInDb(habit, cbUser -> {
+                    // go to previous fragment user was in
+                    navController.popBackStack();       // this goes back to view habit fragment
+                    navController.popBackStack();
+                });
             }
         }
     };
-
-    public void storeHabitInDb(Habit habit){
-        mStore.collection("users").document(username).collection("habits")
-            .document(habit.getHabitId())
-            .set(habit);
-    }
-
-    private void deleteHabitDB(){
-        //delete the habit, no need to check for subcollections since habit events will be stored in an array
-        mStore.collection("users").document(username).collection("habits")
-            .document(habit.getHabitId())
-            .delete();
-    }
 
     /**
      * Checks all the fields and makes sure
