@@ -22,6 +22,7 @@ public class ActionOnItemView {
 
     /**
      * Performs an action on a view within the recycler view item.
+     * @see <a href="https://stackoverflow.com/questions/61013026/performing-click-on-a-button-of-a-child-in-recycler-view-using-espresso">Source1</a>
      * In our case, for today's habits, if given the id of the checkbox
      * and the action click(), it will click on the checkbox.
      * Example:
@@ -35,7 +36,6 @@ public class ActionOnItemView {
      * @return
      *  Returns a ViewAction to be used with RecyclerViewActions. Type {@link ViewAction}
      */
-    // Ref: https://stackoverflow.com/questions/61013026/performing-click-on-a-button-of-a-child-in-recycler-view-using-espresso
     public static ViewAction actionOnItemView(Matcher<View> matcher, ViewAction action) {
 
         return new ViewAction() {
