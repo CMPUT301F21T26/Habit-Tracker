@@ -86,7 +86,8 @@
     <fragment
         android:id="@+id/editHabitEventFragment"
         android:name="com.cmput301f21t26.habittracker.fragments.EditHabitEventFragment"
-        android:label="EDIT HABIT EVENT" >
+        android:label="EDIT HABIT EVENT"
+        tools:layout="@layout/fragment_edit_habit_event" >
         <argument
             android:name="habitEvent"
             app:argType="com.cmput301f21t26.habittracker.objects.HabitEvent" />
@@ -106,7 +107,8 @@
     <fragment
         android:id="@+id/viewHabitEventFragment"
         android:name="com.cmput301f21t26.habittracker.fragments.ViewHabitEventFragment"
-        android:label="VIEW HABIT EVENT" >
+        android:label="VIEW HABIT EVENT"
+        tools:layout="@layout/fragment_view_habit_event" >
         <argument
             android:name="habitEvent"
             app:argType="com.cmput301f21t26.habittracker.objects.HabitEvent" />
