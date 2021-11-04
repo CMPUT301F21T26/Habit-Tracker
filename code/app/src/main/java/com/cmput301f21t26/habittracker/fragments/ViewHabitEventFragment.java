@@ -1,16 +1,7 @@
 package com.cmput301f21t26.habittracker.fragments;
 
 
-import android.content.res.Resources;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,16 +13,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+
 import com.cmput301f21t26.habittracker.MainActivity;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -52,9 +45,6 @@ public class ViewHabitEventFragment extends Fragment {
     private Habit habit;
     private HabitEvent hEvent;
 
-    private FirebaseFirestore mStore;
-    private FirebaseAuth mAuth;
-
     public ViewHabitEventFragment() {
         // Required empty public constructor
     }
@@ -64,12 +54,8 @@ public class ViewHabitEventFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        mAuth = FirebaseAuth.getInstance();
-        mStore = FirebaseFirestore.getInstance();
-
         habit = ViewHabitEventFragmentArgs.fromBundle(getArguments()).getHabit();
         hEvent = ViewHabitEventFragmentArgs.fromBundle(getArguments()).getHabitEvent();
-
     }
 
     @Override
@@ -93,25 +79,19 @@ public class ViewHabitEventFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         navController = Navigation.findNavController(view);
 
-
         // confirm button clicked
-        confirmHabitEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
-                navController.navigate(action);
-            }
+        confirmHabitEventButton.setOnClickListener(v -> {
+            NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+            navController.navigate(action);
         });
         // edit button
-        editHabitEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "clicked edit habit event button");
-                NavDirections action = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
-                navController.navigate(action);
-            }
+        editHabitEventButton.setOnClickListener(v -> {
+            Log.d(TAG, "clicked edit habit event button");
+            NavDirections action = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
+            navController.navigate(action);
         });
 
         setViewHabitEventFields();
@@ -122,7 +102,6 @@ public class ViewHabitEventFragment extends Fragment {
      * to the habit event's info
      */
     private void setViewHabitEventFields() {
-
 
         // Get date and set it to TextView
         String datePattern = "yyyy-MM-dd";
@@ -141,9 +120,7 @@ public class ViewHabitEventFragment extends Fragment {
         if (hEvent.getPhotoUrl() == null) {
             habitEventImageView.setImageResource(R.color.transparent);
         }
-
     }
-
 
     /**
      * Hides menu items in edit habit event fragment

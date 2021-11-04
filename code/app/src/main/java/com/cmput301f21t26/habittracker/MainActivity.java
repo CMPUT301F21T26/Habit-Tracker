@@ -1,12 +1,10 @@
 package com.cmput301f21t26.habittracker;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,61 +12,39 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
-import com.cmput301f21t26.habittracker.objects.User;
-import com.cmput301f21t26.habittracker.ui.home.TodayHabitFragment;
-import com.cmput301f21t26.habittracker.ui.profile.ProfileFragment;
-import com.cmput301f21t26.habittracker.ui.timeline.TimelineFragment;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
+import com.cmput301f21t26.habittracker.objects.UserController;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.WriteBatch;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG = "MainActivity";
-    private static BottomNavigationView navView;
+
     private ActivityMainBinding binding;
     private NavController navController = null;
+
+    private static BottomNavigationView navView;
     private Button addHabitButton;
     private Toolbar toolbar;
     private ImageView redCircle;
     private ImageView searchIcon;
     private FirebaseAuth mAuth;
-    private FirebaseFirestore mStore;
-    private String currentUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,27 +54,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
-        mStore = FirebaseFirestore.getInstance();
-
-        // Get the username
-        if (mAuth.getCurrentUser() != null) {
-            currentUsername = mAuth.getCurrentUser().getDisplayName();
-        }
-
-        // Get the current user's pictureURL
-        mStore.collection("users").document(currentUsername)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            String URL = task.getResult().getString("pictureURL");
-                            setProfileIconToProfilePic(URL);
-                        }
-                    }
-                });
-
-        resetTodayHabits();     // TODO bug: the app does not wait until the changes are applied. Possible solution: Set up data changed listener
 
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
@@ -248,6 +203,13 @@ public class MainActivity extends AppCompatActivity {
         finishAffinity();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        UserController.detachSnapshotListeners();
+        UserController.deleteAllObserversFromCurrentUser();
+    }
+
     /**
      * Hides the menu items.
      * MAKE SURE TO HAVE "setHasOptionsMenu(true);"
@@ -296,100 +258,6 @@ public class MainActivity extends AppCompatActivity {
         navView.setVisibility(View.VISIBLE);
         addHabitButton.setVisibility(View.VISIBLE);
         extendBottomNav.setVisibility(View.VISIBLE);
-
-    }
-
-     private void resetTodayHabits() {
-         Calendar calNow = Calendar.getInstance();
-         int yearNow = calNow.get(Calendar.YEAR);
-         int monthNow = calNow.get(Calendar.MONTH);
-         int weekNow = calNow.get(Calendar.WEEK_OF_MONTH);
-         int dayNow = calNow.get(Calendar.DAY_OF_WEEK);
-
-         Calendar calLastAccessed = Calendar.getInstance();
-
-         DocumentReference userRef = mStore.collection("users").document(currentUsername);
-         CollectionReference habitsRef = userRef.collection("habits");
-
-         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Date dateLastAccessed;
-                            int yearLastAccessed;
-                            int monthLastAccessed;
-                            int weekLastAccessed;
-                            int dayLastAccessed;
-
-                            dateLastAccessed = document.getDate("dateLastAccessed");
-                            calLastAccessed.setTime(Objects.requireNonNull(dateLastAccessed));
-                            yearLastAccessed = calLastAccessed.get(Calendar.YEAR);
-                            monthLastAccessed = calLastAccessed.get(Calendar.MONTH);
-                            weekLastAccessed = calLastAccessed.get(Calendar.WEEK_OF_MONTH);
-                            dayLastAccessed = calLastAccessed.get(Calendar.DAY_OF_WEEK);
-
-                            if ( dayNow > dayLastAccessed
-                                    || weekNow > weekLastAccessed
-                                    || monthNow > monthLastAccessed
-                                    || yearNow > yearLastAccessed ) {
-
-                                // reset today habits
-
-                                // get a new batch write
-                                WriteBatch batch = mStore.batch();
-                                habitsRef.whereArrayContains("daysList", dayNow-1).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                                // update doneForHabit of all habits
-                                                DocumentReference habitRef = habitsRef.document(document.getId());
-                                                batch.update(habitRef, "doneForToday", false);
-                                            }
-
-                                            // commit batch
-                                            batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    Log.d(TAG, "Today habits reset successful");
-                                                }
-                                            });
-
-                                            updateUserLastAccessedDate();
-
-                                        } else {
-                                            Log.d(TAG, "Error getting habits: ", task.getException());
-                                        }
-                                    }
-                                });
-                            }
-                        } else {
-                            Log.d(TAG, "No such user");
-                        }
-                    } else {
-                        Log.d(TAG, "get failed with ", task.getException());
-                    }
-                }
-            });
-    }
-
-    private void updateUserLastAccessedDate() {
-        mStore.collection("users").document(currentUsername)
-                .update("dateLastAccessed", Calendar.getInstance().getTime())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "User dateLastAccessed successfully updated!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating user dateLastAccessed", e);
-                    }
-                });
     }
 
     /**
@@ -410,13 +278,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         navView.setItemIconTintList(null);                  // issue with tinting covering image
                         profileItem.setIcon(new BitmapDrawable(getResources(), resource));
-
                     }
 
                     @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
-
-                    }
+                    public void onLoadCleared(@Nullable Drawable placeholder) { }
                 });
     }
 

@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import com.cmput301f21t26.habittracker.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.User;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -107,11 +108,13 @@ public class LoginFragment extends Fragment {
                                 if (authTask.isSuccessful()){
                                     Toast.makeText(getActivity(), "Logging in", Toast.LENGTH_LONG).show();
 
-                                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                                    // Close existing activity stack and create new root activity
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intent);
-
+                                    // initialize user before moving to MainActivity
+                                    UserController.initCurrentUser(currUser -> {        // get user data then start activity
+                                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                                        // Close existing activity stack and create new root activity
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
+                                    });
                                 } else {
                                     Toast.makeText(getActivity(), "Wrong password", Toast.LENGTH_LONG).show();
                                 }

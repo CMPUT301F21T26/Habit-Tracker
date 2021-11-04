@@ -1,48 +1,40 @@
 package com.cmput301f21t26.habittracker.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.cmput301f21t26.habittracker.MainActivity;
-import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.User;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -50,24 +42,21 @@ public class AddHabitFragment extends Fragment {
 
     private final String TAG = "AddHabitFragment";
     private final String datePattern = "yyyy-MM-dd";
-    private String defaultDate = "YYYY-MM-DD";
+    private String defaultDate;
 
+    private FragmentAddHabitBinding binding;
     private NavController navController;
+
     private Button confirmAddHabitButton;
     private Button chooseDateButton;
-    private ArrayList<Integer> daysList;
     private ChipGroup chipGroup;
-    private FragmentAddHabitBinding binding;
     private SwitchCompat privacySwitch;
-    private FirebaseFirestore mStore;
-    private FirebaseAuth mAuth;
-    private String username;
     private TextView dateFormatMessageTV;
     private EditText habitTitleET;
     private EditText habitReasoningET;
 
     /**
-     * Required empty constructor
+     * No-argument empty constructor
      */
     public AddHabitFragment() { }
 
@@ -76,7 +65,6 @@ public class AddHabitFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentAddHabitBinding.inflate(inflater, container, false);
 
-        daysList = new ArrayList<>();       // init everything to false
         chipGroup = binding.chipGroup;
         confirmAddHabitButton = binding.confirmAddHabitButton;
         chooseDateButton = binding.chooseDateButton;
@@ -84,11 +72,9 @@ public class AddHabitFragment extends Fragment {
         dateFormatMessageTV = binding.dateFormatMessage;
         habitTitleET = binding.habitTitleET;
         habitReasoningET = binding.habitReasoningET;
-        mStore = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        username = mAuth.getCurrentUser().getDisplayName();
         defaultDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         setHasOptionsMenu(true);
+
         return binding.getRoot();
     }
 
@@ -123,12 +109,7 @@ public class AddHabitFragment extends Fragment {
             }
         });
 
-        chooseDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                datePicker.show(requireActivity().getSupportFragmentManager(), "start date");
-            }
-        });
+        chooseDateButton.setOnClickListener(v -> datePicker.show(requireActivity().getSupportFragmentManager(), "start date"));
 
         confirmAddHabitButton.setOnClickListener(confirmOnClickListener);
     }
@@ -142,8 +123,9 @@ public class AddHabitFragment extends Fragment {
 
             if (checkFieldsFilled()) {
 
-                Habit newHabit = null;
-                boolean isPrivate = false;
+                Habit newHabit;
+                boolean isPrivate;
+                ArrayList<Integer> daysList = new ArrayList<>();
 
                 // make sure user clicks on confirm button before storing data into firebase
                 final String title = habitTitleET.getText().toString();
@@ -172,27 +154,18 @@ public class AddHabitFragment extends Fragment {
                     }
                 }
 
-                if(privacySwitch.isChecked()){
-                    isPrivate = true;
-                }
+                isPrivate = privacySwitch.isChecked();
+
                 newHabit = new Habit(title, reason, date, daysList);
                 newHabit.setPrivate(isPrivate);
 
-                storeHabitInDb(newHabit);
-
-                // Goes back to previous fragment user was in
-                navController.popBackStack();
-
+                UserController.storeHabitInDb(newHabit, cbUser -> {
+                    // Goes back to previous fragment user was in
+                    navController.popBackStack();
+                });
             }
-
         }
     };
-
-    public void storeHabitInDb(Habit habit){
-        mStore.collection("users").document(username).collection("habits")
-                .document(habit.getHabitId())
-                .set(habit);
-    }
 
     /**
      * Hides menu items in add habit fragment
@@ -252,5 +225,4 @@ public class AddHabitFragment extends Fragment {
 
         return filled;
     }
-
 }
