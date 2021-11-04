@@ -37,11 +37,8 @@ import org.junit.Test;
 
 public class EditHabitEventFragmentTest {
 
-
     @Rule
     public ActivityTestRule<LoginSignupActivity> rule = new ActivityTestRule<>(LoginSignupActivity.class);
-
-
 
     @Before
     public void setUp() throws InterruptedException {

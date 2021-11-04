@@ -23,7 +23,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class ViewHabitEventFragmentTest {
-
     @Rule
     public ActivityTestRule<LoginSignupActivity> rule = new ActivityTestRule<>(LoginSignupActivity.class);
 
