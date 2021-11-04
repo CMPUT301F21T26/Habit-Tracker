@@ -1,6 +1,9 @@
 package com.cmput301f21t26.habittracker;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,6 +13,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
@@ -18,6 +22,10 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -46,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
-
-        // Get the username
 
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
@@ -253,4 +259,30 @@ public class MainActivity extends AppCompatActivity {
         addHabitButton.setVisibility(View.VISIBLE);
         extendBottomNav.setVisibility(View.VISIBLE);
     }
+
+    /**
+     * Sets the profile icon in the bottom navigation view
+     * to the profile picture of the current user
+     * @param URL
+     *  The URL that contains an image of the user's profile picture {@link String}
+     */
+    public void setProfileIconToProfilePic(String URL) {
+
+        MenuItem profileItem = navView.getMenu().findItem(R.id.navigation_profile);
+        Glide.with(this)
+                .asBitmap()
+                .load(URL)
+                .apply(RequestOptions.circleCropTransform().placeholder(R.drawable.ic_person))
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        navView.setItemIconTintList(null);                  // issue with tinting covering image
+                        profileItem.setIcon(new BitmapDrawable(getResources(), resource));
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) { }
+                });
+    }
+
 }
