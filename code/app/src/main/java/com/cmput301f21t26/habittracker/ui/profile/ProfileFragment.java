@@ -2,10 +2,12 @@ package com.cmput301f21t26.habittracker.ui.profile;
 
 import static android.content.ContentValues.TAG;
 
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -22,6 +24,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.cmput301f21t26.habittracker.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
 import com.cmput301f21t26.habittracker.objects.User;
@@ -29,6 +35,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -302,7 +310,17 @@ public class ProfileFragment extends Fragment {
                                 @Override
                                 public void onComplete(@NonNull Task<Uri> task) {
                                     profileImageUrl = task.getResult().toString();
-                                    documentReference.update("pictureURL", profileImageUrl);
+                                    // Now we update the user's pictureURL field
+                                    // and change the bottom navigation's profile icon to the new profile picture
+                                    documentReference.update("pictureURL", profileImageUrl)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (getActivity() != null) {
+                                                        // ((MainActivity)getActivity()).setProfileIconToProfilePic(profileImageUrl);
+                                                    }
+                                                }
+                                            });
                                 }
                             });
                         }
@@ -314,7 +332,6 @@ public class ProfileFragment extends Fragment {
                         }
                     });
     }
-
 
     @Override
     public void onDestroyView() {
