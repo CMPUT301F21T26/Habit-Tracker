@@ -1,6 +1,10 @@
 package com.cmput301f21t26.habittracker;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -10,6 +14,12 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.ui.home.TodayHabitFragment;
 import com.cmput301f21t26.habittracker.ui.profile.ProfileFragment;
 import com.cmput301f21t26.habittracker.ui.timeline.TimelineFragment;
@@ -20,6 +30,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -73,6 +84,19 @@ public class MainActivity extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null) {
             currentUsername = mAuth.getCurrentUser().getDisplayName();
         }
+
+        // Get the current user's pictureURL
+        mStore.collection("users").document(currentUsername)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            String URL = task.getResult().getString("pictureURL");
+                            setProfileIconToProfilePic(URL);
+                        }
+                    }
+                });
 
         resetTodayHabits();     // TODO bug: the app does not wait until the changes are applied. Possible solution: Set up data changed listener
 
@@ -364,6 +388,34 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.w(TAG, "Error updating user dateLastAccessed", e);
+                    }
+                });
+    }
+
+    /**
+     * Sets the profile icon in the bottom navigation view
+     * to the profile picture of the current user
+     * @param URL
+     *  The URL that contains an image of the user's profile picture {@link String}
+     */
+    public void setProfileIconToProfilePic(String URL) {
+
+        MenuItem profileItem = navView.getMenu().findItem(R.id.navigation_profile);
+        Glide.with(this)
+                .asBitmap()
+                .load(URL)
+                .apply(RequestOptions.circleCropTransform().placeholder(R.drawable.ic_person))
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        navView.setItemIconTintList(null);                  // issue with tinting covering image
+                        profileItem.setIcon(new BitmapDrawable(getResources(), resource));
+
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+
                     }
                 });
     }
