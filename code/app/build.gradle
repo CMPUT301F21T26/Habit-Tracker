@@ -35,6 +35,8 @@ android {
             useJUnitPlatform()
         }
     }
+    compileSdkVersion 31
+    buildToolsVersion '30.0.2'
 }
 
 dependencies {
