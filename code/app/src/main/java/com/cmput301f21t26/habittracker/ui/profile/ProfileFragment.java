@@ -19,7 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
-import com.cmput301f21t26.habittracker.MainActivity;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
 import com.cmput301f21t26.habittracker.objects.User;

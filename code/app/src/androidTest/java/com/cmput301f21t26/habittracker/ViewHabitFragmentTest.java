@@ -9,7 +9,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.CoreMatchers.anything;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasToString;
 
 import android.util.Log;
@@ -17,8 +16,9 @@ import android.util.Log;
 import androidx.test.rule.ActivityTestRule;
 
 
+import com.cmput301f21t26.habittracker.ui.LoginSignupActivity;
+
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 

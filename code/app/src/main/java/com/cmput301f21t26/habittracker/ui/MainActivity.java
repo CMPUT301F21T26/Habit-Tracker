@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker;
+package com.cmput301f21t26.habittracker.ui;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,6 +26,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
+import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.bottomnavigation.BottomNavigationView;

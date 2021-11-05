@@ -8,29 +8,23 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
-import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withChild;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasToString;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.fail;
 
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 
-import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.rule.ActivityTestRule;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matcher;
+import com.cmput301f21t26.habittracker.ui.LoginSignupActivity;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

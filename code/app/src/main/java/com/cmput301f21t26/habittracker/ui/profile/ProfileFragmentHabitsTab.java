@@ -14,7 +14,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.cmput301f21t26.habittracker.HabitAdapter;
+import com.cmput301f21t26.habittracker.ui.habit.HabitAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.UserController;

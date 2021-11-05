@@ -1,9 +1,7 @@
 package com.cmput301f21t26.habittracker;
 
-import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.longClick;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertTrue;
@@ -16,6 +14,8 @@ import androidx.test.espresso.action.ViewActions;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
+import com.cmput301f21t26.habittracker.ui.LoginSignupActivity;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;

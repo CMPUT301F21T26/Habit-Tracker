@@ -2,15 +2,10 @@ package com.cmput301f21t26.habittracker;
 
 import com.cmput301f21t26.habittracker.objects.Habit;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import android.util.Log;
-
-import java.text.SimpleDateFormat;
 
 public class HabitTest {
 

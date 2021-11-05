@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainLoginSignupFragment"
-        android:name="com.cmput301f21t26.habittracker.fragments.MainLoginSignupFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.auth.MainLoginSignupFragment"
         android:label="fragment_main_login_signup"
         tools:layout="@layout/fragment_main_login_signup" >
         <action
@@ -19,14 +19,14 @@
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.cmput301f21t26.habittracker.fragments.LoginFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.auth.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" />
 
 
     <fragment
         android:id="@+id/signupFragment"
-        android:name="com.cmput301f21t26.habittracker.fragments.SignupFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.auth.SignupFragment"
         android:label="fragment_signup"
         tools:layout="@layout/fragment_signup" >
         <action
