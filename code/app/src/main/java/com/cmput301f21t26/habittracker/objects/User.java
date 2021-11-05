@@ -53,7 +53,6 @@ public class User extends Observable implements Serializable {
     private String lastName;
     private String email;
     private String pictureURL;
-    private final Date creationDate;
     private Date dateLastAccessed;
 
     private List<String> followings;
@@ -61,7 +60,7 @@ public class User extends Observable implements Serializable {
     private List<Habit> habits;
     private List<Habit> todayHabits;
     private List<Permission> permissions;
-    private Map<String, List<HabitEvent>> habitEventsMap;
+    private Map<String, List<HabitEvent>> habitEventsMap;       // TODO refactor
 
     public User(String username, String firstName, String lastName, String email, String pictureURL) {
         this.username = username;
@@ -69,7 +68,6 @@ public class User extends Observable implements Serializable {
         this.lastName = lastName;
         this.email = email;
         this.pictureURL = pictureURL;
-        this.creationDate = Calendar.getInstance().getTime();
         this.dateLastAccessed = Calendar.getInstance().getTime();
 
         this.followings = new ArrayList<>();
@@ -278,39 +276,6 @@ public class User extends Observable implements Serializable {
                 return;
             }
         }
-    }
-
-    /**
-     * Gets user data and all data inside the user's subcollections.
-     * The callback function is then called.
-     *
-     * @param callback callback function to be called after reading data from db
-     */
-    protected void readUserDataFromDb(UserCallback callback) {
-
-        final DocumentReference userRef = mStore.collection("users").document(getUid());
-
-        userRef.get().addOnSuccessListener(documentSnapshot -> {
-
-            username = documentSnapshot.getString("username");
-            firstName = documentSnapshot.getString("firstName");
-            lastName = documentSnapshot.getString("lastName");
-            email = documentSnapshot.getString("email");
-            pictureURL = documentSnapshot.getString("pictureURL");
-            dateLastAccessed = documentSnapshot.getDate("dateLastAccessed");
-
-            this.habits = new ArrayList<>();
-            this.todayHabits = new ArrayList<>();
-
-            readHabitsFromDb(callback);
-
-
-            // followings = (List<String>) documentSnapshot.get("followings");
-            // followers = (List<String>) documentSnapshot.get("followers");
-            // TODO permissions
-
-
-        }).addOnFailureListener(e -> Log.w("readUserData", "Reading user data failed" + e.toString()));
     }
 
     protected void readHabitsFromDb(UserCallback callback) {
