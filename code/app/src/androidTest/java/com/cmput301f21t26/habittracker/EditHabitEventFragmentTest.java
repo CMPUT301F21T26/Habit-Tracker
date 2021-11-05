@@ -42,8 +42,8 @@ public class EditHabitEventFragmentTest {
             Log.d("EditHabitEventFragmentTest", e.toString());
         }
 
-
         // Create a habit event. Double click checkbox so then the state is reset.
+        // MAKE SURE THERE IS A HABIT IN TODAY'S HABIT THAT HAS A TITLE OF "Test"!!!!!!
         Thread.sleep(1000);
         ViewAction itemViewAction = ActionOnItemView.actionOnItemView(withId(R.id.habitCheckbox), click());
         onView(withId(R.id.todayHabitRV))
@@ -55,6 +55,7 @@ public class EditHabitEventFragmentTest {
     /**
      * Tests clicking on the edit button on the snackbar
      * that pops up when a habit is checked off in Today's Habits
+     * @throws InterruptedException
      */
     @Test
     public void testSnackbarEdit() throws InterruptedException {
@@ -77,6 +78,7 @@ public class EditHabitEventFragmentTest {
     /**
      * Test that all the views in edit habit event fragment
      * are shown.
+     * @throws InterruptedException
      */
     @Test
     public void testEditHabitEventViews() throws InterruptedException {
@@ -98,6 +100,7 @@ public class EditHabitEventFragmentTest {
     /**
      * Tests viewing edit habit fragment from Timeline fragment
      * and editing the details
+     * @throws InterruptedException
      */
     @Test
     public void testEditDetails() throws InterruptedException {

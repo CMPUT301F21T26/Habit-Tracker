@@ -27,12 +27,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-/**
- * Tests the login and signup pages;
- * i.e. tests for input validation
- * and that the login and signup fragments
- * show up correctly.
- */
 public class SignupTest {
     private static Solo soloStatic;
     private Solo solo;
@@ -109,7 +103,11 @@ public class SignupTest {
                 });
     }
 
-
+    /**
+     * Attempts to delete the newly created user in this test class. Due to asynchronous calls,
+     * we need to attempt to delete it multiple times, but even then, there is no guarantee
+     * that the user will be deleted successfully.
+     */
     @AfterClass
     public static void tearDown() {
         for (int i = 0; i < 7; i++) {
@@ -139,7 +137,10 @@ public class SignupTest {
     }
 
 
-
+    /**
+     * Tests that the signup page shows up when clicked
+     * from the main login signup page.
+     */
     @Test
     public void testSignupPageShows() {
         // Check that the main login/signup page is displayed
@@ -152,6 +153,9 @@ public class SignupTest {
         assertFragmentShown(signupFragment);
     }
 
+    /**
+     * Tests the signup fields in the signup page for correct input validation.
+     */
     @Test
     public void testSignupFieldsEntered() {
         testSignupPageShows();

@@ -43,6 +43,7 @@ public class ViewHabitEventFragmentTest {
     /**
      * Tests if the views are shown in view habit event fragment.
      * NOTE: THIS IS ASSUMING THAT THERE ALREADY IS A HABIT EVENT IN THE TIMELINE!!!
+     * @throws InterruptedException
      */
     @Test
     public void testViewHabitEventDetailsShown() throws InterruptedException {
@@ -77,6 +78,7 @@ public class ViewHabitEventFragmentTest {
     /**
      * Tests if clicking the checkmark button
      * brings the user back
+     * @throws InterruptedException
      */
     @Test
     public void testFinish() throws InterruptedException {

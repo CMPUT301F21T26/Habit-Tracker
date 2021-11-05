@@ -33,7 +33,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment implements Observer {
     private String TAG = "ProfileFragment";
-    private ProfileViewModel profileViewModel;
     private FragmentProfileBinding binding;
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
@@ -49,7 +48,14 @@ public class ProfileFragment extends Fragment implements Observer {
     private String profileImageUrl;
     private User userObject;
 
-    // creates profile fragment for other viewing other users profile page
+    /**
+     * Creates a new profile fragment for when viewing other
+     * user profiles.
+     * @param otherUsername
+     *  The other user's username, of type {@link String}
+     * @return
+     *  The newly created profile fragment, of type {@link Fragment}
+     */
     public static ProfileFragment newInstance(String otherUsername) {
         ProfileFragment profileFragment = new ProfileFragment();
         Bundle bundle = new Bundle();
@@ -60,8 +66,6 @@ public class ProfileFragment extends Fragment implements Observer {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        profileViewModel =
-                new ViewModelProvider(this).get(ProfileViewModel.class);
 
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
