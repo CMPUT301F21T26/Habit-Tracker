@@ -58,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
 
+        // Set profile icon to current user's profile picture in bottom nav
+        setProfileIconToProfilePic(UserController.getCurrentUser().getPictureURL());
+
         // Setting up toolbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

@@ -19,7 +19,6 @@ public class SplashScreenActivity extends AppCompatActivity {
     private static int SPLASH_SCREEN_TIME = 1500;
 
     private FirebaseAuth mAuth;
-    private FirebaseFirestore mStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +28,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
 
         mAuth = FirebaseAuth.getInstance();
-        mStore = FirebaseFirestore.getInstance();
 
         // we want user information to be retrievable even if offline, which is default setting for
         // our database

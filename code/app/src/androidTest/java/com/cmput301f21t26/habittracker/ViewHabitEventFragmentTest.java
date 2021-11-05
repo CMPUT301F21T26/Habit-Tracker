@@ -41,10 +41,28 @@ public class ViewHabitEventFragmentTest {
     }
 
     /**
-     * Tests if the views are shown
+     * Tests if the views are shown in view habit event fragment.
+     * NOTE: THIS IS ASSUMING THAT THERE ALREADY IS A HABIT EVENT IN THE TIMELINE!!!
      */
     @Test
-    public static void testViewHabitEventDetailsShown() throws InterruptedException {
+    public void testViewHabitEventDetailsShown() throws InterruptedException {
+        Thread.sleep(1000);
+        onData(anything()).inAdapterView(withId(R.id.timelineListView)).atPosition(0).perform(click());
+        onView(withId(R.id.habitEventLocationTV)).check(matches(isDisplayed()));
+        onView(withId(R.id.viewHabitEventTitleTV)).check(matches(isDisplayed()));
+        onView(withId(R.id.habitEventDateFormatTV)).check(matches(isDisplayed()));
+        onView(withId(R.id.habitEventCommentET)).check(matches(isDisplayed()));
+        onView(withId(R.id.habitEventImage)).check(matches(isDisplayed()));
+        onView(withId(R.id.confirmHabitEventButton)).check(matches(isDisplayed()));
+        onView(withId(R.id.editHabitEventButton)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Method to be used in EditHabitEventFragmentTest to go to the view
+     * habit event fragment
+     * @throws InterruptedException
+     */
+    public static void goToViewHabitEvent() throws InterruptedException {
         Thread.sleep(1000);
         onData(anything()).inAdapterView(withId(R.id.timelineListView)).atPosition(0).perform(click());
         onView(withId(R.id.habitEventLocationTV)).check(matches(isDisplayed()));
