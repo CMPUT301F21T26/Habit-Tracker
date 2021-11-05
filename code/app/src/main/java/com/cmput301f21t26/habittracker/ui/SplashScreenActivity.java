@@ -28,11 +28,8 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        // we want user information to be retrievable even if offline, which is default setting for
+        // TODO we want user information to be retrievable even if offline, which is default setting for
         // our database
-
-
-
     }
 
     /**

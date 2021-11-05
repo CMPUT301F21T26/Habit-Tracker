@@ -120,7 +120,9 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
-                UserController.updateDoneForTodayInDb(habit, isChecked, user -> {
+                habit.setDoneForToday(isChecked);
+
+                UserController.updateHabitInDb(habit, user -> {
 
                     if (isChecked) {
 
