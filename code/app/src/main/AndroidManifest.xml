@@ -14,7 +14,7 @@
         <activity
             android:name=".LoginSignupActivity"
             android:exported="true"
-            android:theme="@style/SplashTheme"/>
+            android:theme="@style/Theme.HabitTracker"/>
         <activity
             android:name=".SplashScreenActivity"
             android:exported="true"
