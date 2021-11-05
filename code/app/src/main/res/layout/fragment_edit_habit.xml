@@ -290,7 +290,8 @@
         app:iconSize="38dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0"
+        />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/privacySwitch"
@@ -298,12 +299,14 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="36dp"
         android:elevation="10dp"
-        android:text="Private"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/confirmHabitButton"
-        app:layout_constraintLeft_toLeftOf="@id/deleteHabitButton"
-        app:layout_constraintRight_toRightOf="@id/confirmHabitButton"
-        app:layout_constraintStart_toEndOf="@+id/deleteHabitButton" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:flow_horizontalBias="0.5"
+        android:thumb="@drawable/thumb1"
+        app:track="@drawable/track"
+        android:scaleX="0.6"
+        android:scaleY="0.6"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
