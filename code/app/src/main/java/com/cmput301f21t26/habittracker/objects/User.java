@@ -1,9 +1,5 @@
 package com.cmput301f21t26.habittracker.objects;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -159,12 +155,78 @@ public class User extends Observable implements Serializable {
         followers.add(uid);
     }
 
+    /**
+     * Add a given habit into the habits list
+     * @param habit habit to add in the list
+     */
     public void addHabit(Habit habit) {
         habits.add(habit);
     }
 
+    /**
+     * Remove a habit from all habits list
+     *
+     * @param habit habit to remove
+     */
+    public void removeHabit(Habit habit) {
+        for (int i=0; i<habits.size(); i++) {
+            if (habits.get(i).getHabitId().equals(habit.getHabitId())) {
+                habits.remove(i);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Update a habit in all habits list
+     *
+     * @param habit habit to update
+     */
+    public void updateHabit(Habit habit) {
+        for (int i=0; i<habits.size(); i++) {
+            if (habits.get(i).getHabitId().equals(habit.getHabitId())) {
+                // update with new habit
+                habits.set(i, habit);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Add a given habit into the list of habits to do today
+     * @param habit habit to add in the list
+     */
     public void addTodayHabit(Habit habit) {
         todayHabits.add(habit);
+    }
+
+    /**
+     * Remove a habit from today habits list
+     *
+     * @param habit today habit to remove
+     */
+    public void removeTodayHabit(Habit habit) {
+        for (int i=0; i<todayHabits.size(); i++) {
+            if (todayHabits.get(i).getHabitId().equals(habit.getHabitId())) {
+                todayHabits.remove(i);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Update a habit in today habits list
+     *
+     * @param habit today habit to update
+     */
+    public void updateTodayHabit(Habit habit) {
+        for (int i=0; i<todayHabits.size(); i++) {
+            if (todayHabits.get(i).getHabitId().equals(habit.getHabitId())) {
+                // update with new habit
+                todayHabits.set(i, habit);
+                return;
+            }
+        }
     }
 
     /**
@@ -193,7 +255,6 @@ public class User extends Observable implements Serializable {
      * @throws NullPointerException when attempt to access null habit event list
      * @throws RuntimeException when the habit event list is empty
      */
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void removeHabitEvent(String parentHabitId, HabitEvent hEvent) {
         if (!habitEventsMap.containsKey(parentHabitId)) {
             throw new IllegalArgumentException("Parent habit id does not exist");
@@ -242,64 +303,6 @@ public class User extends Observable implements Serializable {
         for (int i=0; i<habitEventsList.size(); i++) {
             if (hEvent.getHabitEventId().equals(habitEventsList.get(i).getHabitEventId())) {
                 habitEventsList.set(i, hEvent);
-                return;
-            }
-        }
-    }
-
-    /**
-     * Remove a habit from all habits list
-     *
-     * @param habit habit to remove
-     */
-    public void removeHabit(Habit habit) {
-        for (int i=0; i<habits.size(); i++) {
-            if (habits.get(i).getHabitId().equals(habit.getHabitId())) {
-                habits.remove(i);
-                return;
-            }
-        }
-    }
-
-    /**
-     * Remove a habit from today habits list
-     *
-     * @param habit today habit to remove
-     */
-    public void removeTodayHabit(Habit habit) {
-        for (int i=0; i<todayHabits.size(); i++) {
-            if (todayHabits.get(i).getHabitId().equals(habit.getHabitId())) {
-                todayHabits.remove(i);
-                return;
-            }
-        }
-    }
-
-    /**
-     * Update a habit in all habits list
-     *
-     * @param habit habit to update
-     */
-    public void updateHabit(Habit habit) {
-        for (int i=0; i<habits.size(); i++) {
-            if (habits.get(i).getHabitId().equals(habit.getHabitId())) {
-                // update with new habit
-                habits.set(i, habit);
-                return;
-            }
-        }
-    }
-
-    /**
-     * Update a habit in today habits list
-     *
-     * @param habit today habit to update
-     */
-    public void updateTodayHabit(Habit habit) {
-        for (int i=0; i<todayHabits.size(); i++) {
-            if (todayHabits.get(i).getHabitId().equals(habit.getHabitId())) {
-                // update with new habit
-                todayHabits.set(i, habit);
                 return;
             }
         }
