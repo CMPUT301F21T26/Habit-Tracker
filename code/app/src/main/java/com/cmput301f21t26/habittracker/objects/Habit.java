@@ -151,7 +151,7 @@ public class Habit implements Serializable {
     }
 
     /**
-     * Given a date, and habit, return a habit event object at that date
+     * Given a date, return a habit event object at that date
      * Return null if no such object is found
      *
      * @param date the date to search for
