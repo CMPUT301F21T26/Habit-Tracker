@@ -12,11 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HabitTracker">
         <activity
-            android:name=".LoginSignupActivity"
+            android:name=".ui.LoginSignupActivity"
             android:exported="true"
             android:theme="@style/Theme.HabitTracker"/>
         <activity
-            android:name=".SplashScreenActivity"
+            android:name=".ui.SplashScreenActivity"
             android:exported="true"
             android:theme="@style/SplashTheme"
             android:windowSoftInputMode="stateHidden|adjustResize"
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:label="@string/todays_habits"
             android:theme="@style/Theme.HabitTracker" />

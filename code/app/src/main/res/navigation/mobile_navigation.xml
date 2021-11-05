@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/todays_habits"
-        android:name="com.cmput301f21t26.habittracker.ui.home.TodayHabitFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.habit.TodayHabitFragment"
         android:label="@string/todays_habits"
         tools:layout="@layout/fragment_today_habit" >
         <argument
@@ -40,7 +40,7 @@
     </fragment>
     <fragment
         android:id="@+id/addHabitFragment"
-        android:name="com.cmput301f21t26.habittracker.fragments.AddHabitFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.habit.AddHabitFragment"
         android:label="ADD HABIT"
         tools:layout="@layout/fragment_add_habit" >
         <argument
@@ -50,7 +50,7 @@
     </fragment>
     <fragment
         android:id="@+id/viewHabitFragment"
-        android:name="com.cmput301f21t26.habittracker.fragments.ViewHabitFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.habit.ViewHabitFragment"
         android:label="VIEW HABIT"
         tools:layout="@layout/fragment_view_habit" >
         <argument
@@ -80,12 +80,12 @@
         app:destination="@id/navigation_profile" />
     <fragment
         android:id="@+id/editHabitFragment"
-        android:name="com.cmput301f21t26.habittracker.fragments.EditHabitFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.habit.EditHabitFragment"
         android:label="EDIT HABIT"
         tools:layout="@layout/fragment_edit_habit" />
     <fragment
         android:id="@+id/editHabitEventFragment"
-        android:name="com.cmput301f21t26.habittracker.fragments.EditHabitEventFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.habitevent.EditHabitEventFragment"
         android:label="EDIT HABIT EVENT"
         tools:layout="@layout/fragment_edit_habit_event" >
         <argument
@@ -106,7 +106,7 @@
         app:destination="@id/navigation_timeline" />
     <fragment
         android:id="@+id/viewHabitEventFragment"
-        android:name="com.cmput301f21t26.habittracker.fragments.ViewHabitEventFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.habitevent.ViewHabitEventFragment"
         android:label="VIEW HABIT EVENT"
         tools:layout="@layout/fragment_view_habit_event" >
         <argument
