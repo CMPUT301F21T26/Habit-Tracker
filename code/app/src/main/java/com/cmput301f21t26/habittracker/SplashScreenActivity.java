@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.WindowManager;
 
 import com.cmput301f21t26.habittracker.objects.UserController;
@@ -19,17 +20,14 @@ public class SplashScreenActivity extends AppCompatActivity {
     private static int SPLASH_SCREEN_TIME = 1500;
 
     private FirebaseAuth mAuth;
-    private FirebaseFirestore mStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // set layout to be splash screen
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);   // Make screen fullscreen so it looks cleaner
         setContentView(R.layout.activity_splash_screen);
 
         mAuth = FirebaseAuth.getInstance();
-        mStore = FirebaseFirestore.getInstance();
 
         // we want user information to be retrievable even if offline, which is default setting for
         // our database
@@ -50,7 +48,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onStart();
         // Delays the splash screen and then goes to either the main activity or login/signup page
         // based on auth tokens
-        new Handler().postDelayed(() -> {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (mAuth.getCurrentUser() != null) {
                 // initialize user before moving to MainActivity
                 UserController.initCurrentUser(user -> {        // get user data then start activity

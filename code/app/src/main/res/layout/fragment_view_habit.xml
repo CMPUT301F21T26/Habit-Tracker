@@ -8,12 +8,12 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="150dp">
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="150dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/habitTitleLayout"
@@ -158,9 +158,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipGroup"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+            <HorizontalScrollView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/activity_vertical_margin"
@@ -169,75 +167,82 @@
                 app:layout_constraintHorizontal_bias="0.481"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/pickDaysMessage"
-                app:layout_constraintVertical_bias="0.016"
-                app:singleLine="true"
-                android:clickable="false"
-                android:focusable="false">
+                app:layout_constraintVertical_bias="0.016">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/sundayChip"
-                    style="@style/CustomChipChoice"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroup"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:singleLine="true"
                     android:clickable="false"
-                    android:focusable="false"
-                    android:text="SU" />
+                    android:focusable="false">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/mondayChip"
-                    style="@style/CustomChipChoice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:text="MO" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/sundayChip"
+                        style="@style/CustomChipChoice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="SU" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tuesdayChip"
-                    style="@style/CustomChipChoice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:text="TU" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/mondayChip"
+                        style="@style/CustomChipChoice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="MO" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/wednesdayChip"
-                    style="@style/CustomChipChoice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:text="WE" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/tuesdayChip"
+                        style="@style/CustomChipChoice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="TU" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/thursdayChip"
-                    style="@style/CustomChipChoice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:text="TH" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/wednesdayChip"
+                        style="@style/CustomChipChoice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="WE" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fridayChip"
-                    style="@style/CustomChipChoice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:text="FR" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/thursdayChip"
+                        style="@style/CustomChipChoice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="TH" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/saturdayChip"
-                    style="@style/CustomChipChoice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:text="SA" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fridayChip"
+                        style="@style/CustomChipChoice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="FR" />
 
-            </com.google.android.material.chip.ChipGroup>
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/saturdayChip"
+                        style="@style/CustomChipChoice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="SA" />
+
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

@@ -89,7 +89,7 @@ public class EditHabitEventFragmentTest {
         // Go to view habit event fragment first
         onView(withId(R.id.navigation_timeline)).perform(click());
         onView(withId(R.id.navigation_timeline)).check(matches(isDisplayed()));
-        ViewHabitEventFragmentTest.testViewHabitEventDetailsShown();
+        ViewHabitEventFragmentTest.goToViewHabitEvent();
 
         // Click edit button
         onView(withId(R.id.editHabitEventButton)).perform(click());
@@ -110,7 +110,7 @@ public class EditHabitEventFragmentTest {
         // Go to view habit event fragment first
         onView(withId(R.id.navigation_timeline)).perform(click());
         onView(withId(R.id.navigation_timeline)).check(matches(isDisplayed()));
-        ViewHabitEventFragmentTest.testViewHabitEventDetailsShown();
+        ViewHabitEventFragmentTest.goToViewHabitEvent();
 
         // Click edit button
         onView(withId(R.id.editHabitEventButton)).perform(click());
@@ -133,7 +133,7 @@ public class EditHabitEventFragmentTest {
 
 
         // Delete that habit event
-        ViewHabitEventFragmentTest.testViewHabitEventDetailsShown();
+        ViewHabitEventFragmentTest.goToViewHabitEvent();
         onView(withId(R.id.editHabitEventButton)).perform(click());
         onView(withId(R.id.deleteHabitEventButton)).perform(click());
     }
