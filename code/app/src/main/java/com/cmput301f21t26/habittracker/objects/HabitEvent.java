@@ -155,8 +155,8 @@ public class HabitEvent implements Serializable {
     }
 
     /**
-     * TODO
-     * @return
+     * Returns the day this habit event was created
+     * @return the day at which the habit event was created
      */
     public Instant getHabitEventDateDay(){
         return this.hEventDate.toInstant().truncatedTo(ChronoUnit.DAYS);

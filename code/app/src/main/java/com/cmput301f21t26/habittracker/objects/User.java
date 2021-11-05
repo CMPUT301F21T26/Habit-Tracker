@@ -27,6 +27,16 @@ public class User extends Observable implements Serializable {
     private List<Habit> todayHabits;
     private List<Permission> permissions;
 
+    /**
+     * A default constructor for User class
+     *
+     * @param username String username
+     * @param firstName String first name of the user
+     * @param lastName String last name of the user
+     * @param email String email of the user
+     * @param pictureURL String url to the profile picture
+     * @param dateLastAccessed Date date the user last Accessed the app
+     */
     public User(String username, String firstName, String lastName, String email, String pictureURL, Date dateLastAccessed) {
         this.username = username;
         this.firstName = firstName;
