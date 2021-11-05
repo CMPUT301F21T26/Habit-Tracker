@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.cmput301f21t26.habittracker"
-        minSdk 21
+        minSdk 26
         targetSdk 31
         versionCode 1
         versionName "1.0"
