@@ -1,10 +1,8 @@
 package com.cmput301f21t26.habittracker.objects;
 
 import android.location.Location;
-import android.os.Build;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 import java.io.Serializable;
 import java.time.Instant;
