@@ -2,10 +2,14 @@ package com.cmput301f21t26.habittracker.objects;
 
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -146,5 +150,10 @@ public class HabitEvent implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Instant getHabitEventDateDay(){
+        return this.hEventDate.toInstant().truncatedTo(ChronoUnit.DAYS);
     }
 }
