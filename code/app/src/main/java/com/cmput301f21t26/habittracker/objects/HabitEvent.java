@@ -13,6 +13,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * HabitEvent class is for when the user finished a habit as planned.
+ */
 public class HabitEvent implements Serializable {
 
     private String comment;
@@ -151,7 +154,10 @@ public class HabitEvent implements Serializable {
         this.title = title;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    /**
+     * TODO
+     * @return
+     */
     public Instant getHabitEventDateDay(){
         return this.hEventDate.toInstant().truncatedTo(ChronoUnit.DAYS);
     }

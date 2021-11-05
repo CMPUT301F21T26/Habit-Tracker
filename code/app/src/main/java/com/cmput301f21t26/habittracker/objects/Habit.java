@@ -8,6 +8,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Habit class stores all habit-related data and associated habit events.
+ */
 public class Habit implements Serializable {
 
     private String habitId;
@@ -18,13 +21,6 @@ public class Habit implements Serializable {
     private boolean isPrivate;
     private ArrayList<HabitEvent> habitEvents;
     private ArrayList<Integer> daysList;
-
-    /**
-     * Empty Habit constructor for use with firestore
-     */
-    public Habit() {
-        this("", "", Calendar.getInstance().getTime(), new ArrayList<>());
-    }
 
     /**
      * A default Habit constructor.
@@ -49,6 +45,13 @@ public class Habit implements Serializable {
         this.daysList = daysList;     // all init to false
         this.habitId = UUID.randomUUID().toString();
         this.isPrivate = false;
+    }
+
+    /**
+     * Empty no-argument constructor required for deserialization
+     */
+    public Habit() {
+        this("", "", Calendar.getInstance().getTime(), new ArrayList<>());
     }
 
     /**

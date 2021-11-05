@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Observable;
 
 /**
- * Class that interacts with the database as well as other User objects.
+ * User class stores all user-related data
  */
 public class User extends Observable implements Serializable {
 

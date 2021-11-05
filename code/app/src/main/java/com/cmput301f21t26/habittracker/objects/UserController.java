@@ -33,6 +33,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Observer;
 
+/**
+ * UserController provides all the methods that access the database.
+ * It also manages the currently signed in user and associated snapshot listeners.
+ */
 public class UserController {
 
     private static User user;
