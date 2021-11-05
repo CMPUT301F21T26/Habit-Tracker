@@ -14,6 +14,12 @@ import static org.hamcrest.Matchers.hasToString;
 
 import android.util.Log;
 
+import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.ui.home.TodayHabitFragment;
+
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.rule.ActivityTestRule;
 
 
@@ -22,7 +28,10 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 public class ViewHabitFragmentTest {
+    final static public Integer WAIT = 500;
     @Rule
     public ActivityTestRule<LoginSignupActivity> rule = new ActivityTestRule<>(LoginSignupActivity.class);
 
@@ -30,6 +39,8 @@ public class ViewHabitFragmentTest {
     public void setUp() throws InterruptedException {
         try {
             LoginTest.login();
+            Thread.sleep(WAIT);
+
         } catch (InterruptedException e) {
             Log.d("ViewHabitFragmentTest", e.toString());
         }
@@ -40,8 +51,7 @@ public class ViewHabitFragmentTest {
      */
     @Test
     public void testViewHabitDetailsShown() throws InterruptedException {
-        Thread.sleep(1000);
-        onData(anything()).inAdapterView(withId(R.id.todayHabitRV)).atPosition(0).perform(click());
+        clickOnHabit();
         onView(withId(R.id.habitTitle)).check(matches(isDisplayed()));
         onView(withId(R.id.habitReasoning)).check(matches(isDisplayed()));
         onView(withId(R.id.chipGroup)).check(matches(isDisplayed()));
@@ -56,10 +66,41 @@ public class ViewHabitFragmentTest {
      */
     @Test
     public void testFinish() throws InterruptedException {
-        Thread.sleep(1000);
-        onData(anything()).inAdapterView(withId(R.id.todayHabitRV)).atPosition(0).perform(click());
-        onView(withId(R.id.confirmHabitButton)).perform(click());
+        clickOnHabit();
+        confirmHabit();
         // Should bring user back to the timeline fragment
         onView(withId(R.id.todays_habits)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Clicks on top habit from recycler view
+     * @throws InterruptedException
+     */
+    public static void clickOnHabit() throws InterruptedException {
+        ArrayList<Habit> todayHabitList = (ArrayList<Habit>) UserController.getCurrentUser().getTodayHabits();
+        Integer position = todayHabitList.size() - 1;
+        onView(withId(R.id.todayHabitRV))
+            .perform(RecyclerViewActions.actionOnItemAtPosition(position, click()));
+        Thread.sleep(WAIT);
+    }
+
+    /**
+     * Assumes already in a view habit, meant to be used after clickOnHabit
+     * Let's you get into editHabitFragment
+     * @throws InterruptedException
+     */
+    public static void editHabit() throws InterruptedException {
+        onView(withId(R.id.editHabitButton))
+            .perform(click());
+        Thread.sleep(WAIT);
+    }
+
+    /**
+     * Presses the confirm/return button
+     * @throws InterruptedException
+     */
+    public static void confirmHabit() throws InterruptedException {
+        onView(withId(R.id.confirmHabitButton)).perform(click());
+        Thread.sleep(WAIT);
     }
 }
