@@ -11,9 +11,7 @@ import android.view.ViewGroup;
 import com.cmput301f21t26.habittracker.R;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link ProfileFragmentFollowingTab#newInstance} factory method to
- * create an instance of this fragment.
+ * To be implemented...
  */
 public class ProfileFragmentFollowingTab extends Fragment {
 

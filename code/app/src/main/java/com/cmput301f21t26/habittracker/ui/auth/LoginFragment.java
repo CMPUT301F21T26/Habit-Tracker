@@ -86,6 +86,14 @@ public class LoginFragment extends Fragment {
         loginConfirmButton.setOnClickListener(loginConfirmOnClickListener);
     }
 
+    /**
+     * Logs in the user into Firebase Authentication with the given input, if successful
+     * will send the user to the main page.
+     * @param username
+     *  The username of the account of type {@link String}
+     * @param password
+     *  The password of the account of type {@link String}
+     */
     public void login(String username, String password){
         // check if user exists
         DocumentReference ref = mStore.collection("users").document(username);

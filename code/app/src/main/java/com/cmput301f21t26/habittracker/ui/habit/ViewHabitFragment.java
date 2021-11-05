@@ -114,6 +114,9 @@ public class ViewHabitFragment extends Fragment {
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
 
+    /**
+     * Updates all the views in the screen with the info given by the habit.
+     */
     private void updateScreen(){
         Log.d(TAG, "habit is " + habit);
         // habit is retrieved, now populate the View with information

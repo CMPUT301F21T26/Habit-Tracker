@@ -17,6 +17,12 @@ import com.cmput301f21t26.habittracker.objects.HabitEvent;
 
 import java.util.ArrayList;
 
+/**
+ * The list view adapter for the timeline fragment;
+ * It displays the user's habit events and will
+ * adapt the size of the item depending on the
+ * available info.
+ */
 public class TimelineListAdapter extends BaseAdapter {
     private String TAG = "TimelineListAdapter";
     private ArrayList<HabitEvent> hEventsList;
