@@ -1,6 +1,7 @@
-package com.cmput301f21t26.habittracker.ui.home;
+package com.cmput301f21t26.habittracker.ui.habit;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.cmput301f21t26.habittracker.HabitAdapter;
+import com.cmput301f21t26.habittracker.ui.habit.HabitAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentTodayHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
@@ -53,6 +54,7 @@ public class TodayHabitFragment extends Fragment {
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
         todayHabitList = (ArrayList<Habit>) UserController.getCurrentUser().getTodayHabits();
+        Log.d("Number", String.valueOf(todayHabitList.size()));
 
         rvListener = new HabitAdapter.RecyclerViewClickListener() {
             @Override

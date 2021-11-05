@@ -1,7 +1,6 @@
 package com.cmput301f21t26.habittracker.objects;
 
 import android.location.Location;
-import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.Nullable;
@@ -14,6 +13,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * HabitEvent class is for when the user finished a habit as planned.
+ */
 public class HabitEvent implements Serializable {
 
     private String comment;
@@ -152,7 +154,10 @@ public class HabitEvent implements Serializable {
         this.title = title;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    /**
+     * Returns the day this habit event was created
+     * @return the day at which the habit event was created
+     */
     public Instant getHabitEventDateDay(){
         return this.hEventDate.toInstant().truncatedTo(ChronoUnit.DAYS);
     }

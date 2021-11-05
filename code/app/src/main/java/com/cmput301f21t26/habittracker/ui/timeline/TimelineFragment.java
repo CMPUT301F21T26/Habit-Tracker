@@ -34,8 +34,8 @@ public class TimelineFragment extends Fragment {
     private FragmentTimelineBinding binding;
     private NavController navController;
 
-    private Map<String, List<HabitEvent>> habitEventsMap;
-    private ArrayList<HabitEvent> habitEventsList;
+    private List<Habit> habitsList;
+    private ArrayList<HabitEvent> allHabitEventsList;
 
     private TimelineViewModel timelineViewModel;
     private TimelineListAdapter timelineListAdapter;
@@ -56,26 +56,26 @@ public class TimelineFragment extends Fragment {
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
-        habitEventsMap = UserController.getCurrentUser().getHabitEventsMap();
-        habitEventsList = new ArrayList<>();
+        habitsList = UserController.getCurrentUser().getHabits();
+        allHabitEventsList = new ArrayList<>();
 
         // add all habit events into one list
-        for (String parentHabitId : habitEventsMap.keySet()) {
-            habitEventsList.addAll(Objects.requireNonNull(habitEventsMap.get(parentHabitId)));
+        for (Habit habit : habitsList) {
+            allHabitEventsList.addAll(habit.getHabitEvents());
         }
 
         timelineListView = binding.timelineListView;
 
         if (getActivity() != null) {
             // Sort habitEventsList in chronological order
-            Collections.sort(habitEventsList, (habitEvent, t1) -> {
+            Collections.sort(allHabitEventsList, (habitEvent, t1) -> {
                 if (habitEvent.getHabitEventDate() != null && t1.getHabitEventDate() != null) {
                     return t1.getHabitEventDate().compareTo(habitEvent.getHabitEventDate());
                 } else {
                     return 0;
                 }
             });
-            timelineListAdapter = new TimelineListAdapter(getActivity(), habitEventsList);
+            timelineListAdapter = new TimelineListAdapter(getActivity(), allHabitEventsList);
             timelineListView.setAdapter(timelineListAdapter);
         }
 

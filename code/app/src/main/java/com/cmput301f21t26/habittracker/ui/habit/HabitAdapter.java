@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker;
+package com.cmput301f21t26.habittracker.ui.habit;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,10 +17,12 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
+import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.User;
-import com.cmput301f21t26.habittracker.objects.UserCallback;
+import com.cmput301f21t26.habittracker.interfaces.UserCallback;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -118,7 +120,9 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
-                UserController.updateDoneForTodayInDb(habit, isChecked, user -> {
+                habit.setDoneForToday(isChecked);
+
+                UserController.updateHabitInDb(habit, user -> {
 
                     if (isChecked) {
 
@@ -150,7 +154,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                         });
                     } else {
                         // if it gets unchecked delete habit event associated with todays date
-                        UserController.removeHabitEventFromDb(UserController.getHabitEventByDate(habit, Calendar.getInstance().getTime()), callback -> {;});
+                        UserController.removeHabitEventFromDb(habit.getHabitEventByDate(Calendar.getInstance().getTime()), callback -> { });
                     }
 
                 });

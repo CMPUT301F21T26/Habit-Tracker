@@ -1,6 +1,8 @@
-package com.cmput301f21t26.habittracker.fragments;
+package com.cmput301f21t26.habittracker.ui.habitevent;
+
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,37 +20,32 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
-import com.cmput301f21t26.habittracker.MainActivity;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitEventBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
-import com.cmput301f21t26.habittracker.objects.UserController;
-import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class EditHabitEventFragment extends Fragment {
 
-    private final String TAG = "EditHabitEventFragment";
+public class ViewHabitEventFragment extends Fragment {
+    private String TAG = "ViewHabitEventFragment";
 
-    private FragmentEditHabitEventBinding binding;
     private NavController navController;
-
-    private Button delBtn;
-    private Button editConfirmBtn;
-    private TextInputEditText commentET;
-    private TextView habitEventDateFormatTV;
+    private Button confirmHabitEventButton;
+    private Button editHabitEventButton;
     private TextView habitEventTitleTV;
-    private TextView habitEventLocationTV;
+    private TextView habitEventDateFormatTV;
     private EditText habitEventCommentET;
+    private TextView habitEventLocationTV;
+    private ImageView habitEventImageView;
 
     private Habit habit;
     private HabitEvent hEvent;
 
-    public EditHabitEventFragment() {
+    public ViewHabitEventFragment() {
         // Required empty public constructor
     }
 
@@ -56,25 +54,26 @@ public class EditHabitEventFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        habit = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabit();
-        hEvent = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabitEvent();
+        habit = ViewHabitEventFragmentArgs.fromBundle(getArguments()).getHabit();
+        hEvent = ViewHabitEventFragmentArgs.fromBundle(getArguments()).getHabitEvent();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_view_habit_event, container, false);
 
-        binding = FragmentEditHabitEventBinding.inflate(inflater, container, false);
+        // Initiate views
+        confirmHabitEventButton = view.findViewById(R.id.confirmHabitEventButton);
+        editHabitEventButton = view.findViewById(R.id.editHabitEventButton);
+        habitEventTitleTV = view.findViewById(R.id.viewHabitEventTitleTV);
+        habitEventDateFormatTV = view.findViewById(R.id.habitEventDateFormatTV);
+        habitEventCommentET = view.findViewById(R.id.habitEventCommentET);
+        habitEventLocationTV = view.findViewById(R.id.habitEventLocationTV);
+        habitEventImageView = view.findViewById(R.id.habitEventImage);
 
-        delBtn = binding.deleteHabitEventButton;
-        editConfirmBtn = binding.confirmHabitEventButton;
-        commentET = binding.habitEventCommentET;
-        habitEventDateFormatTV = binding.habitEventDateFormatTV;
-        habitEventTitleTV = binding.editHabitEventTitleTV;
-        habitEventCommentET = binding.habitEventCommentET;
-        habitEventLocationTV = binding.habitEventLocationTV;
-
-        return binding.getRoot();
+        return view;
     }
 
     @Override
@@ -83,17 +82,27 @@ public class EditHabitEventFragment extends Fragment {
 
         navController = Navigation.findNavController(view);
 
-        editConfirmBtn.setOnClickListener(editConfirmOnClickListener);
-        delBtn.setOnClickListener(deleteOnClickListener);
+        // confirm button clicked
+        confirmHabitEventButton.setOnClickListener(v -> {
+            NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+            navController.navigate(action);
+        });
+        // edit button
+        editHabitEventButton.setOnClickListener(v -> {
+            Log.d(TAG, "clicked edit habit event button");
+            NavDirections action = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
+            navController.navigate(action);
+        });
 
-        setEditHabitEventFields();
+        setViewHabitEventFields();
     }
 
     /**
-     * Sets the fields of the edit habit event fragment views
-     * to the proper values given by the habit event object
+     * Sets all the fields in view habit fragment
+     * to the habit event's info
      */
-    private void setEditHabitEventFields() {
+    private void setViewHabitEventFields() {
+
         // Get date and set it to TextView
         String datePattern = "yyyy-MM-dd";
         SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
@@ -104,13 +113,12 @@ public class EditHabitEventFragment extends Fragment {
         habitEventTitleTV.setText(hEvent.getTitle());
 
         habitEventCommentET.setText(hEvent.getComment());
-
         if (hEvent.getLocation() != null) {
             habitEventLocationTV.setText(hEvent.getLocation().toString());
         }
 
-        if (hEvent.getPhotoUrl() != null) {
-            // TODO set image view to the image given by habit event
+        if (hEvent.getPhotoUrl() == null) {
+            habitEventImageView.setImageResource(R.color.transparent);
         }
     }
 
@@ -137,30 +145,4 @@ public class EditHabitEventFragment extends Fragment {
         super.onStop();
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
-
-    private View.OnClickListener editConfirmOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-
-            String comment = commentET.getText().toString();
-            // TODO get location, photograph from the user
-
-            hEvent.setComment(comment);
-
-            UserController.updateHabitEventInDb(hEvent, user -> {
-                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
-                navController.navigate(action);
-            });
-        }
-    };
-
-    private View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            UserController.removeHabitEventFromDb(hEvent, user -> {
-                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
-                navController.navigate(action);
-            });
-        }
-    };
 }
