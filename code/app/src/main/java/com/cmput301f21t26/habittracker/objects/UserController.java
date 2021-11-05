@@ -293,6 +293,7 @@ public class UserController {
 
                             switch(dc.getType()) {
                                 case ADDED:
+                                    Log.d("AddHabitEvent", "listener");
                                     user.getHabit(parentHabitId).addHabitEvent(hEvent);
                                     break;
                                 case MODIFIED:
@@ -345,7 +346,6 @@ public class UserController {
                 .addOnSuccessListener(unused -> {
                     // add snapshot listener for habit events collection associated to the given habit
                     String parentHabitId = habit.getHabitId();
-                    habitEventsSnapshotListenerMap.put(parentHabitId, getHabitEventsSnapshotListener(parentHabitId));
 
                     callback.onCallback(user);
                 })
