@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker;
+package com.cmput301f21t26.habittracker.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,11 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.WindowManager;
 
+import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * File contains the logic for the splash screen.

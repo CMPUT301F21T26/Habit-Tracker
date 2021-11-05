@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker;
+package com.cmput301f21t26.habittracker.ui.habit;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,10 +17,12 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
+import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.User;
-import com.cmput301f21t26.habittracker.objects.UserCallback;
+import com.cmput301f21t26.habittracker.interfaces.UserCallback;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.snackbar.Snackbar;
 

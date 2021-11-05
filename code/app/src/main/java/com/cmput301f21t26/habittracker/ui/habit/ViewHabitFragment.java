@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker.fragments;
+package com.cmput301f21t26.habittracker.ui.habit;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.cmput301f21t26.habittracker.MainActivity;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentViewHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;

@@ -1,7 +1,6 @@
 package com.cmput301f21t26.habittracker.objects;
 
 import android.location.Location;
-import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.Nullable;

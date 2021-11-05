@@ -3,11 +3,11 @@ package com.cmput301f21t26.habittracker.objects;
 import android.net.Uri;
 import android.os.Build;
 
+import com.cmput301f21t26.habittracker.interfaces.UserCallback;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
