@@ -79,4 +79,5 @@ public class TodayHabitFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 }

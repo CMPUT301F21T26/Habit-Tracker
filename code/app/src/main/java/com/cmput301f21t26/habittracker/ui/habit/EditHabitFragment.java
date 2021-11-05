@@ -78,8 +78,6 @@ public class EditHabitFragment extends Fragment {
 
         binding = FragmentEditHabitBinding.inflate(inflater, container, false);
 
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
         daysList = new ArrayList<>();       // init everything to false
         chipGroup = binding.chipGroup;
         confirmHabitButton = binding.confirmHabitButton;
