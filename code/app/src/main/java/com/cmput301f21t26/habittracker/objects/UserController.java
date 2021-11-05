@@ -243,6 +243,8 @@ public class UserController {
                                     user.updateHabit(habit);
                                     if (habit.getDaysList().contains(today)) {
                                         user.updateTodayHabit(habit);
+                                    } else {
+                                        user.removeTodayHabit(habit);
                                     }
                                     break;
                                 case REMOVED:
