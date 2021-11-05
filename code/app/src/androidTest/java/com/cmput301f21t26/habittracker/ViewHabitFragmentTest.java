@@ -15,7 +15,7 @@ import android.util.Log;
 
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.UserController;
-import com.cmput301f21t26.habittracker.ui.home.TodayHabitFragment;
+import com.cmput301f21t26.habittracker.ui.habit.TodayHabitFragment;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.contrib.RecyclerViewActions;

@@ -4,6 +4,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.cmput301f21t26.habittracker.ui.LoginSignupActivity;
+
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
