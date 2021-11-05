@@ -1,12 +1,13 @@
 package com.cmput301f21t26.habittracker.objects;
 
 import android.net.Uri;
-import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.cmput301f21t26.habittracker.interfaces.UserCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -24,7 +25,6 @@ import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,10 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Observer;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 public class UserController {
 
@@ -57,20 +53,11 @@ public class UserController {
      */
     public static void initCurrentUser(UserCallback callback) {
 
+        habitEventsSnapshotListenerMap = new HashMap<>();
+
         readUserDataFromDb(user -> {
             // add snapshot listeners
             userSnapshotListener = getUserSnapshotListener();
-            habitEventsSnapshotListenerMap = new HashMap<>();
-            for (Habit habit : user.getHabits()) {
-                // add snapshot listeners for habitEvents collection associated to the existing habits
-                // habit events are loaded when the snapshot listeners are first called
-                habitEventsSnapshotListenerMap.put(habit.getHabitId(), getHabitEventsSnapshotListener(habit.getHabitId()));
-            }
-
-            // habitsSnapshotListener will add the same habits again when it's first called.
-            // Clear already added habits.
-            user.getHabits().clear();
-            user.getTodayHabits().clear();
             habitsSnapshotListener = getHabitsSnapshotListener();
 
             resetHabitsInDb(user1 -> {
@@ -150,7 +137,7 @@ public class UserController {
     }
 
     /**
-     * Get user data and all data inside the user's subcollections.
+     * Get user data from the database.
      * The callback function is then called.
      *
      * @param callback callback function to be called after reading data from db
@@ -170,42 +157,9 @@ public class UserController {
 
             user = new User(username, firstName, lastName, email, pictureURL, dateLastAccessed);
 
-            readHabitsFromDb(callback);
+            callback.onCallback(user);
 
         }).addOnFailureListener(e -> Log.w("readUserData", "Reading user data failed" + e.toString()));
-    }
-
-    /**
-     * Gets user's habits from the database and store them in the lists.
-     * Call Callback function is then called.
-     *
-     * @param callback callback function is called after the storing
-     */
-    public static void readHabitsFromDb(UserCallback callback) {
-
-        assert user != null;
-
-        final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
-        final CollectionReference habitsRef = userRef.collection("habits");
-
-        habitsRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-
-                    Habit habit = document.toObject(Habit.class);
-                    user.addHabit(habit);
-
-                    int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
-                    if (habit.getDaysList().contains(today)) {
-                        Log.d("habitAdded", "readHabitsFromDb");
-                        user.addTodayHabit(habit);
-                    }
-                }
-                callback.onCallback(user);
-                user.notifyAllObservers();
-            }
-        }).addOnFailureListener(e -> Log.w("readHabitData", "Reading user habits failed" + e.toString()));
     }
 
     /**
@@ -244,6 +198,8 @@ public class UserController {
     /**
      * Return snapshot listener for user's habits collection.
      * The listener notifies the observers when a habit is added, deleted, or edited
+     * When a habit is added, a snapshot listener for its habit events is added to the map.
+     * When a habit is removed, the snapshot listener for its habit events is removed from the map.
      *
      * @return snapshot listener for user's habits collection
      */
@@ -276,6 +232,7 @@ public class UserController {
                                     if (habit.getDaysList().contains(today)) {
                                         user.addTodayHabit(habit);
                                     }
+                                    habitEventsSnapshotListenerMap.put(habit.getHabitId(), getHabitEventsSnapshotListener(habit.getHabitId()));
                                     Log.d("habitAdded", "habit was added " + habit.getTitle());
                                     break;
                                 case MODIFIED:
@@ -289,6 +246,9 @@ public class UserController {
                                     if (habit.getDaysList().contains(today)) {
                                         user.removeTodayHabit(habit);
                                     }
+                                    // remove snapshot listener for habit events collection associated to the given habit
+                                    habitEventsSnapshotListenerMap.get(habit.getHabitId()).remove();
+                                    habitEventsSnapshotListenerMap.remove(habit.getHabitId());
                                     break;
                                 default:
                                     Log.d("habitAdded", "Unexpected type: " + dc.getType());
@@ -327,13 +287,20 @@ public class UserController {
 
                             switch(dc.getType()) {
                                 case ADDED:
-                                    user.addHabitEvent(parentHabitId, hEvent);
+                                    user.getHabit(parentHabitId).addHabitEvent(hEvent);
                                     break;
                                 case MODIFIED:
-                                    user.updateHabitEvent(parentHabitId, hEvent);
+                                    user.getHabit(parentHabitId).updateHabitEvent(hEvent);
                                     break;
                                 case REMOVED:
-                                    user.removeHabitEvent(parentHabitId, hEvent);
+                                    user.getHabit(parentHabitId).deleteHabitEvent(hEvent);
+
+                                    // if habit event to be removed is dated to today, set done for today of parent habit to false
+                                    if (hEvent.getHabitEventDateDay().equals(user.getDateLastAccessedDay())) {
+                                        Habit habit = UserController.getHabit(parentHabitId);
+                                        habit.setDoneForToday(false);
+                                        UserController.updateHabitInDb(habit, user -> { });
+                                    }
                                     break;
                                 default:
                                     Log.d("habitAdded", "Unexpected type: " + dc.getType());
@@ -398,10 +365,6 @@ public class UserController {
 
         removeAllHabitEventsOfHabitFromDb(habit, cbUser -> {
 
-            // remove snapshot listener for habit events collection associated to the given habit
-            habitEventsSnapshotListenerMap.get(habit.getHabitId()).remove();
-            habitEventsSnapshotListenerMap.remove(habit.getHabitId());
-
             // remove habit from db
             mStore.collection("users").document(getCurrentUserId()).collection("habits")
                     .document(habit.getHabitId())
@@ -427,13 +390,11 @@ public class UserController {
 
         WriteBatch batch = mStore.batch();
 
-        List<HabitEvent> habitEvents = user.getHabitEventsMap().get(habit.getHabitId());
+        List<HabitEvent> habitEvents = habit.getHabitEvents();
 
-        if (habitEvents != null){
-            for (HabitEvent hEvent : habitEvents) {
-                DocumentReference habitEventRef = habitRef.collection("habitEvents").document(hEvent.getHabitEventId());
-                batch.delete(habitEventRef);
-            }
+        for (HabitEvent hEvent : habitEvents) {
+            DocumentReference habitEventRef = habitRef.collection("habitEvents").document(hEvent.getHabitEventId());
+            batch.delete(habitEventRef);
         }
 
         batch.commit().addOnSuccessListener(unused -> callback.onCallback(user));
@@ -454,26 +415,6 @@ public class UserController {
                 .set(habit, SetOptions.merge())        // update the document, instead of overwriting it
                 .addOnSuccessListener(unused -> callback.onCallback(user))
                 .addOnFailureListener(e -> Log.w("updateHabit", "Updating habit failed", e));
-    }
-
-    /**
-     * Given a date, and habit, return a habit event object at that date
-     * Return null if no such object is found
-     *
-     * @param habit habit to search
-     * @param date the date to search for
-     * @return Habit event on given date, if it exists
-     */
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public static HabitEvent getHabitEventByDate(Habit habit, Date date){
-        assert user != null;
-        List<HabitEvent> habitEventsList = user.getHabitEventsMap().get(habit.getHabitId());
-        for (int i=0; i<habitEventsList.size(); i++) {
-            if (habitEventsList.get(i).getHabitEventDateDay().equals(date.toInstant().truncatedTo(ChronoUnit.DAYS))){
-                return habitEventsList.get(i);
-            }
-        }
-        return null;
     }
 
     /**
@@ -568,9 +509,7 @@ public class UserController {
         habitRef.collection("habitEvents")
                 .document(hEvent.getHabitEventId())
                 .delete()
-                .addOnSuccessListener(unused -> {
-                    callback.onCallback(user);
-                })
+                .addOnSuccessListener(unused -> callback.onCallback(user))
                 .addOnFailureListener(e -> Log.w("deleteHabitEvent", "Error deleting habit event", e));
     }
 

@@ -154,7 +154,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                         });
                     } else {
                         // if it gets unchecked delete habit event associated with todays date
-                        UserController.removeHabitEventFromDb(UserController.getHabitEventByDate(habit, Calendar.getInstance().getTime()), callback -> {;});
+                        UserController.removeHabitEventFromDb(habit.getHabitEventByDate(Calendar.getInstance().getTime()), callback -> { });
                     }
 
                 });

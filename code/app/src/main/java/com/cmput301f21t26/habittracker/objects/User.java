@@ -6,9 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 
 /**
@@ -28,7 +26,6 @@ public class User extends Observable implements Serializable {
     private List<Habit> habits;
     private List<Habit> todayHabits;
     private List<Permission> permissions;
-    private Map<String, List<HabitEvent>> habitEventsMap;       // TODO refactor
 
     public User(String username, String firstName, String lastName, String email, String pictureURL, Date dateLastAccessed) {
         this.username = username;
@@ -43,7 +40,6 @@ public class User extends Observable implements Serializable {
         this.habits = new ArrayList<>();
         this.todayHabits = new ArrayList<>();
         this.permissions = new ArrayList<>();
-        this.habitEventsMap = new HashMap<String, List<HabitEvent>>();
     }
 
     /**
@@ -135,10 +131,6 @@ public class User extends Observable implements Serializable {
         return permissions;
     }
 
-    public Map<String, List<HabitEvent>> getHabitEventsMap() {
-        return habitEventsMap;
-    }
-
     /**
      * Add id of a user whom this user is following
      * @param uid id of user this user is following
@@ -224,85 +216,6 @@ public class User extends Observable implements Serializable {
             if (todayHabits.get(i).getHabitId().equals(habit.getHabitId())) {
                 // update with new habit
                 todayHabits.set(i, habit);
-                return;
-            }
-        }
-    }
-
-    /**
-     * Add habit event associated with the given parent habit in a map
-     *
-     * @param parentHabitId String id of parent habit associated with the habit event
-     * @param hEvent habit event to add
-     */
-    public void addHabitEvent(String parentHabitId, HabitEvent hEvent) {
-        if (!habitEventsMap.containsKey(parentHabitId)) {
-            habitEventsMap.put(parentHabitId, new ArrayList<HabitEvent>());
-        }
-        List<HabitEvent> habitEventsList = habitEventsMap.get(parentHabitId);
-        if (habitEventsList == null) {
-            habitEventsList = new ArrayList<>();
-        }
-        habitEventsList.add(hEvent);
-    }
-
-    /**
-     * Delete habit event from the associated parent habit
-     *
-     * @param parentHabitId String id of habit parent to habit event
-     * @param hEvent habit event to delete
-     * @throws IllegalArgumentException if parent habit id does not exist
-     * @throws NullPointerException when attempt to access null habit event list
-     * @throws RuntimeException when the habit event list is empty
-     */
-    public void removeHabitEvent(String parentHabitId, HabitEvent hEvent) {
-        if (!habitEventsMap.containsKey(parentHabitId)) {
-            throw new IllegalArgumentException("Parent habit id does not exist");
-        }
-        List<HabitEvent> habitEventsList = habitEventsMap.get(parentHabitId);
-        if (habitEventsList == null) {
-            throw new NullPointerException("Cannot delete habit event from a null habit events list");
-        }
-        if (habitEventsList.size() <= 0) {
-            throw new RuntimeException("Cannot delete habit event from an empty list");
-        }
-        for (int i=0; i<habitEventsList.size(); i++) {
-            if (hEvent.getHabitEventId().equals(habitEventsList.get(i).getHabitEventId())) {
-                habitEventsList.remove(i);
-                // if habit event to be removed is dated to today, set done for today of parent habit to false
-                if (hEvent.getHabitEventDateDay().equals(this.getDateLastAccessedDay())){
-                    Habit habit = UserController.getHabit(parentHabitId);
-                    habit.setDoneForToday(false);
-                    UserController.updateHabitInDb(habit, user -> { });
-                }
-                return;
-            }
-        }
-    }
-
-    /**
-     * Update habit event from the associated parent habit
-     *
-     * @param parentHabitId String id of habit parent to habit event
-     * @param hEvent habit event to update
-     * @throws IllegalArgumentException if parent habit id does not exist
-     * @throws NullPointerException when attempt to access null habit event list
-     * @throws RuntimeException when the habit event list is empty
-     */
-    public void updateHabitEvent(String parentHabitId, HabitEvent hEvent) {
-        if (!habitEventsMap.containsKey(parentHabitId)) {
-            throw new IllegalArgumentException("Parent habit id does not exist");
-        }
-        List<HabitEvent> habitEventsList = habitEventsMap.get(parentHabitId);
-        if (habitEventsList == null) {
-            throw new NullPointerException("Cannot delete habit event from a null habit events list");
-        }
-        if (habitEventsList.size() <= 0) {
-            throw new RuntimeException("Cannot delete habit event from an empty list");
-        }
-        for (int i=0; i<habitEventsList.size(); i++) {
-            if (hEvent.getHabitEventId().equals(habitEventsList.get(i).getHabitEventId())) {
-                habitEventsList.set(i, hEvent);
                 return;
             }
         }

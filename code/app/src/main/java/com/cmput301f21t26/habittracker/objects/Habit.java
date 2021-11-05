@@ -1,9 +1,11 @@
 package com.cmput301f21t26.habittracker.objects;
 
 import java.io.Serializable;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class Habit implements Serializable {
@@ -141,18 +143,28 @@ public class Habit implements Serializable {
         return habitId;
     }
 
-    /**
-     * Return the habit event in the given index.
-     *
-     * @param index (int)
-     * @return HabitEvent obj
-     */
-    public HabitEvent getHabitEventAt(int index) {
-        return habitEvents.get(index);
+    public List<HabitEvent> getHabitEvents() {
+        return habitEvents;
     }
 
     /**
-     * Store the given habit event into the list.
+     * Given a date, and habit, return a habit event object at that date
+     * Return null if no such object is found
+     *
+     * @param date the date to search for
+     * @return Habit event on given date, if it exists
+     */
+    public HabitEvent getHabitEventByDate(Date date){
+        for (int i=0; i<habitEvents.size(); i++) {
+            if (habitEvents.get(i).getHabitEventDateDay().equals(date.toInstant().truncatedTo(ChronoUnit.DAYS))){
+                return habitEvents.get(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Add the given habit event into the list.
      *
      * @param hEvent habit event to store
      */
@@ -163,10 +175,29 @@ public class Habit implements Serializable {
     /**
      * Remove a habit event stored in the given index.
      *
-     * @param index position at which the target habit event is stored
+     * @param hEvent habit event to remove from the list
      */
-    public void deleteHabitEvent(int index) {
-        habitEvents.remove(index);
+    public void deleteHabitEvent(HabitEvent hEvent) {
+        for (int i=0; i<habitEvents.size(); i++) {
+            if (hEvent.getHabitEventId().equals(habitEvents.get(i).getHabitEventId())) {
+                habitEvents.remove(i);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Update an existing habit event to a given habit event
+     *
+     * @param hEvent updated habit event
+     */
+    public void updateHabitEvent(HabitEvent hEvent) {
+        for (int i=0; i<habitEvents.size(); i++) {
+            if (hEvent.getHabitEventId().equals(habitEvents.get(i).getHabitEventId())) {
+                habitEvents.set(i, hEvent);
+                return;
+            }
+        }
     }
 
     /**
