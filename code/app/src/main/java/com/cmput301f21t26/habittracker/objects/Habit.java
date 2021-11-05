@@ -43,13 +43,13 @@ public class Habit implements Serializable {
         if (reason.length() > 30) {
             throw new IllegalArgumentException("Habit reason must be up to 30 characters");
         }
-        reason = reason;
-        startDate = startDate;
-        isDoneForToday = false;
-        habitEvents = new ArrayList<>();
-        daysList = daysList;     // all init to false
-        habitId = UUID.randomUUID().toString();
-        isPrivate = false;
+        this.reason = reason;
+        this.startDate = startDate;
+        this.isDoneForToday = false;
+        this.habitEvents = new ArrayList<>();
+        this.daysList = daysList;     // all init to false
+        this.habitId = UUID.randomUUID().toString();
+        this.isPrivate = false;
     }
 
     /**

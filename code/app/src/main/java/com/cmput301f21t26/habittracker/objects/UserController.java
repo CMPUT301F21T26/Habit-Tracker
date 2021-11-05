@@ -1,14 +1,21 @@
 package com.cmput301f21t26.habittracker.objects;
 
 import android.net.Uri;
+import android.os.Build;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Observer;
+
+import androidx.annotation.RequiresApi;
 
 public class UserController {
 
@@ -177,6 +184,26 @@ public class UserController {
      */
     public static Habit getHabit(String habitId) {
         return user.getHabit(habitId);
+    }
+
+    /**
+     * Given a date, and habit, return a habit event object at that date
+     * Return null if no such object is found
+     *
+     * @param habit habit to search
+     * @param date the date to search for
+     * @return Habit event on given date, if it exists
+     */
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static HabitEvent getHabitEventByDate(Habit habit, Date date){
+        assert user != null;
+        List<HabitEvent> habitEventsList = user.getHabitEventsMap().get(habit.getHabitId());
+        for (int i=0; i<habitEventsList.size(); i++) {
+            if (habitEventsList.get(i).getHabitEventDateDay().equals(date.toInstant().truncatedTo(ChronoUnit.DAYS))){
+                return habitEventsList.get(i);
+            }
+        }
+        return null;
     }
 
     /**

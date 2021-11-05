@@ -1,6 +1,8 @@
 package com.cmput301f21t26.habittracker.objects;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,10 +12,12 @@ import java.util.Map;
 import java.util.Observable;
 
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -132,6 +136,9 @@ public class User extends Observable implements Serializable {
         return dateLastAccessed;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Instant getDateLastAccessedDay(){ return dateLastAccessed.toInstant().truncatedTo(ChronoUnit.DAYS); }
+
     /**
      * Update the date the user accessed to the app to now
      */
@@ -221,6 +228,7 @@ public class User extends Observable implements Serializable {
      * @throws NullPointerException when attempt to access null habit event list
      * @throws RuntimeException when the habit event list is empty
      */
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void removeHabitEvent(String parentHabitId, HabitEvent hEvent) {
         if (!habitEventsMap.containsKey(parentHabitId)) {
             throw new IllegalArgumentException("Parent habit id does not exist");
@@ -235,6 +243,10 @@ public class User extends Observable implements Serializable {
         for (int i=0; i<habitEventsList.size(); i++) {
             if (hEvent.getHabitEventId().equals(habitEventsList.get(i).getHabitEventId())) {
                 habitEventsList.remove(i);
+                // if habit event to be removed is dated to today, set done for today of parent habit to false
+                if (hEvent.getHabitEventDateDay().equals(this.getDateLastAccessedDay())){
+                    UserController.updateDoneForTodayInDb(UserController.getHabit(parentHabitId), false, donothing -> {;});
+                }
                 return;
             }
         }
@@ -572,9 +584,11 @@ public class User extends Observable implements Serializable {
 
         List<HabitEvent> habitEvents = habitEventsMap.get(habit.getHabitId());
 
-        for (HabitEvent hEvent : habitEvents) {
-            DocumentReference habitEventRef = habitRef.collection("habitEvents").document(hEvent.getHabitEventId());
-            batch.delete(habitEventRef);
+        if (habitEvents!=null){
+            for (HabitEvent hEvent : habitEvents) {
+                DocumentReference habitEventRef = habitRef.collection("habitEvents").document(hEvent.getHabitEventId());
+                batch.delete(habitEventRef);
+            }
         }
 
         batch.commit().addOnSuccessListener(unused -> callback.onCallback(User.this));
@@ -623,10 +637,13 @@ public class User extends Observable implements Serializable {
         final DocumentReference userRef = mStore.collection("users").document(username);
         final DocumentReference habitRef = userRef.collection("habits").document(hEvent.getParentHabitId());
 
+
         habitRef.collection("habitEvents")
                 .document(hEvent.getHabitEventId())
                 .delete()
-                .addOnSuccessListener(unused -> callback.onCallback(User.this))
+                .addOnSuccessListener(unused -> {
+                    callback.onCallback(User.this);
+                })
                 .addOnFailureListener(e -> Log.w("deleteHabitEvent", "Error deleting habit event", e));
     }
 

@@ -2,6 +2,7 @@ package com.cmput301f21t26.habittracker;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -24,6 +26,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
@@ -112,6 +115,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         holder.getPlanTV().setText(getPlanMsg(habit));
         holder.getDoneTodayCB().setChecked(habit.isDoneForToday());
         holder.getDoneTodayCB().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
                 UserController.updateDoneForTodayInDb(habit, isChecked, user -> {
@@ -144,6 +148,9 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                                 snackbar.show();
                             };
                         });
+                    } else {
+                        // if it gets unchecked delete habit event associated with todays date
+                        UserController.removeHabitEventFromDb(UserController.getHabitEventByDate(habit, Calendar.getInstance().getTime()), callback -> {;});
                     }
 
                 });
