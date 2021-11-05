@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * Permission class represents a message sent by the a user to follow another user
+ * Permission class represents a message sent by a user to follow another user
  */
 public class Permission {
 
