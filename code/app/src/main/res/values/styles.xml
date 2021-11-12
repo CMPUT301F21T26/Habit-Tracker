@@ -17,4 +17,9 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="notifPanelAnimation">
+        <item name="android:windowEnterAnimation">@android:anim/accelerate_decelerate_interpolator</item>
+        <item name="android:windowExitAnimation">@android:anim/decelerate_interpolator</item>
+    </style>
+
 </resources>
