@@ -105,10 +105,18 @@
     </fragment>
     <action
         android:id="@+id/action_global_editHabitEventFragment"
-        app:destination="@id/editHabitEventFragment" />
+        app:destination="@id/editHabitEventFragment"
+        app:enterAnim="@anim/enter_from_right"
+        app:exitAnim="@anim/exit_to_left"
+        app:popEnterAnim="@anim/enter_from_left"
+        app:popExitAnim="@anim/exit_to_right" />
     <action
         android:id="@+id/action_global_viewHabitEventFragment"
-        app:destination="@id/viewHabitEventFragment" />
+        app:destination="@id/viewHabitEventFragment"
+        app:enterAnim="@anim/enter_from_right"
+        app:exitAnim="@anim/exit_to_left"
+        app:popEnterAnim="@anim/enter_from_left"
+        app:popExitAnim="@anim/exit_to_right" />
     <action
         android:id="@+id/action_global_timelineFragment"
         app:destination="@id/navigation_timeline" />
