@@ -59,13 +59,21 @@
             app:nullable="true" />
         <action
             android:id="@+id/action_viewHabitFragment_to_editHabitFragment"
-            app:destination="@id/editHabitFragment" />
+            app:destination="@id/editHabitFragment"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_left"
+            app:popEnterAnim="@anim/exit_to_right"
+            app:popExitAnim="@anim/enter_from_left" />
     </fragment>
 
 
     <action
         android:id="@+id/action_global_addHabitFragment"
-        app:destination="@id/addHabitFragment" />
+        app:destination="@id/addHabitFragment"
+        app:enterAnim="@anim/enter_from_right"
+        app:exitAnim="@anim/exit_to_left"
+        app:popExitAnim="@anim/exit_to_right"
+        app:popEnterAnim="@anim/enter_from_left" />
     <action
         android:id="@+id/action_global_viewHabitFragment"
         app:destination="@id/viewHabitFragment" />
