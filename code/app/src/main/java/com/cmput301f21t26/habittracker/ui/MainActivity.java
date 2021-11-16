@@ -1,20 +1,27 @@
 package com.cmput301f21t26.habittracker.ui;
 
+import android.animation.LayoutTransition;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -27,12 +34,17 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
+import com.cmput301f21t26.habittracker.PermissionListAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
+import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.Permission;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -186,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_notif) {
             // Just to show what it would look like with a notif coming in
             redCircle.setVisibility(View.VISIBLE);
+            openNotifDialog();
             return true;
         }
         if (id == R.id.action_search) {
@@ -193,6 +206,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Creates a custom dialog that contains
+     * potential follow requests, and shows it
+     */
+    private void openNotifDialog() {
+        final Dialog notifDialog = new Dialog(this);
+        notifDialog.setContentView(R.layout.notification_panel);
+        notifDialog.getWindow().setBackgroundDrawableResource(R.drawable.notif_panel_background);
+        notifDialog.getWindow().setDimAmount(0.2F);
+        notifDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        notifDialog.getWindow().getAttributes().windowAnimations = R.style.notifPanelAnimation;
+        ListView permissionsListView= (ListView) notifDialog.findViewById(R.id.permissionsListView);
+        ArrayList<Permission> permissionsList = (ArrayList<Permission>) UserController.getCurrentUser().getPermissions();
+        PermissionListAdapter permissionsListAdapter = new PermissionListAdapter(this, permissionsList);
+        permissionsListView.setAdapter(permissionsListAdapter);
+        notifDialog.show();
     }
 
     /**

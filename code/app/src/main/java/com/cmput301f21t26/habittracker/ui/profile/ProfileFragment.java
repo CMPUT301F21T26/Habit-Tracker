@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -42,26 +43,37 @@ public class ProfileFragment extends Fragment implements Observer {
     private TextView followersTV;
     private TextView followingTV;
     private CircleImageView profilePic;
+    private Button followButton;
     private Uri imageUri;
     private Uri newImageUri;
     private String picturePath;
     private String profileImageUrl;
     private User userObject;
+    private User otherUser = null;
 
     /**
      * Creates a new profile fragment for when viewing other
      * user profiles.
-     * @param otherUsername
-     *  The other user's username, of type {@link String}
+     * @param otherUser
+     *  The other user's User object, of type {@link User}
      * @return
      *  The newly created profile fragment, of type {@link Fragment}
      */
-    public static ProfileFragment newInstance(String otherUsername) {
+    public ProfileFragment newInstance(User otherUser) {
         ProfileFragment profileFragment = new ProfileFragment();
         Bundle bundle = new Bundle();
-        bundle.putString("username", otherUsername);
+        bundle.putSerializable("otherUser", otherUser);
         profileFragment.setArguments(bundle);
-        return profileFragment;
+        return new ProfileFragment();
+    }
+
+    /**
+     * Creates a new profile fragment for the current user.
+     * @return
+     * The newly created profile fragment, of type {@link Fragment}
+     */
+    public ProfileFragment newInstance() {
+        return new ProfileFragment();
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -78,9 +90,17 @@ public class ProfileFragment extends Fragment implements Observer {
         profilePic = view.findViewById(R.id.profilePicImageView);
         followersTV = view.findViewById(R.id.followersNumberTV);
         followingTV = view.findViewById(R.id.followingNumberTV);
+        followButton = view.findViewById(R.id.followButton);
 
-        userObject = UserController.getCurrentUser();
-        UserController.addObserverToCurrentUser(this);
+        if (getArguments() != null) {
+            otherUser = (User) getArguments().getSerializable("otherUser");
+        }
+        // otherUser dne i.e we want to view the current user's profile
+        if (otherUser == null) {
+            userObject = UserController.getCurrentUser();
+            UserController.addObserverToCurrentUser(this);
+            followButton.setVisibility(View.INVISIBLE);
+        }
 
         return view;
     }
@@ -93,17 +113,38 @@ public class ProfileFragment extends Fragment implements Observer {
         setTabsAndViewPager();
 
         // fill up user info on view created
-        setFields();
-        setProfilePicImageView();
+        if (otherUser != null) {
+            setFields(otherUser);
+            setProfilePicImageView(otherUser);
+            setFollowButtonState();
+            followButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // TODO Change the text to "REQUESTED" and add a permission request to that user's permission list and in the database
+                }
+            });
+        } else {
+            setFields(userObject);
+            setProfilePicImageView(userObject);
 
-        // When user clicks profile picture, change
-        profilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mGetContent.launch("image/*");  // launch file explorer
-            }
-        });
+            // When user clicks profile picture, change it
+            profilePic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mGetContent.launch("image/*");  // launch file explorer
+                }
+            });
+        }
 
+    }
+
+    private void setFollowButtonState() {
+        // TODO
+        // Set the state of the follow button accordingly
+        // when viewing other user's profile.
+        // Determine if current user is following the viewing profile.
+        // i.e if (UserManager.isFollowing(otherUser.getUsername()) == 1) {
+        // followButton.setText("FOLLOWING"); }
     }
 
     /**
@@ -148,8 +189,10 @@ public class ProfileFragment extends Fragment implements Observer {
     /**
      * Gets the info from the User object and sets
      * the TextViews accordingly
+     * @param userObject
+     * The user object to get the info from {@link User}
      */
-    private void setFields() {
+    private void setFields(User userObject) {
         // Set fields
         fullNameTV.setText(userObject.getFirstName() + " " + userObject.getLastName());
         usernameTV.setText(userObject.getUsername());
@@ -163,8 +206,10 @@ public class ProfileFragment extends Fragment implements Observer {
      * Sets the profile picture to the image
      * referenced in the pictureURL attribute
      * in the user's data in the database.
+     * @param userObject
+     *  The user object to get the profile picture from {@link User}
      */
-    private void setProfilePicImageView() {
+    private void setProfilePicImageView(User userObject) {
         // Set the profile picture
         profileImageUrl = userObject.getPictureURL();
         if (profileImageUrl != null) {
@@ -220,6 +265,10 @@ public class ProfileFragment extends Fragment implements Observer {
                 }
             });
 
+    public User getOtherUser() {
+        return otherUser;
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -230,7 +279,12 @@ public class ProfileFragment extends Fragment implements Observer {
     @Override
     public void update(Observable observable, Object o) {
         // set our info into the textViews and profile pic
-        setFields();
-        setProfilePicImageView();
+        if (otherUser != null) {
+            setFields(otherUser);
+            setProfilePicImageView(otherUser);
+        } else {
+            setFields(userObject);
+            setProfilePicImageView(userObject);
+        }
     }
 }

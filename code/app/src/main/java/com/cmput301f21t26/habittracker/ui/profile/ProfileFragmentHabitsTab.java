@@ -14,6 +14,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.ui.habit.HabitAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
@@ -58,7 +59,13 @@ public class ProfileFragmentHabitsTab extends Fragment {
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
-        habitList = (ArrayList<Habit>) UserController.getCurrentUser().getHabits();
+        ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
+        User otherUser = parentProfileFrag.getOtherUser();
+        if (otherUser != null) {
+            habitList = (ArrayList<Habit>) otherUser.getHabits();
+        } else {
+            habitList = (ArrayList<Habit>) UserController.getCurrentUser().getHabits();
+        }
 
         rvlistener = new HabitAdapter.RecyclerViewClickListener() {
             @Override

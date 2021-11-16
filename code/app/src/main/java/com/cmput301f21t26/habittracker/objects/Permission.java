@@ -13,15 +13,37 @@ public class Permission {
     private final String toUid;
     private final Date dateSent;
     private final String id;
+    private final String pictureURL;
 
-    public Permission(String fromUid, String toUid, Date dateSent) {
+    public Permission(String fromUid, String toUid, Date dateSent, String pictureURL) {
         this.fromUid = fromUid;
         this.toUid = toUid;
         this.dateSent = dateSent;
         this.id = UUID.randomUUID().toString();
+        this.pictureURL = pictureURL;
     }
 
-    public Permission(String fromUid, String toUid) {
-        this(fromUid, toUid, Calendar.getInstance().getTime());       // dateSent = date now
+    public Permission(String fromUid, String toUid, String pictureURL) {
+        this(fromUid, toUid, Calendar.getInstance().getTime(), pictureURL);       // dateSent = date now
+    }
+
+    public String getFromUid() {
+        return fromUid;
+    }
+
+    public String getToUid() {
+        return toUid;
+    }
+
+    public Date getDateSent() {
+        return dateSent;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getPictureURL() {
+        return pictureURL;
     }
 }

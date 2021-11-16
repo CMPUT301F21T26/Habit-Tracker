@@ -57,6 +57,7 @@
                     android:maxLines="1"
                     android:singleLine="true"
                     android:text="Habit title"
+                    android:textColor="@color/dark_blue"
                     android:textSize="@dimen/primary_font_size" />
 
                 <TextView
@@ -69,6 +70,7 @@
                     android:maxLines="1"
                     android:singleLine="true"
                     android:text="Habit plan"
+                    android:textColor="@color/dark_blue"
                     android:textSize="@dimen/secondary_font_size" />
 
             </LinearLayout>
@@ -77,6 +79,7 @@
                 android:id="@+id/habitCheckbox"
                 android:layout_width="48dp"
                 android:layout_height="32dp"
+                android:buttonTint="@color/dark_blue"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
