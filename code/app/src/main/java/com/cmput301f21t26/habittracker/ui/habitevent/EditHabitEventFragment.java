@@ -1,5 +1,7 @@
 package com.cmput301f21t26.habittracker.ui.habitevent;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -8,10 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -44,6 +49,10 @@ public class EditHabitEventFragment extends Fragment {
     private TextView habitEventLocationTV;
     private EditText habitEventCommentET;
 
+    private ImageView habitEventImage;
+    private Button habitEventChooseImageBtn;
+    private ImageButton habitEventCameraBtn;
+
     private Habit habit;
     private HabitEvent hEvent;
 
@@ -73,7 +82,9 @@ public class EditHabitEventFragment extends Fragment {
         habitEventTitleTV = binding.editHabitEventTitleTV;
         habitEventCommentET = binding.habitEventCommentET;
         habitEventLocationTV = binding.habitEventLocationTV;
-
+        habitEventChooseImageBtn = binding.chooseImageButton;
+        habitEventImage = binding.habitEventImage;
+        habitEventCameraBtn = binding.cameraButton;
         return binding.getRoot();
     }
 
@@ -85,7 +96,8 @@ public class EditHabitEventFragment extends Fragment {
 
         editConfirmBtn.setOnClickListener(editConfirmOnClickListener);
         delBtn.setOnClickListener(deleteOnClickListener);
-
+        habitEventCameraBtn.setOnClickListener(cameraBtnOnClickListener);
+        habitEventImage.setOnClickListener(chooseImageOnClickListener);
         setEditHabitEventFields();
     }
 
@@ -161,6 +173,20 @@ public class EditHabitEventFragment extends Fragment {
                 NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                 navController.navigate(action);
             });
+        }
+    };
+
+    private View.OnClickListener cameraBtnOnClickListener = new View.OnClickListener(){
+        @Override
+        public void onClick(View view) {
+
+        }
+    };
+
+    private View.OnClickListener chooseImageOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
         }
     };
 }
