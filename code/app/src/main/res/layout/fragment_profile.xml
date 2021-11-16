@@ -165,6 +165,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:background="@drawable/tab_background"
+            android:clipToOutline="true"
             app:tabTextColor="@color/white"
             app:tabIndicatorColor="@color/green"
             app:tabSelectedTextColor="@color/green"
