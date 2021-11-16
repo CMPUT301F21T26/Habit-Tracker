@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,7 +41,6 @@ public class TodayHabitFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentTodayHabitBinding.inflate(inflater, container, false);
-
         mRecyclerView = binding.todayHabitRV;
         mLayoutManager = new LinearLayoutManager(getActivity());
 
@@ -54,6 +54,10 @@ public class TodayHabitFragment extends Fragment {
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
         todayHabitList = (ArrayList<Habit>) UserController.getCurrentUser().getTodayHabits();
+        // If there are no habits today, show text that says so
+        if (todayHabitList.isEmpty()) {
+            binding.noHabitsTodayTV.setVisibility(View.VISIBLE);
+        }
         Log.d("Number", String.valueOf(todayHabitList.size()));
 
         rvListener = new HabitAdapter.RecyclerViewClickListener() {
