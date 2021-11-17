@@ -1,11 +1,13 @@
 package com.cmput301f21t26.habittracker.ui;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,8 +43,10 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Observer {
 
     private final String TAG = "MainActivity";
 
@@ -69,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
         currentUser = UserController.getCurrentUser();
+        UserController.addObserverToCurrentUser(this);
 
         // Set profile icon to current user's profile picture in bottom nav
         setProfileIconToProfilePic(UserController.getCurrentUser().getPictureURL());
@@ -175,6 +180,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        updateBellIcon();
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -197,8 +204,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_notif) {
-            // Just to show what it would look like with a notif coming in
-            redCircle.setVisibility(View.VISIBLE);
             openNotifDialog();
             return true;
         }
@@ -228,6 +233,26 @@ public class MainActivity extends AppCompatActivity {
         FollowRequestListAdapter followRequestListAdapter = new FollowRequestListAdapter(this, followRequestList);
         permissionsListView.setAdapter(followRequestListAdapter);
         notifDialog.show();
+        // When the dialog is dismissed, update notification icon
+        notifDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                updateBellIcon();
+            }
+        });
+    }
+
+    /**
+     * Updates the bell icon to have a red dot
+     * if there are follow requests, invisible otherwise.
+     */
+    private void updateBellIcon() {
+        // Set red circle to appear on bell icon if there are follow requests
+        if (!UserController.getCurrentUser().getFollowRequests().isEmpty()) {
+            redCircle.setVisibility(View.VISIBLE);
+        } else {
+            redCircle.setVisibility(View.INVISIBLE);
+        }
     }
 
     /**
@@ -325,4 +350,9 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    public void update(Observable observable, Object o) {
+        Log.d("MainActivity", "GOT NOTIFICATION");
+        updateBellIcon();
+    }
 }
