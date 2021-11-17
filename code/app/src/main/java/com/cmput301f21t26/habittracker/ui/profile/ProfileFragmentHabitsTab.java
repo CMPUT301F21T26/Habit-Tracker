@@ -10,10 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
+import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.ui.habit.HabitAdapter;
 import com.cmput301f21t26.habittracker.R;
@@ -32,6 +35,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
     private HabitAdapter habitAdapter;
     private RecyclerView mRecyclerView;
     private HabitAdapter.RecyclerViewClickListener rvlistener;
+    private User userObject;
 
     public ProfileFragmentHabitsTab() {
         // Required empty public constructor
@@ -40,6 +44,8 @@ public class ProfileFragmentHabitsTab extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
+        userObject = parentProfileFrag.getUserObject();
     }
 
     @Override
@@ -59,22 +65,14 @@ public class ProfileFragmentHabitsTab extends Fragment {
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
-        ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
-        User otherUser = parentProfileFrag.getOtherUser();
-        if (otherUser != null) {
-            habitList = (ArrayList<Habit>) otherUser.getHabits();
-        } else {
-            habitList = (ArrayList<Habit>) UserController.getCurrentUser().getHabits();
-        }
-
+        habitList = (ArrayList<Habit>) userObject.getHabits();
+        // TODO If currentUser is not following otherUser, don't allow clicking or showing of habits
         rvlistener = new HabitAdapter.RecyclerViewClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Log.d(TAG, "Clicked on item at position: " + String.valueOf(position));
-                String habitId = habitList.get(position).getHabitId();
-                Bundle bundle = new Bundle();
-                bundle.putString("habitId", habitId);
-                navController.navigate(R.id.viewHabitFragment, bundle);
+                NavDirections action = MobileNavigationDirections.actionGlobalViewHabitFragment(habitList.get(position), userObject);
+                navController.navigate(action);
             }
         };
 
