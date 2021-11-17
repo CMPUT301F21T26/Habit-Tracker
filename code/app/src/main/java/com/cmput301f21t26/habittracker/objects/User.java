@@ -121,6 +121,10 @@ public class User extends Observable implements Serializable {
         this.followers = followers;
     }
 
+    public boolean isFollowing(User otherUser) {
+        return followings.contains(otherUser.getUid());
+    }
+
     public List<Habit> getHabits() {
         return habits;
     }

@@ -123,13 +123,30 @@ public class ProfileFragment extends Fragment implements Observer {
             // When the inputted userObject is not the current user (is the other user)
             setFields(otherUser);
             setProfilePicImageView(otherUser);
-            setFollowButtonState();
+            int initState = getInitialFollowButtonState();
+
+            if (initState == 0) {
+                followButton.setText("FOLLOW");
+            } else if (initState == 1) {
+                followButton.setText("REQUESTED");
+            } else {
+                followButton.setText("FOLLOWING");
+            }
+
             followButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO Change the text to "REQUESTED" and add a permission request to that user's permission list and in the database
                     followRequestController.storeFollowRequestInDb(currentUser, otherUser, unused -> {
-                        followButton.setText("REQUESTED");
+                        if (initState == 0) {
+                            // sent a follow request
+                            followButton.setText("REQUESTED");
+                        } else if (initState == 1) {
+                            // cancelled request
+                            followButton.setText("FOLLOW");
+                        } else {
+                            // unfollow
+                            followButton.setText("FOLLOW");
+                        }
                     });
                 }
             });
@@ -148,16 +165,19 @@ public class ProfileFragment extends Fragment implements Observer {
                 mGetContent.launch("image/*");  // launch file explorer
             });
         }
-
     }
 
-    private void setFollowButtonState() {
-        // TODO
-        // Set the state of the follow button accordingly
-        // when viewing other user's profile.
-        // Determine if current user is following the viewing profile.
-        // i.e if (UserManager.isFollowing(otherUser.getUsername()) == 1) {
-        // followButton.setText("FOLLOWING"); }
+    private int getInitialFollowButtonState() {
+
+        if (currentUser.isFollowing(otherUser)) {
+            /*
+            if (UserController.hasCurrUserSentFollowRequestTo(otherUser)) {
+                return 1;   // 1: sent a follow request
+            }
+            */
+            return 2;   // 2: following
+        }
+        return 0;      // 0: not following (default)
     }
 
     /**
