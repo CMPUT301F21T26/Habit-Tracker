@@ -69,8 +69,10 @@ public class SearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 User otherUser = (User) adapterView.getItemAtPosition(i);
-                NavDirections action = MobileNavigationDirections.actionGlobalNavigationProfile(otherUser);
-                navController.navigate(action);
+                OtherUserController.getHabitList(otherUser, updatedOtheruser -> {
+                    NavDirections action = MobileNavigationDirections.actionGlobalNavigationProfile(updatedOtheruser);
+                    navController.navigate(action);
+                });
             }
         });
         return view;

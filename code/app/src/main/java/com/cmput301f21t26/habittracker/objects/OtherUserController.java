@@ -74,6 +74,7 @@ public class OtherUserController {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot user : task.getResult()) {
                             User tempUser = user.toObject(User.class);
+                            /*
                             // Add the user's habits
                             getHabitList(tempUser.getUsername(), new HabitsListCallback() {
                                 @Override
@@ -83,6 +84,7 @@ public class OtherUserController {
                                     }
                                 }
                             });
+                            */
                             usersList.add(tempUser);
                         }
                         callback.onCallback(usersList);
@@ -130,27 +132,24 @@ public class OtherUserController {
 
     /**
      * Creates a list of private habits from the given user
-     * @param username
+     * @param user
      *  The username of the user that we want to get the habits from, {@link String}
-     * @param callback
-     *  The callback needed due to asynchronous calls, {@link HabitsListCallback}
      */
-    private static void getHabitList(String username, HabitsListCallback callback) {
-        ArrayList<Habit> habitsList = new ArrayList<>();
-        userReference = collectionReference.document(username);
-        userReference.collection("habits").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot habit: task.getResult()) {
-                        Habit tempHabit = habit.toObject(Habit.class);
-                        if (!tempHabit.isPrivate()) {
-                            habitsList.add(habit.toObject(Habit.class));
+    public static void getHabitList(User user, UserCallback callback) {
+        userReference = collectionReference.document(user.getUid());
+        userReference.collection("habits").whereEqualTo("private", false)       // query public habits
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot habit: task.getResult()) {
+                            Log.d("otherUserHabits", "User: " + user.getUsername() + " habit: " + habit.getId());
+                            user.addHabit(habit.toObject(Habit.class));
                         }
+                        callback.onCallback(user);
                     }
-                    callback.onCallback(habitsList);
                 }
-            }
-        });
+            });
     }
 }
