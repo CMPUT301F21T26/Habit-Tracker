@@ -105,12 +105,20 @@ public class User extends Observable implements Serializable {
         this.dateLastAccessed = dateLastAccessed;
     }
 
-    public List<String> getFollowing() {
+    public List<String> getFollowings() {
         return followings;
+    }
+
+    public void setFollowings(List<String> followings) {
+        this.followings = followings;
     }
 
     public List<String> getFollowers() {
         return followers;
+    }
+
+    public void setFollowers(List<String> followers) {
+        this.followers = followers;
     }
 
     public List<Habit> getHabits() {

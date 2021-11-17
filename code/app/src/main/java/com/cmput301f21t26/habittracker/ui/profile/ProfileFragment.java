@@ -210,7 +210,7 @@ public class ProfileFragment extends Fragment implements Observer {
         fullNameTV.setText(userObject.getFirstName() + " " + userObject.getLastName());
         usernameTV.setText(userObject.getUsername());
         int followersNumber = userObject.getFollowers().size();
-        int followingNumber = userObject.getFollowing().size();
+        int followingNumber = userObject.getFollowings().size();
         followersTV.setText(String.valueOf(followersNumber));
         followingTV.setText(String.valueOf(followingNumber));
     }

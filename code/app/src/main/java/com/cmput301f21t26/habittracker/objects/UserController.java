@@ -202,6 +202,9 @@ public class UserController {
                 user.setPictureURL(snapshot.getString("pictureURL"));
                 user.setDateLastAccessed(snapshot.getDate("dateLastAccessed"));
 
+                user.setFollowings((List<String>) snapshot.get("followings"));
+                user.setFollowers((List<String>) snapshot.get("followers"));
+
                 user.notifyAllObservers();
             }
         });

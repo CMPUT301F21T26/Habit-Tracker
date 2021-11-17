@@ -31,6 +31,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -277,6 +278,8 @@ public class SignupFragment extends Fragment {
                         user.put("username", username);
                         user.put("pictureURL", profileImageUrl);
                         user.put("dateLastAccessed", Calendar.getInstance().getTime());
+                        user.put("followings", new ArrayList<String>());
+                        user.put("followers", new ArrayList<String>());
 
                         usersRef
                                 .document(username)     // user id: username
