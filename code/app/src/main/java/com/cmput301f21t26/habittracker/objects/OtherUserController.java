@@ -50,13 +50,18 @@ public class OtherUserController {
      */
     public void getUsersList(String newText, UserListCallback callback) {
 
+        User currentUser = UserController.getCurrentUser();
+
         ArrayList<User> usersList = new ArrayList<>();
         if (!newText.isEmpty()) {
             Query query = usersRef.orderBy("username").startAt(newText).endAt(newText+ "\uf8ff");
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot user : task.getResult()) {
-                        usersList.add(user.toObject(User.class));
+                        if (!user.getId().equals(currentUser.getUid())) {
+                            // only add the users not equal to current user
+                            usersList.add(user.toObject(User.class));
+                        }
                     }
                     callback.onCallback(usersList);
                 }
