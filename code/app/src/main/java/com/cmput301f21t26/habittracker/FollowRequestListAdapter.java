@@ -10,12 +10,16 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cmput301f21t26.habittracker.objects.FollowRequest;
+import com.cmput301f21t26.habittracker.objects.UserController;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FollowRequestListAdapter extends BaseAdapter {
+public class FollowRequestListAdapter extends BaseAdapter implements Observer {
+
     private String TAG = "PermissionListAdapter";
     private ArrayList<FollowRequest> permissionsList;
     private Context mContext;
@@ -23,6 +27,8 @@ public class FollowRequestListAdapter extends BaseAdapter {
     public FollowRequestListAdapter(Context context, ArrayList<FollowRequest> permissionsList) {
         this.mContext = context;
         this.permissionsList = permissionsList;
+
+        UserController.addObserverToCurrentUser(this);
     }
 
     @Override
@@ -44,7 +50,7 @@ public class FollowRequestListAdapter extends BaseAdapter {
     public View getView(int position, View view, ViewGroup viewGroup) {
 
         if (view == null) {
-            view = LayoutInflater.from(mContext).inflate(R.layout.permission_content, viewGroup);
+            view = LayoutInflater.from(mContext).inflate(R.layout.follow_request_content, null);
         }
 
         FollowRequest tempFollowRequest = (FollowRequest) getItem(position);
@@ -76,5 +82,10 @@ public class FollowRequestListAdapter extends BaseAdapter {
         });
 
         return view;
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+       notifyDataSetChanged();
     }
 }
