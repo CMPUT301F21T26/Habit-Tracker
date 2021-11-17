@@ -142,6 +142,27 @@ public class User extends Observable implements Serializable {
     }
 
     /**
+     * Add permission to the permissions list
+     * @param p permission to add
+     */
+    public void addPermission(Permission p) {
+        permissions.add(p);
+    }
+
+    /**
+     * Remove a permission from permissions list.
+     * @param p permission to remove
+     */
+    public void removePermission(Permission p) {
+        for (int i=0; i<permissions.size(); i++) {
+            if (p.getId().equals(permissions.get(i).getId())) {
+                permissions.remove(i);
+                return;
+            }
+        }
+    }
+
+    /**
      * Add id of a user whom this user is following
      * @param uid id of user this user is following
      */
