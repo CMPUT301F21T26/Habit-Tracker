@@ -123,10 +123,8 @@ public class EditHabitFragment extends Fragment {
 
         chooseDateButton.setOnClickListener(v -> datePicker.show(requireActivity().getSupportFragmentManager(), "start date"));
 
-        assert getArguments() != null;
-        String habitId = getArguments().getString("habitId");
         // grabs habit and updates screen with this information
-        habit = UserController.getHabit(habitId);
+        habit = EditHabitFragmentArgs.fromBundle(getArguments()).getHabit();
         updateScreen();
 
         // make the confirm button and delete buttons clickable
