@@ -5,26 +5,24 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * Permission class represents a message sent by a user to follow another user
+ * FollowRequest class represents a message sent by a user to follow another user
  */
 public class FollowRequest {
 
-    private final String fromUid;
-    private final String toUid;
-    private final Date dateSent;
-    private final String id;
-    private final String pictureURL;
+    private String fromUid;
+    private String toUid;
+    private Date dateSent;
+    private String id;
+    private String pictureURL;
 
-    public FollowRequest(String fromUid, String toUid, Date dateSent, String pictureURL) {
-        this.fromUid = fromUid;
-        this.toUid = toUid;
-        this.dateSent = dateSent;
+    public FollowRequest() { }
+
+    public FollowRequest(User fromUser, User toUser) {
+        this.fromUid = fromUser.getUid();
+        this.toUid = toUser.getUid();
+        this.dateSent = Calendar.getInstance().getTime();
         this.id = UUID.randomUUID().toString();
-        this.pictureURL = pictureURL;
-    }
-
-    public FollowRequest(String fromUid, String toUid, String pictureURL) {
-        this(fromUid, toUid, Calendar.getInstance().getTime(), pictureURL);       // dateSent = date now
+        this.pictureURL = fromUser.getPictureURL();
     }
 
     public String getFromUid() {
