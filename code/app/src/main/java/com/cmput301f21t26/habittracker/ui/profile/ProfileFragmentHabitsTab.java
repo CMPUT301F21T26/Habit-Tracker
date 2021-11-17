@@ -16,12 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
-import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.ui.habit.HabitAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
-import com.cmput301f21t26.habittracker.objects.UserController;
 
 import java.util.ArrayList;
 
@@ -45,7 +43,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
-        userObject = parentProfileFrag.getUserObject();
+        userObject = parentProfileFrag.getOtherUser();
     }
 
     @Override

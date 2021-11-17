@@ -16,10 +16,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
+import com.cmput301f21t26.habittracker.objects.FollowRequest;
+import com.cmput301f21t26.habittracker.objects.FollowRequestController;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
@@ -48,9 +49,11 @@ public class ProfileFragment extends Fragment implements Observer {
     private Uri newImageUri;
     private String picturePath;
     private String profileImageUrl;
-    private User userObject;
+    private User otherUser;
     private User currentUser;
 
+    private FollowRequestController followRequestController;
+    
     /**
      * Creates a new profile fragment for when viewing other
      * user profiles.
@@ -94,10 +97,12 @@ public class ProfileFragment extends Fragment implements Observer {
 
         // Get users
         currentUser = UserController.getCurrentUser();
-        userObject = ProfileFragmentArgs.fromBundle(getArguments()).getUser();
+        otherUser = ProfileFragmentArgs.fromBundle(getArguments()).getUser();
+        
+        followRequestController = FollowRequestController.getInstance();
 
         // otherUser dne i.e we want to view the current user's profile
-        if (userObject == currentUser) {
+        if (otherUser == currentUser) {
             UserController.addObserverToCurrentUser(this);
         } else {
 
@@ -114,15 +119,18 @@ public class ProfileFragment extends Fragment implements Observer {
         setTabsAndViewPager();
 
         // fill up user info on view created
-        if (!userObject.getUsername().equals(currentUser.getUsername())) {
+        if (!otherUser.getUsername().equals(currentUser.getUsername())) {
             // When the inputted userObject is not the current user (is the other user)
-            setFields(userObject);
-            setProfilePicImageView(userObject);
+            setFields(otherUser);
+            setProfilePicImageView(otherUser);
             setFollowButtonState();
             followButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     // TODO Change the text to "REQUESTED" and add a permission request to that user's permission list and in the database
+                    followRequestController.storeFollowRequestInDb(currentUser, otherUser, unused -> {
+                        followButton.setText("REQUESTED");
+                    });
                 }
             });
 
@@ -132,15 +140,12 @@ public class ProfileFragment extends Fragment implements Observer {
                 ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
             }
         } else {
-            setFields(userObject);
-            setProfilePicImageView(userObject);
+            setFields(otherUser);
+            setProfilePicImageView(otherUser);
             followButton.setVisibility(View.INVISIBLE);
             // When user clicks profile picture, change it
-            profilePic.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mGetContent.launch("image/*");  // launch file explorer
-                }
+            profilePic.setOnClickListener(view1 -> {
+                mGetContent.launch("image/*");  // launch file explorer
             });
         }
 
@@ -273,8 +278,8 @@ public class ProfileFragment extends Fragment implements Observer {
                 }
             });
 
-    public User getUserObject() {
-        return userObject;
+    public User getOtherUser() {
+        return otherUser;
     }
 
     @Override
@@ -287,7 +292,7 @@ public class ProfileFragment extends Fragment implements Observer {
     @Override
     public void onResume() {
         super.onResume();
-        if (userObject != currentUser) {
+        if (otherUser != currentUser) {
             MainActivity.hideBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
         }
     }
@@ -295,20 +300,21 @@ public class ProfileFragment extends Fragment implements Observer {
     @Override
     public void onStop() {
         super.onStop();
-        if (userObject != currentUser) {
+        if (otherUser != currentUser) {
             MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
         }
     }
 
     @Override
     public void update(Observable observable, Object o) {
+        // TODO what's this for?
         // set our info into the textViews and profile pic
         // and only update if the user we're viewing
         // is the current user (because other users don't have
         // a listener)
-        if (userObject == currentUser) {
-            setFields(userObject);
-            setProfilePicImageView(userObject);
+        if (otherUser == currentUser) {
+            setFields(otherUser);
+            setProfilePicImageView(otherUser);
         }
     }
 }
