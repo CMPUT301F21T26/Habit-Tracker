@@ -43,7 +43,8 @@ public class UserController {
     private static ListenerRegistration userSnapshotListener;
     private static ListenerRegistration habitsSnapshotListener;
     private static Map<String, ListenerRegistration> habitEventsSnapshotListenerMap;
-    private static ListenerRegistration permissionsSnapshotListener;
+
+    private static FollowRequestController followRequestController;
 
     private static final FirebaseFirestore mStore = FirebaseFirestore.getInstance();
     private static final FirebaseStorage mStorage = FirebaseStorage.getInstance();
@@ -60,11 +61,15 @@ public class UserController {
 
         habitEventsSnapshotListenerMap = new HashMap<>();
 
+        // initialize the instances of controllers with lazy construction
+        followRequestController = FollowRequestController.getInstance();
+
         readUserDataFromDb(user -> {
+
             // add snapshot listeners
             userSnapshotListener = getUserSnapshotListener();
             habitsSnapshotListener = getHabitsSnapshotListener();
-            permissionsSnapshotListener = getPermissionsSnapshotListener();
+            followRequestController.initFollowRequestSnapshotListener();
 
             resetHabitsInDb(user1 -> {
                 updateUserLastAccessedDateInDb(callback);
@@ -136,7 +141,7 @@ public class UserController {
             // only detach when user exists
             userSnapshotListener.remove();
             habitsSnapshotListener.remove();
-            permissionsSnapshotListener.remove();
+            followRequestController.detachFollowRequestsSnapshotListener();
             for (String habitId : habitEventsSnapshotListenerMap.keySet()) {
                 habitEventsSnapshotListenerMap.get(habitId).remove();
             }
@@ -322,46 +327,6 @@ public class UserController {
                 });
     }
 
-    /**
-     * Return a snapshot listener for permissions collection
-     *
-     * @return a snapshot listener for permissions collection
-     */
-    private static ListenerRegistration getPermissionsSnapshotListener() {
-
-        assert user != null;
-
-        final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
-
-        return userRef.collection("permissions")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            Log.w("permissionsUpdate", "listen: error", error);
-                            return;
-                        }
-
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
-
-                            FollowRequest followRequest = dc.getDocument().toObject(FollowRequest.class);
-
-                            switch(dc.getType()) {
-                                case ADDED:
-                                    user.addFollowRequest(followRequest);
-                                    break;
-                                case REMOVED:
-                                    user.removeFollowRequest(followRequest);
-                                    break;
-                                default:
-                                    Log.d("permissionsUpdate", "Unexpected type: " + dc.getType());
-                            }
-
-                            user.notifyAllObservers();
-                        }
-                    }
-                });
-    }
 
     /**
      * Given a habit id, return the habit object from the habits list.
@@ -375,7 +340,7 @@ public class UserController {
     }
 
     /**
-     * Store habit in db and a snapshot listener for habit events collection associated to it
+     * Store habit in db.
      * Call callback function after storing
      *
      * @param habit habit to store
@@ -398,7 +363,6 @@ public class UserController {
 
     /**
      * Remove the given habit and all associated habit events from db.
-     * Then remove corresponding snapshot listener for habit events collection>
      * Call callback function after the removal.
      *
      * @param habit habit to remove from db
