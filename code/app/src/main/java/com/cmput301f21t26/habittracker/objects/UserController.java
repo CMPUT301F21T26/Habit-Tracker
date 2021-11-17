@@ -344,14 +344,14 @@ public class UserController {
 
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
 
-                            Permission permission = dc.getDocument().toObject(Permission.class);
+                            FollowRequest followRequest = dc.getDocument().toObject(FollowRequest.class);
 
                             switch(dc.getType()) {
                                 case ADDED:
-                                    user.addPermission(permission);
+                                    user.addFollowRequest(followRequest);
                                     break;
                                 case REMOVED:
-                                    user.removePermission(permission);
+                                    user.removeFollowRequest(followRequest);
                                     break;
                                 default:
                                     Log.d("permissionsUpdate", "Unexpected type: " + dc.getType());

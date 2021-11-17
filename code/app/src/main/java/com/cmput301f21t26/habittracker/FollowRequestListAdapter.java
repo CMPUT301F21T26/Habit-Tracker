@@ -6,23 +6,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.cmput301f21t26.habittracker.objects.HabitEvent;
-import com.cmput301f21t26.habittracker.objects.Permission;
+import com.cmput301f21t26.habittracker.objects.FollowRequest;
 
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class PermissionListAdapter extends BaseAdapter {
+public class FollowRequestListAdapter extends BaseAdapter {
     private String TAG = "PermissionListAdapter";
-    private ArrayList<Permission> permissionsList;
+    private ArrayList<FollowRequest> permissionsList;
     private Context mContext;
 
-    public PermissionListAdapter(Context context, ArrayList<Permission> permissionsList) {
+    public FollowRequestListAdapter(Context context, ArrayList<FollowRequest> permissionsList) {
         this.mContext = context;
         this.permissionsList = permissionsList;
     }
@@ -33,7 +31,7 @@ public class PermissionListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Permission getItem(int i) {
+    public FollowRequest getItem(int i) {
         return permissionsList.get(i);
     }
 
@@ -49,17 +47,17 @@ public class PermissionListAdapter extends BaseAdapter {
             view = LayoutInflater.from(mContext).inflate(R.layout.permission_content, viewGroup);
         }
 
-        Permission tempPermission = (Permission) getItem(position);
+        FollowRequest tempFollowRequest = (FollowRequest) getItem(position);
 
         TextView permissionUsernameTV = (TextView) view.findViewById(R.id.permissionUsernameTV);
         CircleImageView profilePicPermissionImageView = (CircleImageView) view.findViewById(R.id.profilePicPermissionImageView);
         Button allowButton = (Button) view.findViewById(R.id.allowButton);
         Button denyButton = (Button) view.findViewById(R.id.denyButton);
 
-        permissionUsernameTV.setText(tempPermission.getFromUid());
-        if (tempPermission.getPictureURL() != null && mContext != null) {
+        permissionUsernameTV.setText(tempFollowRequest.getFromUid());
+        if (tempFollowRequest.getPictureURL() != null && mContext != null) {
             Glide.with(mContext)
-                    .load(tempPermission.getPictureURL())
+                    .load(tempFollowRequest.getPictureURL())
                     .into(profilePicPermissionImageView);
         }
 

@@ -25,7 +25,7 @@ public class User extends Observable implements Serializable {
     private List<String> followers;
     private List<Habit> habits;
     private List<Habit> todayHabits;
-    private List<Permission> permissions;
+    private List<FollowRequest> followRequests;
 
     /**
      * A default constructor for User class
@@ -49,7 +49,7 @@ public class User extends Observable implements Serializable {
         this.followers = new ArrayList<>();
         this.habits = new ArrayList<>();
         this.todayHabits = new ArrayList<>();
-        this.permissions = new ArrayList<>();
+        this.followRequests = new ArrayList<>();
     }
 
     /**
@@ -137,26 +137,26 @@ public class User extends Observable implements Serializable {
         return todayHabits;
     }
 
-    public List<Permission> getPermissions() {
-        return permissions;
+    public List<FollowRequest> getFollowRequests() {
+        return followRequests;
     }
 
     /**
-     * Add permission to the permissions list
-     * @param p permission to add
+     * Add a follow request to the list
+     * @param fr follow request to add
      */
-    public void addPermission(Permission p) {
-        permissions.add(p);
+    public void addFollowRequest(FollowRequest fr) {
+        followRequests.add(fr);
     }
 
     /**
-     * Remove a permission from permissions list.
-     * @param p permission to remove
+     * Remove a follow request from the list.
+     * @param fr follow request to remove
      */
-    public void removePermission(Permission p) {
-        for (int i=0; i<permissions.size(); i++) {
-            if (p.getId().equals(permissions.get(i).getId())) {
-                permissions.remove(i);
+    public void removeFollowRequest(FollowRequest fr) {
+        for (int i = 0; i< followRequests.size(); i++) {
+            if (fr.getId().equals(followRequests.get(i).getId())) {
+                followRequests.remove(i);
                 return;
             }
         }

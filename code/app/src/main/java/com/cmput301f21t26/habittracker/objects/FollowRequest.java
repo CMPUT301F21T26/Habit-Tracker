@@ -7,7 +7,7 @@ import java.util.UUID;
 /**
  * Permission class represents a message sent by a user to follow another user
  */
-public class Permission {
+public class FollowRequest {
 
     private final String fromUid;
     private final String toUid;
@@ -15,7 +15,7 @@ public class Permission {
     private final String id;
     private final String pictureURL;
 
-    public Permission(String fromUid, String toUid, Date dateSent, String pictureURL) {
+    public FollowRequest(String fromUid, String toUid, Date dateSent, String pictureURL) {
         this.fromUid = fromUid;
         this.toUid = toUid;
         this.dateSent = dateSent;
@@ -23,7 +23,7 @@ public class Permission {
         this.pictureURL = pictureURL;
     }
 
-    public Permission(String fromUid, String toUid, String pictureURL) {
+    public FollowRequest(String fromUid, String toUid, String pictureURL) {
         this(fromUid, toUid, Calendar.getInstance().getTime(), pictureURL);       // dateSent = date now
     }
 
