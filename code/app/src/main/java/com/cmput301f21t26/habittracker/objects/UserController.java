@@ -43,6 +43,7 @@ public class UserController {
     private static ListenerRegistration userSnapshotListener;
     private static ListenerRegistration habitsSnapshotListener;
     private static Map<String, ListenerRegistration> habitEventsSnapshotListenerMap;
+    private static ListenerRegistration permissionsSnapshotListener;
 
     private static final FirebaseFirestore mStore = FirebaseFirestore.getInstance();
     private static final FirebaseStorage mStorage = FirebaseStorage.getInstance();
@@ -63,6 +64,7 @@ public class UserController {
             // add snapshot listeners
             userSnapshotListener = getUserSnapshotListener();
             habitsSnapshotListener = getHabitsSnapshotListener();
+            permissionsSnapshotListener = getPermissionsSnapshotListener();
 
             resetHabitsInDb(user1 -> {
                 updateUserLastAccessedDateInDb(callback);
@@ -134,6 +136,7 @@ public class UserController {
             // only detach when user exists
             userSnapshotListener.remove();
             habitsSnapshotListener.remove();
+            permissionsSnapshotListener.remove();
             for (String habitId : habitEventsSnapshotListenerMap.keySet()) {
                 habitEventsSnapshotListenerMap.get(habitId).remove();
             }
@@ -269,7 +272,7 @@ public class UserController {
      * Return a snapshot listener for habitEvents collection in the parent habit
      *
      * @param parentHabitId parent habit id
-     * @return  a snapshot listener for habitEvents collection
+     * @return a snapshot listener for habitEvents collection
      */
     private static ListenerRegistration getHabitEventsSnapshotListener(String parentHabitId) {
 
@@ -311,6 +314,47 @@ public class UserController {
                                     break;
                                 default:
                                     Log.d("habitAdded", "Unexpected type: " + dc.getType());
+                            }
+
+                            user.notifyAllObservers();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Return a snapshot listener for permissions collection
+     *
+     * @return a snapshot listener for permissions collection
+     */
+    private static ListenerRegistration getPermissionsSnapshotListener() {
+
+        assert user != null;
+
+        final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
+
+        return userRef.collection("permissions")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
+                        if (error != null) {
+                            Log.w("permissionsUpdate", "listen: error", error);
+                            return;
+                        }
+
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                            Permission permission = dc.getDocument().toObject(Permission.class);
+
+                            switch(dc.getType()) {
+                                case ADDED:
+                                    user.addPermission(permission);
+                                    break;
+                                case REMOVED:
+                                    user.removePermission(permission);
+                                    break;
+                                default:
+                                    Log.d("permissionsUpdate", "Unexpected type: " + dc.getType());
                             }
 
                             user.notifyAllObservers();
