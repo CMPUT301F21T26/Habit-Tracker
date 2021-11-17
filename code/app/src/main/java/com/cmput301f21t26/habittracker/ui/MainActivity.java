@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -39,6 +41,7 @@ import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.Permission;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView redCircle;
     private ImageView searchIcon;
     private FirebaseAuth mAuth;
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
+        currentUser = UserController.getCurrentUser();
 
         // Set profile icon to current user's profile picture in bottom nav
         setProfileIconToProfilePic(UserController.getCurrentUser().getPictureURL());
@@ -99,21 +104,23 @@ public class MainActivity extends AppCompatActivity {
                 int id = item.getItemId();
                 if (id == R.id.todays_habits) {
                     action = MobileNavigationDirections.actionGlobalTodaysHabits(null);
+                    navController.navigate(action);
+                    return true;
                 }
                 if (id == R.id.navigation_timeline) {
                     action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                    navController.navigate(action);
+                    return true;
                 }
                 if (id == R.id.navigation_profile) {
-                    action = MobileNavigationDirections.actionGlobalNavigationProfile(null);
+                    action = MobileNavigationDirections.actionGlobalNavigationProfile(UserController.getCurrentUser());
+                    navController.navigate(action);
+                    return true;
                 }
-                assert action != null;
-                navController.navigate(action);
-
-                return true;
+                return false;
             }
         });
 
-        NavigationUI.setupWithNavController(binding.navView, navController);
         NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
 
         addHabitButton.setOnClickListener(new View.OnClickListener() {
@@ -133,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+
         return true;
     }
 
@@ -202,8 +210,11 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_search) {
+            NavDirections action = MobileNavigationDirections.actionGlobalSearchFragment();
+            navController.navigate(action);
             return true;
         }
+
 
         return super.onOptionsItemSelected(item);
     }

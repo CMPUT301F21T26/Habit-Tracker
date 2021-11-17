@@ -29,17 +29,17 @@ public class PermissionListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return 0;
+        return permissionsList.size();
     }
 
     @Override
-    public Object getItem(int i) {
-        return null;
+    public Permission getItem(int i) {
+        return permissionsList.get(i);
     }
 
     @Override
     public long getItemId(int i) {
-        return 0;
+        return i;
     }
 
     @Override

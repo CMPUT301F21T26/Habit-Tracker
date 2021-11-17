@@ -11,10 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.ui.habit.HabitAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentTodayHabitBinding;
@@ -64,9 +66,8 @@ public class TodayHabitFragment extends Fragment {
             @Override
             public void onClick(View view, int position) {
                 Habit habit = todayHabitList.get(position);     // retrieve habit in this pos
-                Bundle bundle = new Bundle();
-                bundle.putString("habitId", habit.getHabitId());        // pass habit id
-                navController.navigate(R.id.viewHabitFragment, bundle);
+                NavDirections action = MobileNavigationDirections.actionGlobalViewHabitFragment(habit, UserController.getCurrentUser());
+                navController.navigate(action);
             }
         };
 

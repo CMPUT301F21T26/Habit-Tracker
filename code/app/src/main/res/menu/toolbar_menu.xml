@@ -14,11 +14,21 @@
             android:orderInCategory="200"
             android:title="Search"
             app:actionLayout="@layout/search_custom_layout"
-            app:showAsAction="ifRoom" />
+            app:showAsAction="always"/>
         <item
             android:id="@+id/action_notif"
             android:orderInCategory="300"
             android:title="Notification"
             app:actionLayout="@layout/notif_red_badge"
             app:showAsAction="always"/>
+        <item
+            android:id="@+id/action_clicked_search"
+            android:orderInCategory="400"
+            android:title="Search A User"
+            app:showAsAction="never"
+            android:visible="false"
+            android:iconifiedByDefault="false"
+            app:searchIcon="@null"
+            app:searchHintIcon="@null"
+            app:actionViewClass="androidx.appcompat.widget.SearchView" />
     </menu>
