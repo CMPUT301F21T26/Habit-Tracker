@@ -224,9 +224,9 @@ public class MainActivity extends AppCompatActivity {
         notifDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         notifDialog.getWindow().getAttributes().windowAnimations = R.style.notifPanelAnimation;
         ListView permissionsListView= (ListView) notifDialog.findViewById(R.id.permissionsListView);
-        ArrayList<FollowRequest> permissionsList = (ArrayList<FollowRequest>) UserController.getCurrentUser().getFollowRequests();
-        FollowRequestListAdapter permissionsListAdapter = new FollowRequestListAdapter(this, permissionsList);
-        permissionsListView.setAdapter(permissionsListAdapter);
+        ArrayList<FollowRequest> followRequestList = (ArrayList<FollowRequest>) UserController.getCurrentUser().getFollowRequests();
+        FollowRequestListAdapter followRequestListAdapter = new FollowRequestListAdapter(this, followRequestList);
+        permissionsListView.setAdapter(followRequestListAdapter);
         notifDialog.show();
     }
 
