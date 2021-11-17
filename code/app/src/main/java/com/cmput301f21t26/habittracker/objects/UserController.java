@@ -44,6 +44,8 @@ public class UserController {
     private static ListenerRegistration habitsSnapshotListener;
     private static Map<String, ListenerRegistration> habitEventsSnapshotListenerMap;
 
+    private static FollowRequestController followRequestController;
+
     private static final FirebaseFirestore mStore = FirebaseFirestore.getInstance();
     private static final FirebaseStorage mStorage = FirebaseStorage.getInstance();
 
@@ -59,10 +61,15 @@ public class UserController {
 
         habitEventsSnapshotListenerMap = new HashMap<>();
 
+        // initialize the instances of controllers with lazy construction
+        followRequestController = FollowRequestController.getInstance();
+
         readUserDataFromDb(user -> {
+
             // add snapshot listeners
             userSnapshotListener = getUserSnapshotListener();
             habitsSnapshotListener = getHabitsSnapshotListener();
+            followRequestController.initFollowRequestSnapshotListener();
 
             resetHabitsInDb(user1 -> {
                 updateUserLastAccessedDateInDb(callback);
@@ -134,6 +141,7 @@ public class UserController {
             // only detach when user exists
             userSnapshotListener.remove();
             habitsSnapshotListener.remove();
+            followRequestController.detachFollowRequestsSnapshotListener();
             for (String habitId : habitEventsSnapshotListenerMap.keySet()) {
                 habitEventsSnapshotListenerMap.get(habitId).remove();
             }
@@ -193,6 +201,9 @@ public class UserController {
                 user.setLastName(snapshot.getString("lastName"));
                 user.setPictureURL(snapshot.getString("pictureURL"));
                 user.setDateLastAccessed(snapshot.getDate("dateLastAccessed"));
+
+                user.setFollowings((List<String>) snapshot.get("followings"));
+                user.setFollowers((List<String>) snapshot.get("followers"));
 
                 user.notifyAllObservers();
             }
@@ -269,7 +280,7 @@ public class UserController {
      * Return a snapshot listener for habitEvents collection in the parent habit
      *
      * @param parentHabitId parent habit id
-     * @return  a snapshot listener for habitEvents collection
+     * @return a snapshot listener for habitEvents collection
      */
     private static ListenerRegistration getHabitEventsSnapshotListener(String parentHabitId) {
 
@@ -319,6 +330,7 @@ public class UserController {
                 });
     }
 
+
     /**
      * Given a habit id, return the habit object from the habits list.
      * Return null if no such habit is in the list.
@@ -331,7 +343,7 @@ public class UserController {
     }
 
     /**
-     * Store habit in db and a snapshot listener for habit events collection associated to it
+     * Store habit in db.
      * Call callback function after storing
      *
      * @param habit habit to store
@@ -354,7 +366,6 @@ public class UserController {
 
     /**
      * Remove the given habit and all associated habit events from db.
-     * Then remove corresponding snapshot listener for habit events collection>
      * Call callback function after the removal.
      *
      * @param habit habit to remove from db

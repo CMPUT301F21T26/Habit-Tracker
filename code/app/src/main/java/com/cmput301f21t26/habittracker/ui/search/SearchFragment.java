@@ -43,13 +43,12 @@ public class SearchFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         usersList = new ArrayList<>();
-        otherUserController = new OtherUserController();
+        otherUserController = OtherUserController.getInstance();
     }
 
     @Override
@@ -69,8 +68,10 @@ public class SearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 User otherUser = (User) adapterView.getItemAtPosition(i);
-                NavDirections action = MobileNavigationDirections.actionGlobalNavigationProfile(otherUser);
-                navController.navigate(action);
+                otherUserController.getHabitList(otherUser, updatedOtheruser -> {
+                    NavDirections action = MobileNavigationDirections.actionGlobalNavigationProfile(updatedOtheruser);
+                    navController.navigate(action);
+                });
             }
         });
         return view;
@@ -100,7 +101,7 @@ public class SearchFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                OtherUserController.getUsersList(newText, new UserListCallback() {
+                otherUserController.getUsersList(newText, new UserListCallback() {
                     @Override
                     public void onCallback(ArrayList<User> listOfUsers) {
                         usersList = listOfUsers;
@@ -119,13 +120,15 @@ public class SearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        MainActivity.hideBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
+        MainActivity.hideBottomNav(getActivity().findViewById(R.id.addHabitButton),
+                getActivity().findViewById(R.id.extendBottomNav));
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
+        MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton),
+                getActivity().findViewById(R.id.extendBottomNav));
     }
 
 }

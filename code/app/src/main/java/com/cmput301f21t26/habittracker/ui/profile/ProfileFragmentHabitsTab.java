@@ -16,12 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
-import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.User;
+import com.cmput301f21t26.habittracker.objects.UserController;
 import com.cmput301f21t26.habittracker.ui.habit.HabitAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
-import com.cmput301f21t26.habittracker.objects.UserController;
 
 import java.util.ArrayList;
 
@@ -45,7 +44,11 @@ public class ProfileFragmentHabitsTab extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
-        userObject = parentProfileFrag.getUserObject();
+
+        userObject = parentProfileFrag.getOtherUser();
+        if (parentProfileFrag.getOtherUser().getUid().equals(UserController.getCurrentUserId())) {
+            userObject = UserController.getCurrentUser();
+        }
     }
 
     @Override
@@ -66,7 +69,6 @@ public class ProfileFragmentHabitsTab extends Fragment {
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
         habitList = (ArrayList<Habit>) userObject.getHabits();
-        // TODO If currentUser is not following otherUser, don't allow clicking or showing of habits
         rvlistener = new HabitAdapter.RecyclerViewClickListener() {
             @Override
             public void onClick(View view, int position) {
@@ -76,13 +78,21 @@ public class ProfileFragmentHabitsTab extends Fragment {
             }
         };
 
-        habitAdapter = new HabitAdapter(habitList, getActivity(), rvlistener);
+        if (userObject.getUid().equals(UserController.getCurrentUserId())
+                || UserController.getCurrentUser().isFollowing(userObject)) {
 
-        // display today habits
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setAdapter(habitAdapter);
+            // show habits only when the userObject is equal to current user
+            // or current user is following userObject
+            habitAdapter = new HabitAdapter(habitList, getActivity(), rvlistener);
 
-        // Hide checkbox
-        habitAdapter.checkBoxVisibility(View.GONE);
+            // display today habits
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            mRecyclerView.setAdapter(habitAdapter);
+
+            // Hide checkbox
+            habitAdapter.checkBoxVisibility(View.GONE);
+        } else {
+            // TODO tell the user you can't view this selected other user's habits
+        }
     }
 }
