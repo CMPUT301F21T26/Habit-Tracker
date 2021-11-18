@@ -18,6 +18,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -225,6 +226,7 @@ public class UserController {
         final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
 
         return userRef.collection("habits")
+                .orderBy("habitPosition", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
@@ -365,6 +367,42 @@ public class UserController {
     }
 
     /**
+     * Gets the highest index and adds 1, then sets
+     * that index to the given habit's habitPosition.
+     * @param habit
+     *  The habit to set the new habit position to, {@link Habit}
+     * @param callback
+     *  call back function to be called after setting the new position
+     */
+    public static void setNewHabitPosition(Habit habit, UserCallback callback) {
+        assert user != null;
+        Query highestIndexQuery = mStore.collection("users").document(getCurrentUserId()).collection("habits")
+                .orderBy("habitPosition", Query.Direction.DESCENDING).limit(1);
+
+        highestIndexQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    int highestPosition = 0;
+                    for (DocumentSnapshot habit : task.getResult()) {
+                        if (habit == null) {
+                            highestPosition = -1;
+                        } else {
+                            highestPosition = ((Long) habit.get("habitPosition")).intValue();
+                        }
+                        Log.d("UserController", "the highest position index is: "+highestPosition);
+                    }
+
+                    highestPosition += 1;
+
+                    habit.setHabitPosition(highestPosition);
+                    callback.onCallback(user);
+                }
+            }
+        });
+    }
+
+    /**
      * Remove the given habit and all associated habit events from db.
      * Call callback function after the removal.
      *
@@ -379,6 +417,10 @@ public class UserController {
         if (!habitEventsSnapshotListenerMap.containsKey(habit.getHabitId())) {
             throw new IllegalArgumentException("Habit does not exist");
         }
+
+        // Remove the habit from the user's habit list and update the habitPosition of each habit in db
+        user.removeHabit(habit);
+        updateHabitPositions();
 
         removeAllHabitEventsOfHabitFromDb(habit, cbUser -> {
 
@@ -577,5 +619,15 @@ public class UserController {
                     });
                 })
                 .addOnFailureListener(e -> Log.d("storeProfilePicture", "Default profile pic was not stored"));
+    }
+
+    /**
+     * Updates the habitPositions of each habit
+     */
+    public static void updateHabitPositions() {
+        for (Habit habit : user.getHabits()) {
+            habit.setHabitPosition(user.getHabits().indexOf(habit));
+            UserController.updateHabitInDb(habit, cbUser -> {});
+        }
     }
 }
