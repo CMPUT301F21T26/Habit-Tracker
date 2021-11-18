@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +22,7 @@ import com.cmput301f21t26.habittracker.objects.UserController;
 import com.cmput301f21t26.habittracker.ui.habit.HabitAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.ui.habit.HabitItemTouchHelper;
 
 import java.util.ArrayList;
 
@@ -71,7 +73,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
         habitList = (ArrayList<Habit>) userObject.getHabits();
         rvlistener = new HabitAdapter.RecyclerViewClickListener() {
             @Override
-            public void onClick(View view, int position) {
+            public void onClick(int position) {
                 Log.d(TAG, "Clicked on item at position: " + String.valueOf(position));
                 NavDirections action = MobileNavigationDirections.actionGlobalViewHabitFragment(habitList.get(position), userObject);
                 navController.navigate(action);
@@ -85,12 +87,19 @@ public class ProfileFragmentHabitsTab extends Fragment {
             // or current user is following userObject
             habitAdapter = new HabitAdapter(habitList, getActivity(), rvlistener);
 
+            // Set ItemTouchHelper to allow rearranging habits
+            HabitItemTouchHelper habitItemTouchHelper = new HabitItemTouchHelper(habitAdapter);
+            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(habitItemTouchHelper);
+            habitAdapter.setItemTouchHelper(itemTouchHelper);
+            itemTouchHelper.attachToRecyclerView(mRecyclerView);
+
             // display today habits
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             mRecyclerView.setAdapter(habitAdapter);
 
             // Hide checkbox
             habitAdapter.checkBoxVisibility(View.GONE);
+
         } else {
             // TODO tell the user you can't view this selected other user's habits
         }

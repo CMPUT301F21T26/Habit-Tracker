@@ -21,6 +21,7 @@ public class Habit implements Serializable {
     private boolean isPrivate;
     private ArrayList<HabitEvent> habitEvents;
     private ArrayList<Integer> daysList;
+    private int habitPosition;
 
     /**
      * A default Habit constructor.
@@ -45,6 +46,7 @@ public class Habit implements Serializable {
         this.daysList = daysList;     // all init to false
         this.habitId = UUID.randomUUID().toString();
         this.isPrivate = false;
+        this.habitPosition = 0;
     }
 
     /**
@@ -226,5 +228,13 @@ public class Habit implements Serializable {
 
     public void setPrivate(boolean isPrivate) {
         this.isPrivate = isPrivate;
+    }
+
+    public int getHabitPosition() {
+        return habitPosition;
+    }
+
+    public void setHabitPosition(int habitPosition) {
+        this.habitPosition = habitPosition;
     }
 }

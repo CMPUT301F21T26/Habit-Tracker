@@ -157,12 +157,14 @@ public class AddHabitFragment extends Fragment {
 
                 newHabit = new Habit(title, reason, date, daysList);
                 newHabit.setPrivate(isPrivate);
-
-                Log.d(TAG, newHabit.getReason());
-                UserController.storeHabitInDb(newHabit, cbUser -> {
-                    // Goes back to previous fragment user was in
-                    navController.popBackStack();
+                UserController.setNewHabitPosition(newHabit, cbUser -> {
+                    Log.d(TAG, newHabit.getReason());
+                    UserController.storeHabitInDb(newHabit, cbUser2 -> {
+                        // Goes back to previous fragment user was in
+                        navController.popBackStack();
+                    });
                 });
+
             }
         }
     };
