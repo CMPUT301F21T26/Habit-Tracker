@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -64,7 +65,7 @@ public class TodayHabitFragment extends Fragment {
 
         rvListener = new HabitAdapter.RecyclerViewClickListener() {
             @Override
-            public void onClick(View view, int position) {
+            public void onClick(int position) {
                 Habit habit = todayHabitList.get(position);     // retrieve habit in this pos
                 NavDirections action = MobileNavigationDirections.actionGlobalViewHabitFragment(habit, UserController.getCurrentUser());
                 navController.navigate(action);
@@ -73,7 +74,12 @@ public class TodayHabitFragment extends Fragment {
 
         // feed todayHabitList to the adapter
         habitAdapter = new HabitAdapter(todayHabitList, getActivity(), rvListener);
-
+        // Set ItemTouchHelper to disallow rearranging habits
+        HabitItemTouchHelper habitItemTouchHelper = new HabitItemTouchHelper(habitAdapter);
+        habitItemTouchHelper.setDraggable(false);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(habitItemTouchHelper);
+        habitAdapter.setItemTouchHelper(itemTouchHelper);
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
         // display today habits
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(habitAdapter);
