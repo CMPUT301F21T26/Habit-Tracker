@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -55,31 +56,6 @@ public class ProfileFragment extends Fragment implements Observer {
     private User currentUser;
 
     private FollowRequestController followRequestController;
-    
-    /**
-     * Creates a new profile fragment for when viewing other
-     * user profiles.
-     * @param otherUser
-     *  The other user's User object, of type {@link User}
-     * @return
-     *  The newly created profile fragment, of type {@link Fragment}
-     */
-    public static ProfileFragment newInstance(User otherUser) {
-        ProfileFragment profileFragment = new ProfileFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("otherUser", otherUser);
-        profileFragment.setArguments(bundle);
-        return new ProfileFragment();
-    }
-
-    /**
-     * Creates a new profile fragment for the current user.
-     * @return
-     * The newly created profile fragment, of type {@link Fragment}
-     */
-    public static ProfileFragment newInstance() {
-        return new ProfileFragment();
-    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -107,7 +83,7 @@ public class ProfileFragment extends Fragment implements Observer {
         // otherUser dne i.e we want to view the current user's profile
         if (otherUser == currentUser) {
             UserController.addObserverToCurrentUser(this);
-        } 
+        }
 
         return view;
     }
@@ -151,13 +127,9 @@ public class ProfileFragment extends Fragment implements Observer {
                     });
                 }
             });
-
-            // Add back button
-            if (((MainActivity) getActivity()) != null) {
-                ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-            }
+            
         } else {
+            // The other user is the current user
             setFields(otherUser);
             setProfilePicImageView(otherUser);
             followButton.setVisibility(View.INVISIBLE);
@@ -315,6 +287,11 @@ public class ProfileFragment extends Fragment implements Observer {
         super.onCreateOptionsMenu(menu, inflater);
         if (otherUser != currentUser) {
             MainActivity.hideMenuItems(menu);
+            // Add back button
+            if (((MainActivity) getActivity()) != null) {
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+            }
         }
     }
 
@@ -323,6 +300,11 @@ public class ProfileFragment extends Fragment implements Observer {
         super.onResume();
         if (otherUser != currentUser) {
             MainActivity.hideBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
+            // Add back button
+            if (((MainActivity) getActivity()) != null) {
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+            }
         }
     }
 
@@ -331,6 +313,11 @@ public class ProfileFragment extends Fragment implements Observer {
         super.onStop();
         if (otherUser != currentUser) {
             MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
+            // remove back button
+            if (((MainActivity) getActivity()) != null) {
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
+            }
         }
     }
 
