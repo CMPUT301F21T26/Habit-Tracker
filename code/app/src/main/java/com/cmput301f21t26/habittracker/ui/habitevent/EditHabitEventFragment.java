@@ -1,6 +1,11 @@
 package com.cmput301f21t26.habittracker.ui.habitevent;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -8,10 +13,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -44,6 +55,10 @@ public class EditHabitEventFragment extends Fragment {
     private TextView habitEventLocationTV;
     private EditText habitEventCommentET;
 
+    private ImageView habitEventImage;
+    private Button habitEventChooseImageBtn;
+    private ImageButton habitEventCameraBtn;
+
     private Habit habit;
     private HabitEvent hEvent;
 
@@ -73,7 +88,9 @@ public class EditHabitEventFragment extends Fragment {
         habitEventTitleTV = binding.editHabitEventTitleTV;
         habitEventCommentET = binding.habitEventCommentET;
         habitEventLocationTV = binding.habitEventLocationTV;
-
+        habitEventChooseImageBtn = binding.chooseImageButton;
+        habitEventImage = binding.habitEventImage;
+        habitEventCameraBtn = binding.cameraButton;
         return binding.getRoot();
     }
 
@@ -85,7 +102,8 @@ public class EditHabitEventFragment extends Fragment {
 
         editConfirmBtn.setOnClickListener(editConfirmOnClickListener);
         delBtn.setOnClickListener(deleteOnClickListener);
-
+        habitEventCameraBtn.setOnClickListener(cameraBtnOnClickListener);
+        habitEventImage.setOnClickListener(chooseImageOnClickListener);
         setEditHabitEventFields();
     }
 
@@ -163,4 +181,28 @@ public class EditHabitEventFragment extends Fragment {
             });
         }
     };
+
+    private View.OnClickListener cameraBtnOnClickListener = new View.OnClickListener(){
+        @Override
+        public void onClick(View view) {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        }
+    };
+
+    private View.OnClickListener chooseImageOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            mGetContent.launch("image/*");  // launch file explorer
+
+        }
+    };
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
+                    if (uri != null) {
+                       //UPDATE THIS
+            });
 }
