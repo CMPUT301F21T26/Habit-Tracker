@@ -107,9 +107,7 @@ public class ProfileFragment extends Fragment implements Observer {
         // otherUser dne i.e we want to view the current user's profile
         if (otherUser == currentUser) {
             UserController.addObserverToCurrentUser(this);
-        } else {
-
-        }
+        } 
 
         return view;
     }
