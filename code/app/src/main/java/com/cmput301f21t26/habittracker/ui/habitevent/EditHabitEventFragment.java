@@ -222,6 +222,8 @@ public class EditHabitEventFragment extends Fragment {
                 public void onActivityResult(Uri uri) {
                     // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
                     if (uri != null) {
-                       //UPDATE THIS
+                        //UPDATE THIS
+                    }
+                }
             });
 }
