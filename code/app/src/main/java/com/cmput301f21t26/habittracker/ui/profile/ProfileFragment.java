@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -84,6 +86,7 @@ public class ProfileFragment extends Fragment implements Observer {
 
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
+        setHasOptionsMenu(true);
 
         // Initiate views
         tabLayout = view.findViewById(R.id.tabLayout);
@@ -307,6 +310,14 @@ public class ProfileFragment extends Fragment implements Observer {
         super.onDestroyView();
         binding = null;
         UserController.deleteObserverFromCurrentUser(this);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if (otherUser != currentUser) {
+            MainActivity.hideMenuItems(menu);
+        }
     }
 
     @Override
