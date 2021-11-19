@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private ImageView redCircle;
     private ImageView searchIcon;
     private FirebaseAuth mAuth;
-    private User currentUser;
     private OtherUserController otherUserController;
 
     @Override
@@ -70,17 +69,22 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        mAuth = FirebaseAuth.getInstance();
-
+        // find views
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
-        currentUser = UserController.getCurrentUser();
+
+        // Get our instances
+        mAuth = FirebaseAuth.getInstance();
         UserController.addObserverToCurrentUser(this);
         otherUserController = OtherUserController.getInstance();
 
         // Set profile icon to current user's profile picture in bottom nav
         setProfileIconToProfilePic(UserController.getCurrentUser().getPictureURL());
+
+        // Setting up navController
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
+        assert navHostFragment != null;
+        navController = navHostFragment.getNavController();
 
         // Setting up toolbar
         toolbar = findViewById(R.id.toolbar);
@@ -92,10 +96,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 R.id.todays_habits, R.id.navigation_timeline, R.id.navigation_profile)
                 .build();
 
-        // Setting up navController
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
-        assert navHostFragment != null;
-        navController = navHostFragment.getNavController();
+        NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
 
         // Clicking on icons navigate to the selected fragments
         navView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -122,8 +123,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 return false;
             }
         });
-
-        NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
 
         addHabitButton.setOnClickListener(new View.OnClickListener() {
             @Override
