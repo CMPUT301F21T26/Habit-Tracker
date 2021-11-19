@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -36,6 +37,7 @@ import com.cmput301f21t26.habittracker.FollowRequestListAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
 import com.cmput301f21t26.habittracker.objects.FollowRequest;
+import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private ImageView searchIcon;
     private FirebaseAuth mAuth;
     private User currentUser;
+    private OtherUserController otherUserController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         navView = findViewById(R.id.nav_view);
         currentUser = UserController.getCurrentUser();
         UserController.addObserverToCurrentUser(this);
+        otherUserController = OtherUserController.getInstance();
 
         // Set profile icon to current user's profile picture in bottom nav
         setProfileIconToProfilePic(UserController.getCurrentUser().getPictureURL());
@@ -228,10 +232,28 @@ public class MainActivity extends AppCompatActivity implements Observer {
         notifDialog.getWindow().setDimAmount(0.2F);
         notifDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         notifDialog.getWindow().getAttributes().windowAnimations = R.style.notifPanelAnimation;
-        ListView permissionsListView= (ListView) notifDialog.findViewById(R.id.permissionsListView);
+
+        // Set our list view and its adapter
+        ListView followRequestListView= (ListView) notifDialog.findViewById(R.id.followRequestListView);
         ArrayList<FollowRequest> followRequestList = (ArrayList<FollowRequest>) UserController.getCurrentUser().getFollowRequests();
-        FollowRequestListAdapter followRequestListAdapter = new FollowRequestListAdapter(this, followRequestList);
-        permissionsListView.setAdapter(followRequestListAdapter);
+
+        // Set item onclick listener so when user clicks on a follow request, go to user's profile
+        FollowRequestListAdapter.OnDialogListClickListener onDialogListClickListener = new FollowRequestListAdapter.OnDialogListClickListener() {
+            @Override
+            public void onItemClick(String username) {
+                otherUserController.getUser(username, otherUser -> {
+                    otherUserController.getHabitList(otherUser, updatedOtheruser -> {
+                        NavDirections action = MobileNavigationDirections.actionGlobalNavigationProfile(updatedOtheruser);
+                        navController.navigate(action);
+                        notifDialog.dismiss();
+                    });
+                });
+            }
+        };
+
+        FollowRequestListAdapter followRequestListAdapter = new FollowRequestListAdapter(this, followRequestList, onDialogListClickListener);
+        followRequestListView.setAdapter(followRequestListAdapter);
+
         notifDialog.show();
         // When the dialog is dismissed, update notification icon
         notifDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
