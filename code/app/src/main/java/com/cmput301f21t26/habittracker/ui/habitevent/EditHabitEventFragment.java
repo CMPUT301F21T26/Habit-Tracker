@@ -1,8 +1,11 @@
 package com.cmput301f21t26.habittracker.ui.habitevent;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -43,6 +46,7 @@ import java.util.Locale;
 public class EditHabitEventFragment extends Fragment {
 
     private final String TAG = "EditHabitEventFragment";
+    private static final int REQUEST_IMAGE_CAPTURE = 101;
 
     private FragmentEditHabitEventBinding binding;
     private NavController navController;
@@ -90,7 +94,7 @@ public class EditHabitEventFragment extends Fragment {
         habitEventLocationTV = binding.habitEventLocationTV;
         habitEventChooseImageBtn = binding.chooseImageButton;
         habitEventImage = binding.habitEventImage;
-        habitEventCameraBtn = binding.cameraButton;
+        habitEventCameraBtn = (ImageButton) binding.cameraButton;
         return binding.getRoot();
     }
 
@@ -105,6 +109,9 @@ public class EditHabitEventFragment extends Fragment {
         habitEventCameraBtn.setOnClickListener(cameraBtnOnClickListener);
         habitEventImage.setOnClickListener(chooseImageOnClickListener);
         setEditHabitEventFields();
+
+
+
     }
 
     /**
@@ -182,13 +189,22 @@ public class EditHabitEventFragment extends Fragment {
         }
     };
 
-    private View.OnClickListener cameraBtnOnClickListener = new View.OnClickListener(){
+    private View.OnClickListener cameraBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+
+        Bitmap captureImage = (Bitmap) data.getExtras().get("data");
+        habitEventImage.setImageBitmap(captureImage);
+
+    }
 
     private View.OnClickListener chooseImageOnClickListener = new View.OnClickListener() {
         @Override
@@ -203,6 +219,9 @@ public class EditHabitEventFragment extends Fragment {
                 public void onActivityResult(Uri uri) {
                     // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
                     if (uri != null) {
-                       //UPDATE THIS
+                        //UPDATE THIS
+                    }
+                }
             });
 }
+
