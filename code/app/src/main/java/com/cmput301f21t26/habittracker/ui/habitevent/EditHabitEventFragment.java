@@ -1,5 +1,6 @@
 package com.cmput301f21t26.habittracker.ui.habitevent;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -157,10 +159,27 @@ public class EditHabitEventFragment extends Fragment {
     private View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            UserController.removeHabitEventFromDb(hEvent, user -> {
-                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
-                navController.navigate(action);
-            });
+            // prompt user to approve
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Delete Habit Event")
+                    .setMessage("Are you sure you want to delete this habit event? The data will be lost forever.")
+                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // update DB
+                            UserController.removeHabitEventFromDb(hEvent, cbUser -> {
+                                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                                navController.navigate(action);
+                            });
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
         }
     };
 }
