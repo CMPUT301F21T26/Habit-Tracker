@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -36,6 +37,7 @@ import com.cmput301f21t26.habittracker.FollowRequestListAdapter;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
 import com.cmput301f21t26.habittracker.objects.FollowRequest;
+import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private ImageView redCircle;
     private ImageView searchIcon;
     private FirebaseAuth mAuth;
-    private User currentUser;
+    private OtherUserController otherUserController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,16 +69,22 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        mAuth = FirebaseAuth.getInstance();
-
+        // find views
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
-        currentUser = UserController.getCurrentUser();
+
+        // Get our instances
+        mAuth = FirebaseAuth.getInstance();
         UserController.addObserverToCurrentUser(this);
+        otherUserController = OtherUserController.getInstance();
 
         // Set profile icon to current user's profile picture in bottom nav
         setProfileIconToProfilePic(UserController.getCurrentUser().getPictureURL());
+
+        // Setting up navController
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
+        assert navHostFragment != null;
+        navController = navHostFragment.getNavController();
 
         // Setting up toolbar
         toolbar = findViewById(R.id.toolbar);
@@ -88,10 +96,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 R.id.todays_habits, R.id.navigation_timeline, R.id.navigation_profile)
                 .build();
 
-        // Setting up navController
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
-        assert navHostFragment != null;
-        navController = navHostFragment.getNavController();
+        NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
 
         // Clicking on icons navigate to the selected fragments
         navView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -118,8 +123,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 return false;
             }
         });
-
-        NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
 
         addHabitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -228,10 +231,28 @@ public class MainActivity extends AppCompatActivity implements Observer {
         notifDialog.getWindow().setDimAmount(0.2F);
         notifDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         notifDialog.getWindow().getAttributes().windowAnimations = R.style.notifPanelAnimation;
-        ListView permissionsListView= (ListView) notifDialog.findViewById(R.id.permissionsListView);
+
+        // Set our list view and its adapter
+        ListView followRequestListView= (ListView) notifDialog.findViewById(R.id.followRequestListView);
         ArrayList<FollowRequest> followRequestList = (ArrayList<FollowRequest>) UserController.getCurrentUser().getFollowRequests();
-        FollowRequestListAdapter followRequestListAdapter = new FollowRequestListAdapter(this, followRequestList);
-        permissionsListView.setAdapter(followRequestListAdapter);
+
+        // Set item onclick listener so when user clicks on a follow request, go to user's profile
+        FollowRequestListAdapter.OnDialogListClickListener onDialogListClickListener = new FollowRequestListAdapter.OnDialogListClickListener() {
+            @Override
+            public void onItemClick(String username) {
+                otherUserController.getUser(username, otherUser -> {
+                    otherUserController.getHabitList(otherUser, updatedOtheruser -> {
+                        NavDirections action = MobileNavigationDirections.actionGlobalNavigationProfile(updatedOtheruser);
+                        navController.navigate(action);
+                        notifDialog.dismiss();
+                    });
+                });
+            }
+        };
+
+        FollowRequestListAdapter followRequestListAdapter = new FollowRequestListAdapter(this, followRequestList, onDialogListClickListener);
+        followRequestListView.setAdapter(followRequestListAdapter);
+
         notifDialog.show();
         // When the dialog is dismissed, update notification icon
         notifDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {

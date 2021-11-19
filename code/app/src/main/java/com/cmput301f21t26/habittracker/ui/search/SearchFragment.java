@@ -114,7 +114,6 @@ public class SearchFragment extends Fragment {
             }
         });
 
-
     }
 
     @Override
@@ -122,6 +121,11 @@ public class SearchFragment extends Fragment {
         super.onResume();
         MainActivity.hideBottomNav(getActivity().findViewById(R.id.addHabitButton),
                 getActivity().findViewById(R.id.extendBottomNav));
+        // Add back button
+        if (((MainActivity) getActivity()) != null) {
+            ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
     }
 
     @Override
@@ -129,6 +133,10 @@ public class SearchFragment extends Fragment {
         super.onStop();
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton),
                 getActivity().findViewById(R.id.extendBottomNav));
+        // remove back button
+        if (((MainActivity) getActivity()) != null) {
+            ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
+        }
     }
-
 }

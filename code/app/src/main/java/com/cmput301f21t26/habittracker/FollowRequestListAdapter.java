@@ -23,10 +23,19 @@ public class FollowRequestListAdapter extends BaseAdapter implements Observer {
     private String TAG = "PermissionListAdapter";
     private ArrayList<FollowRequest> permissionsList;
     private Context mContext;
+    private OnDialogListClickListener dialogListClickListener;
 
-    public FollowRequestListAdapter(Context context, ArrayList<FollowRequest> permissionsList) {
+    /**
+     * Allows clicking of follow request in the notification dialog
+     */
+    public interface OnDialogListClickListener {
+        void onItemClick(String username);
+    }
+
+    public FollowRequestListAdapter(Context context, ArrayList<FollowRequest> permissionsList, OnDialogListClickListener listener) {
         this.mContext = context;
         this.permissionsList = permissionsList;
+        this. dialogListClickListener = listener;
 
         UserController.addObserverToCurrentUser(this);
     }
@@ -55,16 +64,16 @@ public class FollowRequestListAdapter extends BaseAdapter implements Observer {
 
         FollowRequest tempFollowRequest = (FollowRequest) getItem(position);
 
-        TextView permissionUsernameTV = (TextView) view.findViewById(R.id.permissionUsernameTV);
-        CircleImageView profilePicPermissionImageView = (CircleImageView) view.findViewById(R.id.profilePicPermissionImageView);
+        TextView followRequestUsernameTV = (TextView) view.findViewById(R.id.followRequestUsernameTV);
+        CircleImageView profilePicFollowRequestImageView = (CircleImageView) view.findViewById(R.id.profilePicFollowRequestImageView);
         Button allowButton = (Button) view.findViewById(R.id.allowButton);
         Button denyButton = (Button) view.findViewById(R.id.denyButton);
 
-        permissionUsernameTV.setText(tempFollowRequest.getFromUid());
+        followRequestUsernameTV.setText(tempFollowRequest.getFromUid());
         if (tempFollowRequest.getPictureURL() != null && mContext != null) {
             Glide.with(mContext)
                     .load(tempFollowRequest.getPictureURL())
-                    .into(profilePicPermissionImageView);
+                    .into(profilePicFollowRequestImageView);
         }
 
         allowButton.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +87,13 @@ public class FollowRequestListAdapter extends BaseAdapter implements Observer {
             @Override
             public void onClick(View view) {
                 // TODO Deny the user the follow; delete permission request in database
+            }
+        });
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogListClickListener.onItemClick(tempFollowRequest.getFromUid());
             }
         });
 

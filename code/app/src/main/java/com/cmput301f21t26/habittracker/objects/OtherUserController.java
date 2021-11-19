@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -96,5 +97,25 @@ public class OtherUserController {
                     }
                 }
             });
+    }
+
+    /**
+     * Gets the user object from the database from the given username
+     * @param username username that we want to get the {@link User} object from
+     * @param callback callback function to be called after retrieving user
+     */
+    public void getUser(String username, UserCallback callback) {
+        final DocumentReference userReference = usersRef.document(username);
+        userReference
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            User otherUser = task.getResult().toObject(User.class);
+                            callback.onCallback(otherUser);
+                        }
+                    }
+                });
     }
 }
