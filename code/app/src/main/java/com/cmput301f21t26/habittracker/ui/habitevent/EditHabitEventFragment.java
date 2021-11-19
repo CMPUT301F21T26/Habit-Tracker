@@ -1,8 +1,11 @@
 package com.cmput301f21t26.habittracker.ui.habitevent;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +17,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -179,6 +185,7 @@ public class EditHabitEventFragment extends Fragment {
     private View.OnClickListener cameraBtnOnClickListener = new View.OnClickListener(){
         @Override
         public void onClick(View view) {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         }
     };
@@ -186,7 +193,16 @@ public class EditHabitEventFragment extends Fragment {
     private View.OnClickListener chooseImageOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            mGetContent.launch("image/*");  // launch file explorer
 
         }
     };
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
+                    if (uri != null) {
+                       //UPDATE THIS
+            });
 }
