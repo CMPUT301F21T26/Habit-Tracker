@@ -1,5 +1,7 @@
 package com.cmput301f21t26.habittracker.ui.habitevent;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 
 import static android.app.Activity.RESULT_OK;
@@ -22,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -43,6 +46,7 @@ import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -50,6 +54,7 @@ public class EditHabitEventFragment extends Fragment {
 
     private final String TAG = "EditHabitEventFragment";
     private static final int REQUEST_IMAGE_CAPTURE = 101;
+    private Uri uri;
 
     private FragmentEditHabitEventBinding binding;
     private NavController navController;
@@ -110,9 +115,8 @@ public class EditHabitEventFragment extends Fragment {
         editConfirmBtn.setOnClickListener(editConfirmOnClickListener);
         delBtn.setOnClickListener(deleteOnClickListener);
         habitEventCameraBtn.setOnClickListener(cameraBtnOnClickListener);
-        habitEventImage.setOnClickListener(chooseImageOnClickListener);
+        habitEventChooseImageBtn.setOnClickListener(chooseImageOnClickListener);
         setEditHabitEventFields();
-
 
 
     }
@@ -139,6 +143,8 @@ public class EditHabitEventFragment extends Fragment {
 
         if (hEvent.getPhotoUrl() != null) {
             // TODO set image view to the image given by habit event
+            habitEventImage.setImageURI(Uri.parse(hEvent.getPhotoUrl()));
+
         }
     }
 
@@ -213,35 +219,57 @@ public class EditHabitEventFragment extends Fragment {
         @Override
         public void onClick(View view) {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            mStartForResult.launch(takePictureIntent);
         }
     };
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
-        super.onActivityResult(requestCode,resultCode,data);
 
-        Bitmap captureImage = (Bitmap) data.getExtras().get("data");
-        habitEventImage.setImageBitmap(captureImage);
+        ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent takePictureIntent = result.getData();
+                    // Handle the intent
+                    Bitmap captureImage = (Bitmap) takePictureIntent.getExtras().get("data");
+                    habitEventImage.setImageBitmap(captureImage);
 
-    }
-
-    private View.OnClickListener chooseImageOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            mGetContent.launch("image/*");  // launch file explorer
-
-        }
-    };
-    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
-            new ActivityResultCallback<Uri>() {
-                @Override
-                public void onActivityResult(Uri uri) {
-                    // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
-                    if (uri != null) {
-                        //UPDATE THIS
-                    }
+                    uri = getImageUri(getContext(), captureImage);
+                    hEvent.setPhotoUrl(uri.toString());
                 }
-            });
+            }
+        });
+
+
+        public Uri getImageUri(Context inContext, Bitmap inImage) {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+
+            return Uri.parse(path);
+        }
+
+        private View.OnClickListener chooseImageOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mGetContent.launch("image/*");  // launch file explorer
+
+            }
+        };
+        ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri uri) {
+                        // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
+                        if (uri != null) {
+                            //UPDATE THIS
+                            habitEventImage.setImageURI(uri);
+
+                            hEvent.setPhotoUrl(uri.toString());
+
+
+                        }
+                    }
+                });
+
 }
 
