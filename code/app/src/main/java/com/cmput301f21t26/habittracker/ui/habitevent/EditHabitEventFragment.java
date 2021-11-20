@@ -65,6 +65,8 @@ public class EditHabitEventFragment extends Fragment {
     private ImageView habitEventImage;
     private Button habitEventChooseImageBtn;
     private ImageButton habitEventCameraBtn;
+    private Uri imageUri;
+    private String PicturePath;
 
     private Habit habit;
     private HabitEvent hEvent;
@@ -234,13 +236,11 @@ public class EditHabitEventFragment extends Fragment {
         }
     };
     ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
-            new ActivityResultCallback<Uri>() {
-                @Override
-                public void onActivityResult(Uri uri) {
-                    // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
-                    if (uri != null) {
-                        //UPDATE THIS
-                    }
+            uri -> {
+                // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
+                if (uri != null) {
+                    imageUri = uri;
+                    habitEventImage.setImageURI(imageUri);
                 }
             });
 }
