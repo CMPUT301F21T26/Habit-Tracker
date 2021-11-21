@@ -384,19 +384,13 @@ public class UserController {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    int highestPosition = 0;
+                    int highestPosition = -1;
                     for (DocumentSnapshot habit : task.getResult()) {
-                        if (habit == null) {
-                            highestPosition = -1;
-                        } else {
-                            highestPosition = ((Long) habit.get("habitPosition")).intValue();
-                        }
+                        highestPosition = ((Long) habit.get("habitPosition")).intValue();
                         Log.d("UserController", "the highest position index is: "+highestPosition);
                     }
 
-                    highestPosition += 1;
-
-                    habit.setHabitPosition(highestPosition);
+                    habit.setHabitPosition(highestPosition + 1);
                     callback.onCallback(user);
                 }
             }
