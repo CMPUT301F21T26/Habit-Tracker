@@ -43,8 +43,8 @@ public class UserController {
     private static User user;
     private static ListenerRegistration userSnapshotListener;
     private static ListenerRegistration habitsSnapshotListener;
-    private static Map<String, ListenerRegistration> habitEventsSnapshotListenerMap;
 
+    private static HabitEventController habitEventController;
     private static FollowRequestController followRequestController;
 
     private static final FirebaseFirestore mStore = FirebaseFirestore.getInstance();
@@ -60,9 +60,8 @@ public class UserController {
      */
     public static void initCurrentUser(UserCallback callback) {
 
-        habitEventsSnapshotListenerMap = new HashMap<>();
-
         // initialize the instances of controllers with lazy construction
+        habitEventController = HabitEventController.getInstance();
         followRequestController = FollowRequestController.getInstance();
 
         readUserDataFromDb(user -> {
@@ -142,10 +141,8 @@ public class UserController {
             // only detach when user exists
             userSnapshotListener.remove();
             habitsSnapshotListener.remove();
+            habitEventController.detachAllHabitEventsSnapshotListener();
             followRequestController.detachFollowRequestsSnapshotListener();
-            for (String habitId : habitEventsSnapshotListenerMap.keySet()) {
-                habitEventsSnapshotListenerMap.get(habitId).remove();
-            }
         }
     }
 
@@ -249,7 +246,7 @@ public class UserController {
                                     if (habit.getDaysList().contains(today)) {
                                         user.addTodayHabit(habit);
                                     }
-                                    habitEventsSnapshotListenerMap.put(habit.getHabitId(), getHabitEventsSnapshotListener(habit.getHabitId()));
+                                    habitEventController.initHabitEventsSnapshotListener(habit.getHabitId());
                                     Log.d("habitAdded", "habit was added " + habit.getTitle());
                                     break;
                                 case MODIFIED:
@@ -266,68 +263,13 @@ public class UserController {
                                         user.removeTodayHabit(habit);
                                     }
                                     // remove snapshot listener for habit events collection associated to the given habit
-                                    habitEventsSnapshotListenerMap.get(habit.getHabitId()).remove();
-                                    habitEventsSnapshotListenerMap.remove(habit.getHabitId());
+                                    habitEventController.detachHabitEventsSnapshotListener(habit.getHabitId());
                                     break;
                                 default:
                                     Log.d("habitAdded", "Unexpected type: " + dc.getType());
                             }
                         }
                         user.notifyAllObservers();
-                    }
-                });
-    }
-
-    /**
-     * Return a snapshot listener for habitEvents collection in the parent habit
-     *
-     * @param parentHabitId parent habit id
-     * @return a snapshot listener for habitEvents collection
-     */
-    private static ListenerRegistration getHabitEventsSnapshotListener(String parentHabitId) {
-
-        assert user != null;
-
-        final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
-        final DocumentReference parentHabitRef = userRef.collection("habits").document(parentHabitId);
-
-        return parentHabitRef.collection("habitEvents")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            Log.w("habitEventUpdate", "listen:error", error);
-                            return;
-                        }
-
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
-
-                            HabitEvent hEvent = dc.getDocument().toObject(HabitEvent.class);
-
-                            switch(dc.getType()) {
-                                case ADDED:
-                                    Log.d("AddHabitEvent", "listener");
-                                    user.getHabit(parentHabitId).addHabitEvent(hEvent);
-                                    break;
-                                case MODIFIED:
-                                    user.getHabit(parentHabitId).updateHabitEvent(hEvent);
-                                    break;
-                                case REMOVED:
-                                    user.getHabit(parentHabitId).deleteHabitEvent(hEvent);
-
-                                    // if habit event to be removed is dated to today, set done for today of parent habit to false
-                                    if (hEvent.getHabitEventDateDay().equals(user.getDateLastAccessedDay())) {
-                                        Habit habit = UserController.getHabit(parentHabitId);
-                                        habit.setDoneForToday(false);
-                                        UserController.updateHabitInDb(habit, user -> { });
-                                    }
-                                    break;
-                                default:
-                                    Log.d("habitAdded", "Unexpected type: " + dc.getType());
-                            }
-
-                            user.notifyAllObservers();
-                        }
                     }
                 });
     }
@@ -409,11 +351,7 @@ public class UserController {
 
         assert user != null;
 
-        if (!habitEventsSnapshotListenerMap.containsKey(habit.getHabitId())) {
-            throw new IllegalArgumentException("Habit does not exist");
-        }
-
-        removeAllHabitEventsOfHabitFromDb(habit, cbUser -> {
+        habitEventController.removeAllHabitEventsOfHabitFromDb(habit, cbUser -> {
 
             // remove habit from db
             mStore.collection("users").document(getCurrentUserId()).collection("habits")
@@ -426,32 +364,6 @@ public class UserController {
                     })
                     .addOnFailureListener(e -> Log.w("removeHabit", "Removing habit failed", e));
         });
-    }
-
-    /**
-     * Given a habit, remove all of its associated habit events from the database.
-     * Call callback function after the removal
-     *
-     * @param habit target habit
-     * @param callback callback function to be called after the removal
-     */
-    public static void removeAllHabitEventsOfHabitFromDb(Habit habit, UserCallback callback) {
-
-        assert user != null;
-
-        final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
-        final DocumentReference habitRef = userRef.collection("habits").document(habit.getHabitId());
-
-        WriteBatch batch = mStore.batch();
-
-        List<HabitEvent> habitEvents = habit.getHabitEvents();
-
-        for (HabitEvent hEvent : habitEvents) {
-            DocumentReference habitEventRef = habitRef.collection("habitEvents").document(hEvent.getHabitEventId());
-            batch.delete(habitEventRef);
-        }
-
-        batch.commit().addOnSuccessListener(unused -> callback.onCallback(user));
     }
 
     /**
@@ -527,73 +439,6 @@ public class UserController {
     }
 
     /**
-     * Store a given habit event in an input parent habit's collection.
-     * Call callback function after successful storing.
-     *
-     * @param hEvent    habit event to be stored
-     * @param callback  callback function to be called after storing habit event
-     */
-    public static void storeHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
-        assert user != null;
-
-        final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
-        final DocumentReference habitsRef = userRef.collection("habits").document(hEvent.getParentHabitId());
-
-        habitsRef.collection("habitEvents")
-                .document(hEvent.getHabitEventId())
-                .set(hEvent)
-                .addOnSuccessListener(unused -> callback.onCallback(user))
-                .addOnFailureListener(e -> Log.d("addHabitEvent", "Adding habit event failed " + e.toString()));
-    }
-
-    /**
-     * Remove the given habit event associated to the parent habit.
-     * Call callback function after the removal.
-     *
-     * @param hEvent habit event to be removed
-     * @param callback callback function to be called after the removal
-     */
-    public static void removeHabitEventFromDb(HabitEvent hEvent, UserCallback callback) {
-
-        assert user != null;
-
-        final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
-        final DocumentReference habitRef = userRef.collection("habits").document(hEvent.getParentHabitId());
-
-        habitRef.collection("habitEvents")
-                .document(hEvent.getHabitEventId())
-                .delete()
-                .addOnSuccessListener(unused -> callback.onCallback(user))
-                .addOnFailureListener(e -> Log.w("deleteHabitEvent", "Error deleting habit event", e));
-    }
-
-    /**
-     * Update an existing habit event with a given habit event in db.
-     * Call callback function after the update.
-     *
-     * @param hEvent updated habit event object
-     * @param callback callback function to be called after the update
-     */
-    public static void updateHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
-
-        assert user != null;
-
-        final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
-        final DocumentReference habitRef = userRef.collection("habits").document(hEvent.getParentHabitId());
-
-        String msg =  hEvent.getPhotoUrl();
-        Log.d("updateHabitEvent", "msg: " + msg);
-
-        habitRef.collection("habitEvents")
-                .document(hEvent.getHabitEventId())
-                .set(hEvent, SetOptions.merge())
-                .addOnSuccessListener(unused -> {
-                    callback.onCallback(user);
-                })
-                .addOnFailureListener(e -> Log.w("updateHabitEvent", "Updating habit event failed", e));
-    }
-
-    /**
      * Update the profile picture and pictureURL in db.
      * Call callback function after the update.
      *
@@ -619,23 +464,6 @@ public class UserController {
                     });
                 })
                 .addOnFailureListener(e -> Log.d("storeProfilePicture", "Default profile pic was not stored"));
-    }
-    public static void updateHabitEventImageInDb(HabitEvent hEvent, String picturePath, Uri imageUri, UserCallback callback) {
-
-        assert user != null;
-
-        final StorageReference storageRef = mStorage.getReference(picturePath);
-
-        storageRef
-                .putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // If successful, get the download url and store it in pictureURL
-                    storageRef.getDownloadUrl().addOnSuccessListener(url -> {
-                        hEvent.setPhotoUrl(url.toString());
-                        UserController.updateHabitEventInDb(hEvent, callback);
-                    });
-                })
-                .addOnFailureListener(e -> Log.d("storeHabitEventImage", "Habit Event Image was not stored"));
     }
 
     /**

@@ -24,6 +24,7 @@ import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.cmput301f21t26.habittracker.objects.HabitEventController;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.interfaces.UserCallback;
 import com.cmput301f21t26.habittracker.objects.UserController;
@@ -46,6 +47,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     private Context mContext;
     private ItemTouchHelper touchHelper;
 
+    private HabitEventController habitEventController;
+
     /**
      * Initialize the dataset of the HabitAdapter
      *
@@ -58,6 +61,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         this.listener = listener;
 
         UserController.addObserverToCurrentUser(this);
+
+        habitEventController = HabitEventController.getInstance();
     }
 
     // Create new views (invoked by the layout manager)
@@ -103,7 +108,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                         // Set the title of the habit event
                         hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
 
-                        UserController.storeHabitEventInDb(hEvent, new UserCallback() {
+                        habitEventController.storeHabitEventInDb(hEvent, new UserCallback() {
                             @Override
                             public void onCallback(User user) {
                                 // show snackbar after storing an habit event in db
@@ -122,7 +127,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                         });
                     } else {
                         // if it gets unchecked delete habit event associated with todays date
-                        UserController.removeHabitEventFromDb(habit.getHabitEventByDate(Calendar.getInstance().getTime()), callback -> { });
+                        habitEventController.removeHabitEventFromDb(habit.getHabitEventByDate(Calendar.getInstance().getTime()), callback -> { });
                     }
 
                 });

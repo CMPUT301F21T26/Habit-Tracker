@@ -39,6 +39,7 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.cmput301f21t26.habittracker.objects.HabitEventController;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
@@ -80,6 +81,8 @@ public class EditHabitEventFragment extends Fragment {
     private Habit habit;
     private HabitEvent hEvent;
 
+    private HabitEventController habitEventController;
+
     public EditHabitEventFragment() {
         // Required empty public constructor
     }
@@ -91,6 +94,8 @@ public class EditHabitEventFragment extends Fragment {
 
         habit = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabit();
         hEvent = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabitEvent();
+
+        habitEventController = HabitEventController.getInstance();
     }
 
     @Override
@@ -195,7 +200,7 @@ public class EditHabitEventFragment extends Fragment {
 
             hEvent.setComment(comment);
 
-            UserController.updateHabitEventInDb(hEvent, user -> {
+            habitEventController.updateHabitEventInDb(hEvent, user -> {
                 NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                 navController.navigate(action);
             });
@@ -217,7 +222,7 @@ public class EditHabitEventFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // update DB
-                            UserController.removeHabitEventFromDb(hEvent, cbUser -> {
+                            habitEventController.removeHabitEventFromDb(hEvent, cbUser -> {
                                 NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                                 navController.navigate(action);
                             });
@@ -262,7 +267,7 @@ public class EditHabitEventFragment extends Fragment {
 
                     uri = getImageUri(getContext(), captureImage);
                     picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
-                    UserController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> {
+                    habitEventController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> {
 
                     });
                 }
@@ -297,7 +302,7 @@ public class EditHabitEventFragment extends Fragment {
                     public void onActivityResult(Uri uri) {
                         if (uri != null) {
                             picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
-                            UserController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> {
+                            habitEventController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> {
                                 // TODO refactor: set image right after the user chooses the image
                                 if (getActivity() != null) {
                                     Glide.with(getActivity())
