@@ -215,6 +215,10 @@ public class EditHabitEventFragment extends Fragment {
         }
     };
 
+    /**
+     * responds to clicks on camera button by launching camera to capture a photo
+     *
+     */
     private View.OnClickListener cameraBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -224,7 +228,12 @@ public class EditHabitEventFragment extends Fragment {
     };
 
 
-        ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+    /**
+     * sets the photo from the camera to the image view of the habit event, and
+     * updates the photoUrl parameter of the respective habit event
+     *
+     */
+    ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override
             public void onActivityResult(ActivityResult result) {
                 if (result.getResultCode() == Activity.RESULT_OK) {
@@ -248,28 +257,28 @@ public class EditHabitEventFragment extends Fragment {
             return Uri.parse(path);
         }
 
-        private View.OnClickListener chooseImageOnClickListener = new View.OnClickListener() {
+    /** responds to clicks on the choose image button by launching the users file explorer to select an image
+     *
+     */
+    private View.OnClickListener chooseImageOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mGetContent.launch("image/*");  // launch file explorer
-
             }
         };
-        ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+    /**
+     * sets the image chosen from the users library to the image view of the habit event, and updates the
+     * PhotoUrl parameter of the respective habit event
+     */
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
                 new ActivityResultCallback<Uri>() {
                     @Override
                     public void onActivityResult(Uri uri) {
-                        // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
                         if (uri != null) {
-                            //UPDATE THIS
                             habitEventImage.setImageURI(uri);
-
                             hEvent.setPhotoUrl(uri.toString());
-
-
                         }
                     }
                 });
-
 }
 
