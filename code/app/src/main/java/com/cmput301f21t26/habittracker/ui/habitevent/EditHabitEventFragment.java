@@ -255,7 +255,7 @@ public class EditHabitEventFragment extends Fragment {
 
                     uri = getImageUri(getContext(), captureImage);
                     picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
-                    UserController.updateHabitEventImageInDb(hEvent.getHabitEventId(),picturePath, uri, user -> {
+                    UserController.updateHabitEventImageInDb(habit.getHabitId(), hEvent.getHabitEventId(),picturePath, uri, user -> {
                     });
                 }
             }
@@ -290,7 +290,7 @@ public class EditHabitEventFragment extends Fragment {
                         if (uri != null) {
                             habitEventImage.setImageURI(uri);
                             picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
-                            UserController.updateHabitEventImageInDb(hEvent.getHabitEventId(),picturePath, uri, user -> {
+                            UserController.updateHabitEventImageInDb(habit.getHabitId(),hEvent.getHabitEventId(),picturePath, uri, user -> {
                             });
 
                         }
