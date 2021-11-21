@@ -55,6 +55,8 @@ public class EditHabitEventFragment extends Fragment {
     private final String TAG = "EditHabitEventFragment";
     private static final int REQUEST_IMAGE_CAPTURE = 101;
     private Uri uri;
+    private String picturePath;
+    private String dbImageUrl;
 
     private FragmentEditHabitEventBinding binding;
     private NavController navController;
@@ -172,6 +174,10 @@ public class EditHabitEventFragment extends Fragment {
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
 
+    /**
+     * listener to handle clicks on edit button in edit habit event, takes current information that is available inside the
+     * edit habit event fragment and updates it in the database
+     */
     private View.OnClickListener editConfirmOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -181,6 +187,7 @@ public class EditHabitEventFragment extends Fragment {
 
             hEvent.setComment(comment);
 
+
             UserController.updateHabitEventInDb(hEvent, user -> {
                 NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                 navController.navigate(action);
@@ -188,6 +195,10 @@ public class EditHabitEventFragment extends Fragment {
         }
     };
 
+    /**
+     * listener to handle clicks on delete button in edit habit event, creates alert dialog that prompts the user to either continue
+     * and delete the habit event, or to cancel their deletion
+     */
     private View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -243,7 +254,9 @@ public class EditHabitEventFragment extends Fragment {
                     habitEventImage.setImageBitmap(captureImage);
 
                     uri = getImageUri(getContext(), captureImage);
-                    hEvent.setPhotoUrl(uri.toString());
+                    picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
+                    UserController.updateHabitEventImageInDb(hEvent.getHabitEventId(),picturePath, uri, user -> {
+                    });
                 }
             }
         });
@@ -276,7 +289,10 @@ public class EditHabitEventFragment extends Fragment {
                     public void onActivityResult(Uri uri) {
                         if (uri != null) {
                             habitEventImage.setImageURI(uri);
-                            hEvent.setPhotoUrl(uri.toString());
+                            picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
+                            UserController.updateHabitEventImageInDb(hEvent.getHabitEventId(),picturePath, uri, user -> {
+                            });
+
                         }
                     }
                 });

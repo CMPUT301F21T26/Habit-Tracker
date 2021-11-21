@@ -620,6 +620,27 @@ public class UserController {
                 })
                 .addOnFailureListener(e -> Log.d("storeProfilePicture", "Default profile pic was not stored"));
     }
+    public static void updateHabitEventImageInDb(String hEventId, String picturePath, Uri imageUri, UserCallback callback) {
+
+        assert user != null;
+
+        final StorageReference storageRef = mStorage.getReference(picturePath);
+
+        storageRef
+                .putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // If successful, get the download url and store it in pictureURL
+                    storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        mStore.collection("users").document(getCurrentUserId())
+                                .collection("habits")
+                                .document(hEventId)
+                                .update("photoUrl", uri.toString())
+                                .addOnSuccessListener(unused -> callback.onCallback(user))
+                                .addOnFailureListener(e -> Log.d("updateUser", "Updating user failed"));
+                    });
+                })
+                .addOnFailureListener(e -> Log.d("storeHabitEventImage", "Habit Event Image was not stored"));
+    }
 
     /**
      * Updates the habitPositions of each habit
