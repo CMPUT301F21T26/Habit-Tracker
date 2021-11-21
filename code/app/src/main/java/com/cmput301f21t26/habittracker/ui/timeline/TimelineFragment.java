@@ -20,6 +20,7 @@ import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentTimelineBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
 
 import java.util.ArrayList;
@@ -27,8 +28,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Observable;
+import java.util.Observer;
 
-public class TimelineFragment extends Fragment {
+public class TimelineFragment extends Fragment implements Observer {
     private String TAG = "TimelineFragment";
 
     private FragmentTimelineBinding binding;
@@ -51,6 +54,8 @@ public class TimelineFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        UserController.addObserverToCurrentUser(this);
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
@@ -100,5 +105,17 @@ public class TimelineFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void update(Observable observable, Object obj) {
+        // TODO refactor update inplace, not just create new ArrayList
+
+        allHabitEventsList = new ArrayList<>();
+        // add all habit events into one list
+        for (Habit habit : habitsList) {
+            allHabitEventsList.addAll(habit.getHabitEvents());
+        }
+        timelineListAdapter.notifyDataSetChanged();
     }
 }

@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +38,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
@@ -47,6 +49,8 @@ import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -145,8 +149,12 @@ public class EditHabitEventFragment extends Fragment {
 
         if (hEvent.getPhotoUrl() != null) {
             // TODO set image view to the image given by habit event
-            habitEventImage.setImageURI(Uri.parse(hEvent.getPhotoUrl()));
-
+            if (getActivity() != null) {
+                Glide.with(getActivity())
+                        .load(hEvent.getPhotoUrl())
+                        .placeholder(R.drawable.default_image)
+                        .into(habitEventImage);
+            }
         }
     }
 
@@ -186,7 +194,6 @@ public class EditHabitEventFragment extends Fragment {
             // TODO get location, photograph from the user
 
             hEvent.setComment(comment);
-
 
             UserController.updateHabitEventInDb(hEvent, user -> {
                 NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
@@ -255,7 +262,8 @@ public class EditHabitEventFragment extends Fragment {
 
                     uri = getImageUri(getContext(), captureImage);
                     picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
-                    UserController.updateHabitEventImageInDb(habit.getHabitId(), hEvent.getHabitEventId(),picturePath, uri, user -> {
+                    UserController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> {
+
                     });
                 }
             }
@@ -288,9 +296,15 @@ public class EditHabitEventFragment extends Fragment {
                     @Override
                     public void onActivityResult(Uri uri) {
                         if (uri != null) {
-                            habitEventImage.setImageURI(uri);
                             picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
-                            UserController.updateHabitEventImageInDb(habit.getHabitId(),hEvent.getHabitEventId(),picturePath, uri, user -> {
+                            UserController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> {
+                                // TODO refactor: set image right after the user chooses the image
+                                if (getActivity() != null) {
+                                    Glide.with(getActivity())
+                                            .load(hEvent.getPhotoUrl())
+                                            .placeholder(R.drawable.default_image)
+                                            .into(habitEventImage);
+                                }
                             });
 
                         }
