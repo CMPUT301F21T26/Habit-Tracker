@@ -55,6 +55,8 @@ public class EditHabitEventFragment extends Fragment {
     private final String TAG = "EditHabitEventFragment";
     private static final int REQUEST_IMAGE_CAPTURE = 101;
     private Uri uri;
+    private String picturePath;
+    private String dbImageUrl;
 
     private FragmentEditHabitEventBinding binding;
     private NavController navController;
@@ -181,11 +183,10 @@ public class EditHabitEventFragment extends Fragment {
         public void onClick(View view) {
 
             String comment = commentET.getText().toString();
-            String url = uri.toString();
             // TODO get location, photograph from the user
 
             hEvent.setComment(comment);
-            hEvent.setPhotoUrl(url);
+
 
             UserController.updateHabitEventInDb(hEvent, user -> {
                 NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
@@ -253,7 +254,9 @@ public class EditHabitEventFragment extends Fragment {
                     habitEventImage.setImageBitmap(captureImage);
 
                     uri = getImageUri(getContext(), captureImage);
-                    hEvent.setPhotoUrl(uri.toString());
+                    picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
+                    UserController.updateHabitEventImageInDb(hEvent.getHabitEventId(),picturePath, uri, user -> {
+                    });
                 }
             }
         });
@@ -286,7 +289,10 @@ public class EditHabitEventFragment extends Fragment {
                     public void onActivityResult(Uri uri) {
                         if (uri != null) {
                             habitEventImage.setImageURI(uri);
-                            hEvent.setPhotoUrl(uri.toString());
+                            picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
+                            UserController.updateHabitEventImageInDb(hEvent.getHabitEventId(),picturePath, uri, user -> {
+                            });
+
                         }
                     }
                 });
