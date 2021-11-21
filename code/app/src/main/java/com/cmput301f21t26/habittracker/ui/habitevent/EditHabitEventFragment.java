@@ -172,14 +172,20 @@ public class EditHabitEventFragment extends Fragment {
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
 
+    /**
+     * listener to handle clicks on edit button in edit habit event, takes current information that is available inside the
+     * edit habit event fragment and updates it in the database
+     */
     private View.OnClickListener editConfirmOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
 
             String comment = commentET.getText().toString();
+            String url = uri.toString();
             // TODO get location, photograph from the user
 
             hEvent.setComment(comment);
+            hEvent.setPhotoUrl(url);
 
             UserController.updateHabitEventInDb(hEvent, user -> {
                 NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
@@ -188,6 +194,10 @@ public class EditHabitEventFragment extends Fragment {
         }
     };
 
+    /**
+     * listener to handle clicks on delete button in edit habit event, creates alert dialog that prompts the user to either continue
+     * and delete the habit event, or to cancel their deletion
+     */
     private View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
