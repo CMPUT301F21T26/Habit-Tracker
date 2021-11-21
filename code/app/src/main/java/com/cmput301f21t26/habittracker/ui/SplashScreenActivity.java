@@ -1,11 +1,17 @@
 package com.cmput301f21t26.habittracker.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
 import android.content.Intent;
+import android.graphics.drawable.AnimatedStateListDrawable;
+import android.graphics.drawable.AnimatedVectorDrawable;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.ImageView;
 
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.UserController;
@@ -16,7 +22,10 @@ import com.google.firebase.auth.FirebaseAuth;
  */
 public class SplashScreenActivity extends AppCompatActivity {
 
-    private static int SPLASH_SCREEN_TIME = 1500;
+    private static int SPLASH_SCREEN_TIME = 2000;
+    private AnimatedVectorDrawableCompat avd;
+    private AnimatedVectorDrawable avd2;
+    private AnimationDrawable ad;
 
     private FirebaseAuth mAuth;
 
@@ -27,6 +36,29 @@ public class SplashScreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
 
         mAuth = FirebaseAuth.getInstance();
+
+        ImageView checkmark = findViewById(R.id.checkMark);
+        ImageView gradient = findViewById(R.id.Gradient);
+
+        Drawable drawable = checkmark.getDrawable();
+
+        // Animate checkmark, different AVD for compatibility between devices
+        if (drawable instanceof AnimatedVectorDrawableCompat) {
+            avd = (AnimatedVectorDrawableCompat) drawable;
+            avd.start();
+        } else if (drawable instanceof AnimatedVectorDrawable) {
+            avd2 = (AnimatedVectorDrawable) drawable;
+            avd2.start();
+        }
+
+        // Animate gradient
+        Drawable gradientDrawable = gradient.getDrawable();
+        if (gradientDrawable instanceof AnimationDrawable) {
+            ad = (AnimationDrawable) gradientDrawable;
+            ad.setEnterFadeDuration(10);
+            ad.setExitFadeDuration(500);
+            ad.start();
+        }
 
         // TODO we want user information to be retrievable even if offline, which is default setting for
         // our database
@@ -50,11 +82,13 @@ public class SplashScreenActivity extends AppCompatActivity {
                 UserController.initCurrentUser(user -> {        // get user data then start activity
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 });
 
             } else {
                 Intent intent = new Intent(this, LoginSignupActivity.class);
                 startActivity(intent);
+                overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
             }
         }, SPLASH_SCREEN_TIME);
     }

@@ -3,7 +3,9 @@ package com.cmput301f21t26.habittracker.ui.habit;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -15,6 +17,7 @@ import androidx.annotation.RequiresApi;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
@@ -33,7 +36,7 @@ import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 
-public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> implements Observer {
+public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> implements Observer, ItemTouchHelperAdapter {
 
     private final String TAG = "HabitAdapter";
     private final Activity activity;
@@ -41,42 +44,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     private int mVisibility = View.VISIBLE;
     private RecyclerViewClickListener listener;
     private Context mContext;
-
-    /**
-     * Provide a reference to the type of views that you are using
-     * (custom ViewHolder)
-     */
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private final TextView titleTV;
-        private final TextView planTV;
-        private final CheckBox doneTodayCB;
-
-        public ViewHolder(View view) {
-            super(view);
-
-            titleTV = view.findViewById(R.id.habitTitleTV);
-            planTV = view.findViewById(R.id.habitPlanTV);
-            doneTodayCB = view.findViewById(R.id.habitCheckbox);
-            view.setOnClickListener(this);
-        }
-
-        public TextView getTitleTV() {
-            return titleTV;
-        }
-
-        public TextView getPlanTV() {
-            return planTV;
-        }
-
-        public CheckBox getDoneTodayCB() {
-            return doneTodayCB;
-        }
-
-        @Override
-        public void onClick(View view) {
-            listener.onClick(view, getAdapterPosition());
-        }
-    }
+    private ItemTouchHelper touchHelper;
 
     /**
      * Initialize the dataset of the HabitAdapter
@@ -171,6 +139,16 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         return habitList.size();
     }
 
+    // When habit item is dragged, change its position in the list
+    // in the database.
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        Habit fromHabit = habitList.get(fromPosition);
+        habitList.remove(fromHabit);
+        habitList.add(toPosition, fromHabit);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
     /**
      * Changes the visibility of the check box in the habit item UI
      * @param visibility
@@ -182,7 +160,91 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
 
     // Implementing onClick
     public interface RecyclerViewClickListener {
-        void onClick(View view, int position);
+        void onClick(int position);
+    }
+
+    /**
+     * Sets the habit adapter's ItemTouchHelper
+     * @param touchHelper
+     *  The {@link ItemTouchHelper} to be attached to the habit adapter
+     */
+    public void setItemTouchHelper(ItemTouchHelper touchHelper) {
+        this.touchHelper = touchHelper;
+    }
+
+    /**
+     * Provide a reference to the type of views that you are using
+     * (custom ViewHolder)
+     */
+    public class ViewHolder extends RecyclerView.ViewHolder implements
+            View.OnTouchListener,
+            GestureDetector.OnGestureListener {
+        private final TextView titleTV;
+        private final TextView planTV;
+        private final CheckBox doneTodayCB;
+        GestureDetector gestureDetector;
+
+        public ViewHolder(View view) {
+            super(view);
+
+            titleTV = view.findViewById(R.id.habitTitleTV);
+            planTV = view.findViewById(R.id.habitPlanTV);
+            doneTodayCB = view.findViewById(R.id.habitCheckbox);
+            gestureDetector = new GestureDetector(view.getContext(), this);
+
+            view.setOnTouchListener(this);
+        }
+
+        public TextView getTitleTV() {
+            return titleTV;
+        }
+
+        public TextView getPlanTV() {
+            return planTV;
+        }
+
+        public CheckBox getDoneTodayCB() {
+            return doneTodayCB;
+        }
+
+
+        @Override
+        public boolean onDown(MotionEvent motionEvent) {
+            return false;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent motionEvent) {
+
+        }
+
+        // This is basically onClick
+        @Override
+        public boolean onSingleTapUp(MotionEvent motionEvent) {
+            listener.onClick(getAdapterPosition());
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+            return true;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent motionEvent) {
+            touchHelper.startDrag(this);
+        }
+
+        @Override
+        public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+            return false;
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            gestureDetector.onTouchEvent(motionEvent);
+            return true;
+        }
     }
 
     private String getPlanMsg(Habit habit) {

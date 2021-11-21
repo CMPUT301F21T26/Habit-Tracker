@@ -1,6 +1,18 @@
 package com.cmput301f21t26.habittracker.ui.habitevent;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
+
+import static android.app.Activity.RESULT_OK;
+
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -8,10 +20,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -26,12 +46,17 @@ import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 public class EditHabitEventFragment extends Fragment {
 
     private final String TAG = "EditHabitEventFragment";
+    private static final int REQUEST_IMAGE_CAPTURE = 101;
+    private Uri uri;
+    private String picturePath;
+    private String dbImageUrl;
 
     private FragmentEditHabitEventBinding binding;
     private NavController navController;
@@ -43,6 +68,10 @@ public class EditHabitEventFragment extends Fragment {
     private TextView habitEventTitleTV;
     private TextView habitEventLocationTV;
     private EditText habitEventCommentET;
+
+    private ImageView habitEventImage;
+    private Button habitEventChooseImageBtn;
+    private ImageButton habitEventCameraBtn;
 
     private Habit habit;
     private HabitEvent hEvent;
@@ -73,7 +102,9 @@ public class EditHabitEventFragment extends Fragment {
         habitEventTitleTV = binding.editHabitEventTitleTV;
         habitEventCommentET = binding.habitEventCommentET;
         habitEventLocationTV = binding.habitEventLocationTV;
-
+        habitEventChooseImageBtn = binding.chooseImageButton;
+        habitEventImage = binding.habitEventImage;
+        habitEventCameraBtn = (ImageButton) binding.cameraButton;
         return binding.getRoot();
     }
 
@@ -85,8 +116,11 @@ public class EditHabitEventFragment extends Fragment {
 
         editConfirmBtn.setOnClickListener(editConfirmOnClickListener);
         delBtn.setOnClickListener(deleteOnClickListener);
-
+        habitEventCameraBtn.setOnClickListener(cameraBtnOnClickListener);
+        habitEventChooseImageBtn.setOnClickListener(chooseImageOnClickListener);
         setEditHabitEventFields();
+
+
     }
 
     /**
@@ -111,6 +145,8 @@ public class EditHabitEventFragment extends Fragment {
 
         if (hEvent.getPhotoUrl() != null) {
             // TODO set image view to the image given by habit event
+            habitEventImage.setImageURI(Uri.parse(hEvent.getPhotoUrl()));
+
         }
     }
 
@@ -138,6 +174,10 @@ public class EditHabitEventFragment extends Fragment {
         MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
     }
 
+    /**
+     * listener to handle clicks on edit button in edit habit event, takes current information that is available inside the
+     * edit habit event fragment and updates it in the database
+     */
     private View.OnClickListener editConfirmOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -147,6 +187,7 @@ public class EditHabitEventFragment extends Fragment {
 
             hEvent.setComment(comment);
 
+
             UserController.updateHabitEventInDb(hEvent, user -> {
                 NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                 navController.navigate(action);
@@ -154,13 +195,106 @@ public class EditHabitEventFragment extends Fragment {
         }
     };
 
+    /**
+     * listener to handle clicks on delete button in edit habit event, creates alert dialog that prompts the user to either continue
+     * and delete the habit event, or to cancel their deletion
+     */
     private View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            UserController.removeHabitEventFromDb(hEvent, user -> {
-                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
-                navController.navigate(action);
-            });
+            // prompt user to approve
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Delete Habit Event")
+                    .setMessage("Are you sure you want to delete this habit event? The data will be lost forever.")
+                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // update DB
+                            UserController.removeHabitEventFromDb(hEvent, cbUser -> {
+                                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                                navController.navigate(action);
+                            });
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
         }
     };
+
+    /**
+     * responds to clicks on camera button by launching camera to capture a photo
+     *
+     */
+    private View.OnClickListener cameraBtnOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            mStartForResult.launch(takePictureIntent);
+        }
+    };
+
+
+    /**
+     * sets the photo from the camera to the image view of the habit event, and
+     * updates the photoUrl parameter of the respective habit event
+     *
+     */
+    ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent takePictureIntent = result.getData();
+                    // Handle the intent
+                    Bitmap captureImage = (Bitmap) takePictureIntent.getExtras().get("data");
+                    habitEventImage.setImageBitmap(captureImage);
+
+                    uri = getImageUri(getContext(), captureImage);
+                    picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
+                    UserController.updateHabitEventImageInDb(habit.getHabitId(), hEvent.getHabitEventId(),picturePath, uri, user -> {
+                    });
+                }
+            }
+        });
+
+
+        public Uri getImageUri(Context inContext, Bitmap inImage) {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+
+            return Uri.parse(path);
+        }
+
+    /** responds to clicks on the choose image button by launching the users file explorer to select an image
+     *
+     */
+    private View.OnClickListener chooseImageOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mGetContent.launch("image/*");  // launch file explorer
+            }
+        };
+    /**
+     * sets the image chosen from the users library to the image view of the habit event, and updates the
+     * PhotoUrl parameter of the respective habit event
+     */
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri uri) {
+                        if (uri != null) {
+                            habitEventImage.setImageURI(uri);
+                            picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
+                            UserController.updateHabitEventImageInDb(habit.getHabitId(),hEvent.getHabitEventId(),picturePath, uri, user -> {
+                            });
+
+                        }
+                    }
+                });
 }
+

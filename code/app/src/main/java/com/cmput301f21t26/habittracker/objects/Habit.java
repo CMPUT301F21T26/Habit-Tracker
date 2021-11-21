@@ -23,6 +23,8 @@ public class Habit implements Serializable {
     private ArrayList<Integer> daysList;
     private Integer supposedHE;
     private Integer completedHE;
+    private int habitPosition;
+
 
     /**
      * A default Habit constructor.
@@ -49,6 +51,8 @@ public class Habit implements Serializable {
         this.isPrivate = false;
         this.supposedHE = 0;
         this.completedHE = 0;
+        this.habitPosition = 0;
+
     }
 
     /**
@@ -268,14 +272,22 @@ public class Habit implements Serializable {
         Calendar start = Calendar.getInstance();
         start.setTime(dayLastAccessed);
         //now check today>start
-        if (start.before(today)&&start.get(Calendar.DAY_OF_WEEK)<today.get(Calendar.DAY_OF_WEEK)) {
+        if (start.before(today) && start.get(Calendar.DAY_OF_WEEK) < today.get(Calendar.DAY_OF_WEEK)) {
             //now we know at least one day has passed, loop through all days until we get to today
             do {
-                start.add(Calendar.DAY_OF_WEEK,1);
+                start.add(Calendar.DAY_OF_WEEK, 1);
                 if (daysList.contains(start.get(Calendar.DAY_OF_WEEK))) {
                     this.supposedHE += 1;
                 }
-            } while (start.before(today)||(start.get(Calendar.DAY_OF_WEEK))==(today.get(Calendar.DAY_OF_WEEK)));
+            } while (start.before(today) || (start.get(Calendar.DAY_OF_WEEK)) == (today.get(Calendar.DAY_OF_WEEK)));
         }
+    }
+
+    public int getHabitPosition() {
+        return habitPosition;
+    }
+
+    public void setHabitPosition(int habitPosition) {
+        this.habitPosition = habitPosition;
     }
 }

@@ -4,8 +4,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -15,10 +19,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
+import com.cmput301f21t26.habittracker.objects.FollowRequest;
+import com.cmput301f21t26.habittracker.objects.FollowRequestController;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
@@ -42,33 +47,22 @@ public class ProfileFragment extends Fragment implements Observer {
     private TextView followersTV;
     private TextView followingTV;
     private CircleImageView profilePic;
+    private Button followButton;
     private Uri imageUri;
     private Uri newImageUri;
     private String picturePath;
     private String profileImageUrl;
-    private User userObject;
+    private User otherUser;
+    private User currentUser;
 
-    /**
-     * Creates a new profile fragment for when viewing other
-     * user profiles.
-     * @param otherUsername
-     *  The other user's username, of type {@link String}
-     * @return
-     *  The newly created profile fragment, of type {@link Fragment}
-     */
-    public static ProfileFragment newInstance(String otherUsername) {
-        ProfileFragment profileFragment = new ProfileFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("username", otherUsername);
-        profileFragment.setArguments(bundle);
-        return profileFragment;
-    }
+    private FollowRequestController followRequestController;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
+        setHasOptionsMenu(true);
 
         // Initiate views
         tabLayout = view.findViewById(R.id.tabLayout);
@@ -78,9 +72,18 @@ public class ProfileFragment extends Fragment implements Observer {
         profilePic = view.findViewById(R.id.profilePicImageView);
         followersTV = view.findViewById(R.id.followersNumberTV);
         followingTV = view.findViewById(R.id.followingNumberTV);
+        followButton = view.findViewById(R.id.followButton);
 
-        userObject = UserController.getCurrentUser();
-        UserController.addObserverToCurrentUser(this);
+        // Get users
+        currentUser = UserController.getCurrentUser();
+        otherUser = ProfileFragmentArgs.fromBundle(getArguments()).getUser();
+        
+        followRequestController = FollowRequestController.getInstance();
+
+        // otherUser dne i.e we want to view the current user's profile
+        if (otherUser == currentUser) {
+            UserController.addObserverToCurrentUser(this);
+        }
 
         return view;
     }
@@ -93,17 +96,61 @@ public class ProfileFragment extends Fragment implements Observer {
         setTabsAndViewPager();
 
         // fill up user info on view created
-        setFields();
-        setProfilePicImageView();
+        if (!otherUser.getUsername().equals(currentUser.getUsername())) {
+            // When the inputted userObject is not the current user (is the other user)
+            setFields(otherUser);
+            setProfilePicImageView(otherUser);
+            int initState = getInitialFollowButtonState();
 
-        // When user clicks profile picture, change
-        profilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mGetContent.launch("image/*");  // launch file explorer
+            if (initState == 0) {
+                followButton.setText("FOLLOW");
+            } else if (initState == 1) {
+                followButton.setText("REQUESTED");
+            } else {
+                followButton.setText("FOLLOWING");
             }
-        });
 
+            followButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    followRequestController.storeFollowRequestInDb(currentUser, otherUser, unused -> {
+                        if (initState == 0) {
+                            // sent a follow request
+                            followButton.setText("REQUESTED");
+                        } else if (initState == 1) {
+                            // cancelled request
+                            followButton.setText("FOLLOW");
+                        } else {
+                            // unfollow
+                            followButton.setText("FOLLOW");
+                        }
+                    });
+                }
+            });
+            
+        } else {
+            // The other user is the current user
+            setFields(otherUser);
+            setProfilePicImageView(otherUser);
+            followButton.setVisibility(View.INVISIBLE);
+            // When user clicks profile picture, change it
+            profilePic.setOnClickListener(view1 -> {
+                mGetContent.launch("image/*");  // launch file explorer
+            });
+        }
+    }
+
+    private int getInitialFollowButtonState() {
+
+        if (currentUser.isFollowing(otherUser)) {
+            /*
+            if (UserController.hasCurrUserSentFollowRequestTo(otherUser)) {
+                return 1;   // 1: sent a follow request
+            }
+            */
+            return 2;   // 2: following
+        }
+        return 0;      // 0: not following (default)
     }
 
     /**
@@ -148,13 +195,15 @@ public class ProfileFragment extends Fragment implements Observer {
     /**
      * Gets the info from the User object and sets
      * the TextViews accordingly
+     * @param userObject
+     * The user object to get the info from {@link User}
      */
-    private void setFields() {
+    private void setFields(User userObject) {
         // Set fields
         fullNameTV.setText(userObject.getFirstName() + " " + userObject.getLastName());
         usernameTV.setText(userObject.getUsername());
         int followersNumber = userObject.getFollowers().size();
-        int followingNumber = userObject.getFollowing().size();
+        int followingNumber = userObject.getFollowings().size();
         followersTV.setText(String.valueOf(followersNumber));
         followingTV.setText(String.valueOf(followingNumber));
     }
@@ -163,8 +212,10 @@ public class ProfileFragment extends Fragment implements Observer {
      * Sets the profile picture to the image
      * referenced in the pictureURL attribute
      * in the user's data in the database.
+     * @param userObject
+     *  The user object to get the profile picture from {@link User}
      */
-    private void setProfilePicImageView() {
+    private void setProfilePicImageView(User userObject) {
         // Set the profile picture
         profileImageUrl = userObject.getPictureURL();
         if (profileImageUrl != null) {
@@ -220,6 +271,10 @@ public class ProfileFragment extends Fragment implements Observer {
                 }
             });
 
+    public User getOtherUser() {
+        return otherUser;
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -228,9 +283,54 @@ public class ProfileFragment extends Fragment implements Observer {
     }
 
     @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if (otherUser != currentUser) {
+            MainActivity.hideMenuItems(menu);
+            // Add back button
+            if (((MainActivity) getActivity()) != null) {
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (otherUser != currentUser) {
+            MainActivity.hideBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
+            // Add back button
+            if (((MainActivity) getActivity()) != null) {
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+            }
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (otherUser != currentUser) {
+            MainActivity.showBottomNav(getActivity().findViewById(R.id.addHabitButton), getActivity().findViewById(R.id.extendBottomNav));
+            // remove back button
+            if (((MainActivity) getActivity()) != null) {
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
+            }
+        }
+    }
+
+    @Override
     public void update(Observable observable, Object o) {
+        // TODO what's this for?
         // set our info into the textViews and profile pic
-        setFields();
-        setProfilePicImageView();
+        // and only update if the user we're viewing
+        // is the current user (because other users don't have
+        // a listener)
+        if (otherUser == currentUser) {
+            setFields(otherUser);
+            setProfilePicImageView(otherUser);
+        }
     }
 }

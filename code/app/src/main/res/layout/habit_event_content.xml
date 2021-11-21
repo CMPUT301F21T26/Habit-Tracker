@@ -36,6 +36,7 @@
                     android:fontFamily="@font/rubik_bold"
                     android:maxLines="2"
                     android:text="Habit event title"
+                    android:textColor="@color/dark_blue"
                     android:textSize="@dimen/primary_font_size" />
 
                 <TextView
@@ -48,6 +49,7 @@
                     android:maxLines="1"
                     android:singleLine="true"
                     android:text="Location"
+                    android:textColor="@color/dark_blue"
                     android:textSize="@dimen/secondary_font_size" />
 
             </LinearLayout>
@@ -74,6 +76,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/rubik"
+                    android:textColor="@color/dark_blue"
                     android:paddingHorizontal="@dimen/activity_vertical_margin"
                     android:text="Now listen mate, I need to splash the boots. You know, strain the potatoes. Water the horses. You know, go where the big knobs hang out. Shake hands with the wife’s best friend? Drain the dragon? Siphon the python? Ring the rattlesnake? You know, unbutton the mutton? Like, point Percy at the porcelain?" />
 

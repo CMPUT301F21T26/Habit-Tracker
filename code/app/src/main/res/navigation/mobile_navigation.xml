@@ -54,21 +54,36 @@
         android:label="VIEW HABIT"
         tools:layout="@layout/fragment_view_habit" >
         <argument
+            android:name="habit"
+            app:argType="com.cmput301f21t26.habittracker.objects.Habit"
+            app:nullable="true" />
+        <argument
             android:name="user"
             app:argType="com.cmput301f21t26.habittracker.objects.User"
             app:nullable="true" />
         <action
             android:id="@+id/action_viewHabitFragment_to_editHabitFragment"
-            app:destination="@id/editHabitFragment" />
+            app:destination="@id/editHabitFragment"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_left"
+            app:popEnterAnim="@anim/exit_to_right"
+            app:popExitAnim="@anim/enter_from_left" />
     </fragment>
 
 
     <action
         android:id="@+id/action_global_addHabitFragment"
-        app:destination="@id/addHabitFragment" />
+        app:destination="@id/addHabitFragment"
+        app:enterAnim="@anim/enter_from_right"
+        app:exitAnim="@anim/exit_to_left"
+        app:popExitAnim="@anim/exit_to_right"
+        app:popEnterAnim="@anim/enter_from_left" />
     <action
         android:id="@+id/action_global_viewHabitFragment"
         app:destination="@id/viewHabitFragment" />
+    <action
+        android:id="@+id/action_global_editHabitFragment"
+        app:destination="@id/editHabitFragment" />
     <action
         android:id="@+id/action_global_navigation_timeline"
         app:destination="@id/navigation_timeline" />
@@ -82,7 +97,13 @@
         android:id="@+id/editHabitFragment"
         android:name="com.cmput301f21t26.habittracker.ui.habit.EditHabitFragment"
         android:label="EDIT HABIT"
-        tools:layout="@layout/fragment_edit_habit" />
+        tools:layout="@layout/fragment_edit_habit" >
+
+        <argument
+            android:name="habit"
+            app:argType="com.cmput301f21t26.habittracker.objects.Habit"
+            app:nullable="true" />
+    </fragment>
     <fragment
         android:id="@+id/editHabitEventFragment"
         android:name="com.cmput301f21t26.habittracker.ui.habitevent.EditHabitEventFragment"
@@ -97,10 +118,18 @@
     </fragment>
     <action
         android:id="@+id/action_global_editHabitEventFragment"
-        app:destination="@id/editHabitEventFragment" />
+        app:destination="@id/editHabitEventFragment"
+        app:enterAnim="@anim/enter_from_right"
+        app:exitAnim="@anim/exit_to_left"
+        app:popEnterAnim="@anim/enter_from_left"
+        app:popExitAnim="@anim/exit_to_right" />
     <action
         android:id="@+id/action_global_viewHabitEventFragment"
-        app:destination="@id/viewHabitEventFragment" />
+        app:destination="@id/viewHabitEventFragment"
+        app:enterAnim="@anim/enter_from_right"
+        app:exitAnim="@anim/exit_to_left"
+        app:popEnterAnim="@anim/enter_from_left"
+        app:popExitAnim="@anim/exit_to_right" />
     <action
         android:id="@+id/action_global_timelineFragment"
         app:destination="@id/navigation_timeline" />
@@ -116,6 +145,14 @@
             android:name="habit"
             app:argType="com.cmput301f21t26.habittracker.objects.Habit" />
     </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.search.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" />
+    <action
+        android:id="@+id/action_global_searchFragment"
+        app:destination="@id/searchFragment"/>
 
 
 </navigation>

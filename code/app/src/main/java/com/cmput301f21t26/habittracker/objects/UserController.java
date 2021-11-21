@@ -18,6 +18,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -45,6 +46,8 @@ public class UserController {
     private static ListenerRegistration habitsSnapshotListener;
     private static Map<String, ListenerRegistration> habitEventsSnapshotListenerMap;
 
+    private static FollowRequestController followRequestController;
+
     private static final FirebaseFirestore mStore = FirebaseFirestore.getInstance();
     private static final FirebaseStorage mStorage = FirebaseStorage.getInstance();
 
@@ -60,10 +63,15 @@ public class UserController {
 
         habitEventsSnapshotListenerMap = new HashMap<>();
 
+        // initialize the instances of controllers with lazy construction
+        followRequestController = FollowRequestController.getInstance();
+
         readUserDataFromDb(user -> {
+
             // add snapshot listeners
             userSnapshotListener = getUserSnapshotListener();
             habitsSnapshotListener = getHabitsSnapshotListener();
+            followRequestController.initFollowRequestSnapshotListener();
 
             resetHabitsInDb(user1 -> {
                 updateVisuals();
@@ -136,6 +144,7 @@ public class UserController {
             // only detach when user exists
             userSnapshotListener.remove();
             habitsSnapshotListener.remove();
+            followRequestController.detachFollowRequestsSnapshotListener();
             for (String habitId : habitEventsSnapshotListenerMap.keySet()) {
                 habitEventsSnapshotListenerMap.get(habitId).remove();
             }
@@ -196,6 +205,9 @@ public class UserController {
                 user.setPictureURL(snapshot.getString("pictureURL"));
                 user.setDateLastAccessed(snapshot.getDate("dateLastAccessed"));
 
+                user.setFollowings((List<String>) snapshot.get("followings"));
+                user.setFollowers((List<String>) snapshot.get("followers"));
+
                 user.notifyAllObservers();
             }
         });
@@ -216,6 +228,7 @@ public class UserController {
         final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
 
         return userRef.collection("habits")
+                .orderBy("habitPosition", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
@@ -271,7 +284,7 @@ public class UserController {
      * Return a snapshot listener for habitEvents collection in the parent habit
      *
      * @param parentHabitId parent habit id
-     * @return  a snapshot listener for habitEvents collection
+     * @return a snapshot listener for habitEvents collection
      */
     private static ListenerRegistration getHabitEventsSnapshotListener(String parentHabitId) {
 
@@ -321,6 +334,7 @@ public class UserController {
                 });
     }
 
+
     /**
      * Given a habit id, return the habit object from the habits list.
      * Return null if no such habit is in the list.
@@ -333,7 +347,7 @@ public class UserController {
     }
 
     /**
-     * Store habit in db and a snapshot listener for habit events collection associated to it
+     * Store habit in db.
      * Call callback function after storing
      *
      * @param habit habit to store
@@ -352,8 +366,43 @@ public class UserController {
     }
 
     /**
+     * Gets the highest index and adds 1, then sets
+     * that index to the given habit's habitPosition.
+     * @param habit
+     *  The habit to set the new habit position to, {@link Habit}
+     * @param callback
+     *  call back function to be called after setting the new position
+     */
+    public static void setNewHabitPosition(Habit habit, UserCallback callback) {
+        assert user != null;
+        Query highestIndexQuery = mStore.collection("users").document(getCurrentUserId()).collection("habits")
+                .orderBy("habitPosition", Query.Direction.DESCENDING).limit(1);
+
+        highestIndexQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    int highestPosition = 0;
+                    for (DocumentSnapshot habit : task.getResult()) {
+                        if (habit == null) {
+                            highestPosition = -1;
+                        } else {
+                            highestPosition = ((Long) habit.get("habitPosition")).intValue();
+                        }
+                        Log.d("UserController", "the highest position index is: "+highestPosition);
+                    }
+
+                    highestPosition += 1;
+
+                    habit.setHabitPosition(highestPosition);
+                    callback.onCallback(user);
+                }
+            }
+        });
+    }
+
+    /**
      * Remove the given habit and all associated habit events from db.
-     * Then remove corresponding snapshot listener for habit events collection>
      * Call callback function after the removal.
      *
      * @param habit habit to remove from db
@@ -367,6 +416,10 @@ public class UserController {
         if (!habitEventsSnapshotListenerMap.containsKey(habit.getHabitId())) {
             throw new IllegalArgumentException("Habit does not exist");
         }
+
+        // Remove the habit from the user's habit list and update the habitPosition of each habit in db
+        user.removeHabit(habit);
+        updateHabitPositions();
 
         removeAllHabitEventsOfHabitFromDb(habit, cbUser -> {
 
@@ -575,9 +628,43 @@ public class UserController {
         Date lastAccessed = user.getDateLastAccessed();
         Calendar now = Calendar.getInstance();
         List<Habit> habits = user.getHabits();
-        for (int i=0;i<habits.size();i++){
+        for (int i = 0; i < habits.size(); i++) {
             habits.get(i).updateVisualIndicatorDenominator(lastAccessed, now);
         }
         user.notifyAllObservers();
+    }
+
+    public static void updateHabitEventImageInDb(String habitId, String hEventId, String picturePath, Uri imageUri, UserCallback callback) {
+
+        assert user != null;
+
+        final StorageReference storageRef = mStorage.getReference(picturePath);
+
+        storageRef
+                .putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // If successful, get the download url and store it in pictureURL
+                    storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        mStore.collection("users").document(getCurrentUserId())
+                                .collection("habits")
+                                .document(habitId)
+                                .collection("habitEvents")
+                                .document(hEventId)
+                                .update("photoUrl", uri.toString())
+                                .addOnSuccessListener(unused -> callback.onCallback(user))
+                                .addOnFailureListener(e -> Log.d("updateUser", "Updating user failed"));
+                    });
+                })
+                .addOnFailureListener(e -> Log.d("storeHabitEventImage", "Habit Event Image was not stored"));
+    }
+
+    /**
+     * Updates the habitPositions of each habit
+     */
+    public static void updateHabitPositions() {
+        for (Habit habit : user.getHabits()) {
+            habit.setHabitPosition(user.getHabits().indexOf(habit));
+            UserController.updateHabitInDb(habit, cbUser -> {});
+        }
     }
 }

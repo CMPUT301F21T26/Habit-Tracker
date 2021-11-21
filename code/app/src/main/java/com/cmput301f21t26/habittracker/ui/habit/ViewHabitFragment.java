@@ -13,13 +13,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import com.cmput301f21t26.habittracker.MobileNavigationDirections;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentViewHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.ui.habitevent.ViewHabitEventFragmentArgs;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -61,6 +65,13 @@ public class ViewHabitFragment extends Fragment {
         confirmHabitButton = binding.confirmHabitButton;
         editHabitButton = binding.editHabitButton;
 
+        // Hide edit button if passed in user object is not the owner (i.e. not the current user)
+        User userObject = ViewHabitFragmentArgs.fromBundle(getArguments()).getUser();
+        if (userObject != UserController.getCurrentUser() &&
+                !userObject.getUsername().equals(UserController.getCurrentUser().getUsername())) {           // for the case of viewing one's own profile
+            editHabitButton.setVisibility(View.GONE);
+        }
+
         // Inflate the layout for this fragment
         return binding.getRoot();
     }
@@ -71,9 +82,8 @@ public class ViewHabitFragment extends Fragment {
 
         navController = Navigation.findNavController(view);
         assert getArguments() != null;
-        String habitId = getArguments().getString("habitId");
         // grabs habit and updates screen with this information
-        habit = UserController.getHabit(habitId);
+        habit = ViewHabitFragmentArgs.fromBundle(getArguments()).getHabit();
         updateScreen();
         // make the confirm button and edit buttons clickable
         // confirm first
@@ -84,9 +94,8 @@ public class ViewHabitFragment extends Fragment {
         // edit button
         editHabitButton.setOnClickListener(v -> {
             Log.d(TAG, "clicked edit habit button");
-            Bundle bundle = new Bundle();
-            bundle.putString("habitId", habitId);
-            navController.navigate(R.id.editHabitFragment, bundle);
+            NavDirections action = MobileNavigationDirections.actionGlobalEditHabitFragment(habit);
+            navController.navigate(action);
         });
     }
 

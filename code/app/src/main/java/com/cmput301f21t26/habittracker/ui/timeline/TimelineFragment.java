@@ -56,10 +56,14 @@ public class TimelineFragment extends Fragment {
 
         habitsList = UserController.getCurrentUser().getHabits();
         allHabitEventsList = new ArrayList<>();
-
         // add all habit events into one list
         for (Habit habit : habitsList) {
             allHabitEventsList.addAll(habit.getHabitEvents());
+        }
+
+        // If there are no habit events, show text that says so
+        if (allHabitEventsList.isEmpty()) {
+            binding.noHabitEventsTV.setVisibility(View.VISIBLE);
         }
 
         timelineListView = binding.timelineListView;

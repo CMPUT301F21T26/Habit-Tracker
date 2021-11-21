@@ -1,6 +1,7 @@
 package com.cmput301f21t26.habittracker.ui.habitevent;
 
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -119,6 +120,9 @@ public class ViewHabitEventFragment extends Fragment {
 
         if (hEvent.getPhotoUrl() == null) {
             habitEventImageView.setImageResource(R.color.transparent);
+        }
+        else{
+            habitEventImageView.setImageURI(Uri.parse(hEvent.getPhotoUrl()));
         }
     }
 

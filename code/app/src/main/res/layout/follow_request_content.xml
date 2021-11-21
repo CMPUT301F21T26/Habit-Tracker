@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="100dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profilePicFollowRequestImageView"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/default_profile_pic"
+        app:civ_border_color="@color/black"
+        app:civ_border_width="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.55"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"/>
+
+    <LinearLayout
+        android:id="@+id/followRequestTextTopLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toRightOf="@id/profilePicFollowRequestImageView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintHorizontal_bias="0"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginVertical="@dimen/activity_vertical_margin">
+
+        <TextView
+            android:id="@+id/followRequestUsernameTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/rubik_bold"
+            android:textColor="@color/black"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:ems="12"
+            android:text="Username"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/followRequestWantsToFollowTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/rubik_light"
+            android:textColor="@color/black"
+            android:lines="1"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="wants to follow you"
+            android:textSize="@dimen/secondary_font_size" />
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/allowButton"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/rubik_bold"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:text="ALLOW"
+        app:strokeColor="@color/black"
+        app:strokeWidth="2dp"
+        android:layout_marginStart="-8dp"
+        app:layout_constraintStart_toStartOf="@id/followRequestTextTopLayout"
+        app:layout_constraintTop_toBottomOf="@id/followRequestTextTopLayout"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/denyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleY="0.8"
+        android:scaleX="0.8"
+        android:text="DENY"
+        android:textColor="@color/red"
+        android:fontFamily="@font/rubik_bold"
+        app:rippleColor="@color/red"
+        android:backgroundTint="@color/white"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/black"
+        app:layout_constraintStart_toEndOf="@id/allowButton"
+        app:layout_constraintTop_toBottomOf="@id/followRequestTextTopLayout"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

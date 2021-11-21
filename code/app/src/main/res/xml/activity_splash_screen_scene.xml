@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:duration="2000"
+        motion:autoTransition="animateToEnd">
+       <KeyFrameSet>
+           <KeyAttribute
+               motion:motionTarget="@+id/Logo"
+               motion:framePosition="0"
+               android:alpha="0" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="0"
+               android:rotation="0" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="100"
+               android:rotation="45" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="40"
+               android:rotation="0" />
+           <KeyAttribute
+               motion:motionTarget="@+id/Logo"
+               motion:framePosition="40"
+               android:alpha="0" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="71"
+               android:rotation="45" />
+           <KeyAttribute
+               motion:motionTarget="@+id/Logo"
+               motion:framePosition="71"
+               android:alpha="0" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="0"
+               android:translationX="0dp" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="0"
+               android:translationY="0dp" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="40"
+               android:translationY="0dp" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="71"
+               android:translationY="0dp" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="40"
+               android:translationX="0dp" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="71"
+               android:translationX="10dp" />
+           <KeyAttribute
+               motion:motionTarget="@+id/checkMark"
+               motion:framePosition="100"
+               android:translationX="10dp" />
+           <KeyAttribute
+               motion:motionTarget="@+id/imageView2"
+               motion:framePosition="0"
+               android:alpha="0" />
+           <KeyAttribute
+               motion:motionTarget="@+id/imageView2"
+               motion:framePosition="71"
+               android:alpha="0" />
+       </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+    </ConstraintSet>
+</MotionScene>

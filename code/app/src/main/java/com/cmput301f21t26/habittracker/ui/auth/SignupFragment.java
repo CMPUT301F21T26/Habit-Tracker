@@ -20,6 +20,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.cmput301f21t26.habittracker.R;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -30,6 +31,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +51,8 @@ public class SignupFragment extends Fragment {
     private EditText usernameET;
     private EditText passwordET;
     private EditText confirmPassET;
+    private TextInputLayout confirmPassLayout;
+    private TextInputLayout passwordLayout;
     private Button signupConfirmButton;
     private CircleImageView setProfilePic;
     private FirebaseAuth mAuth;
@@ -154,6 +158,8 @@ public class SignupFragment extends Fragment {
         signupConfirmButton.setOnClickListener(signupConfirmOnClickListener);
         setProfilePic = view.findViewById(R.id.circleImageView);
         setProfilePic.setOnClickListener(setProfileOnClickListener);
+        confirmPassLayout = view.findViewById(R.id.confirmPassLayout);
+        passwordLayout = view.findViewById(R.id.passwordLayout);
 
         navController = Navigation.findNavController(view);
     }
@@ -272,6 +278,8 @@ public class SignupFragment extends Fragment {
                         user.put("username", username);
                         user.put("pictureURL", profileImageUrl);
                         user.put("dateLastAccessed", Calendar.getInstance().getTime());
+                        user.put("followings", new ArrayList<String>());
+                        user.put("followers", new ArrayList<String>());
 
                         usersRef
                                 .document(username)     // user id: username
@@ -332,16 +340,25 @@ public class SignupFragment extends Fragment {
             filled = false;
         }
         if (password.isEmpty()) {
-            passwordET.setError("Cannot be empty");
+            passwordLayout.setError("Cannot be empty");
+            passwordLayout.setErrorIconDrawable(null);
             filled = false;
+        } else {
+            passwordLayout.setErrorEnabled(false);
         }
         if (confirmPass.isEmpty()) {
-            confirmPassET.setError("Cannot be empty");
+            confirmPassLayout.setError("Cannot be empty");
+            confirmPassLayout.setErrorIconDrawable(null);
             filled = false;
+        } else {
+            confirmPassLayout.setErrorEnabled(false);
         }
         if (!confirmPass.equals(password)){
-            confirmPassET.setError("Passwords must match");
+            confirmPassLayout.setError("Passwords must match");
+            confirmPassLayout.setErrorIconDrawable(null);
             filled = false;
+        } else {
+            confirmPassLayout.setErrorEnabled(false);
         }
 
         return filled;
