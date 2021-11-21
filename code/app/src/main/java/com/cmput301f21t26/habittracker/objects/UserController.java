@@ -354,6 +354,7 @@ public class UserController {
     public static void storeHabitInDb(Habit habit, UserCallback callback) {
         assert user != null;
 
+        // TODO exclude habitevents array
         mStore.collection("users").document(getCurrentUserId()).collection("habits")
                 .document(habit.getHabitId())
                 .set(habit)
@@ -418,17 +419,17 @@ public class UserController {
             throw new IllegalArgumentException("Habit does not exist");
         }
 
-        // Remove the habit from the user's habit list and update the habitPosition of each habit in db
-        user.removeHabit(habit);
-        updateHabitPositions();
-
         removeAllHabitEventsOfHabitFromDb(habit, cbUser -> {
 
             // remove habit from db
             mStore.collection("users").document(getCurrentUserId()).collection("habits")
                     .document(habit.getHabitId())
                     .delete()
-                    .addOnSuccessListener(unused -> callback.onCallback(cbUser))
+                    .addOnSuccessListener(unused -> {
+                        // Remove the habit from the user's habit list and update the habitPosition of each habit in db
+                        updateHabitPositions();
+                        callback.onCallback(cbUser);
+                    })
                     .addOnFailureListener(e -> Log.w("removeHabit", "Removing habit failed", e));
         });
     }
@@ -576,7 +577,7 @@ public class UserController {
      * Update an existing habit event with a given habit event in db.
      * Call callback function after the update.
      *
-     * @param hEvent habit event to update
+     * @param hEvent updated habit event object
      * @param callback callback function to be called after the update
      */
     public static void updateHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
@@ -586,10 +587,15 @@ public class UserController {
         final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
         final DocumentReference habitRef = userRef.collection("habits").document(hEvent.getParentHabitId());
 
+        String msg =  hEvent.getPhotoUrl();
+        Log.d("updateHabitEvent", "msg: " + msg);
+
         habitRef.collection("habitEvents")
                 .document(hEvent.getHabitEventId())
                 .set(hEvent, SetOptions.merge())
-                .addOnSuccessListener(unused -> callback.onCallback(user))
+                .addOnSuccessListener(unused -> {
+                    callback.onCallback(user);
+                })
                 .addOnFailureListener(e -> Log.w("updateHabitEvent", "Updating habit event failed", e));
     }
 
@@ -611,16 +617,16 @@ public class UserController {
                 .putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     // If successful, get the download url and store it in pictureURL
-                    storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    storageRef.getDownloadUrl().addOnSuccessListener(url -> {
                         mStore.collection("users").document(getCurrentUserId())
-                                .update("pictureURL", uri.toString())
+                                .update("pictureURL", url.toString())
                                 .addOnSuccessListener(unused -> callback.onCallback(user))
                                 .addOnFailureListener(e -> Log.d("updateUser", "Updating user failed"));
                     });
                 })
                 .addOnFailureListener(e -> Log.d("storeProfilePicture", "Default profile pic was not stored"));
     }
-    public static void updateHabitEventImageInDb(String habitId, String hEventId, String picturePath, Uri imageUri, UserCallback callback) {
+    public static void updateHabitEventImageInDb(HabitEvent hEvent, String picturePath, Uri imageUri, UserCallback callback) {
 
         assert user != null;
 
@@ -630,15 +636,9 @@ public class UserController {
                 .putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     // If successful, get the download url and store it in pictureURL
-                    storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        mStore.collection("users").document(getCurrentUserId())
-                                .collection("habits")
-                                .document(habitId)
-                                .collection("habitEvents")
-                                .document(hEventId)
-                                .update("photoUrl", uri.toString())
-                                .addOnSuccessListener(unused -> callback.onCallback(user))
-                                .addOnFailureListener(e -> Log.d("updateUser", "Updating user failed"));
+                    storageRef.getDownloadUrl().addOnSuccessListener(url -> {
+                        hEvent.setPhotoUrl(url.toString());
+                        UserController.updateHabitEventInDb(hEvent, callback);
                     });
                 })
                 .addOnFailureListener(e -> Log.d("storeHabitEventImage", "Habit Event Image was not stored"));
