@@ -620,7 +620,7 @@ public class UserController {
                 })
                 .addOnFailureListener(e -> Log.d("storeProfilePicture", "Default profile pic was not stored"));
     }
-    public static void updateHabitEventImageInDb(String hEventId, String picturePath, Uri imageUri, UserCallback callback) {
+    public static void updateHabitEventImageInDb(String habitId, String hEventId, String picturePath, Uri imageUri, UserCallback callback) {
 
         assert user != null;
 
@@ -633,6 +633,8 @@ public class UserController {
                     storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         mStore.collection("users").document(getCurrentUserId())
                                 .collection("habits")
+                                .document(habitId)
+                                .collection("habitEvents")
                                 .document(hEventId)
                                 .update("photoUrl", uri.toString())
                                 .addOnSuccessListener(unused -> callback.onCallback(user))
