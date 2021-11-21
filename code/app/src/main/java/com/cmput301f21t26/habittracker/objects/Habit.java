@@ -21,6 +21,8 @@ public class Habit implements Serializable {
     private boolean isPrivate;
     private ArrayList<HabitEvent> habitEvents;
     private ArrayList<Integer> daysList;
+    private Integer supposedHE;
+    private Integer completedHE;
 
     /**
      * A default Habit constructor.
@@ -45,6 +47,8 @@ public class Habit implements Serializable {
         this.daysList = daysList;     // all init to false
         this.habitId = UUID.randomUUID().toString();
         this.isPrivate = false;
+        this.supposedHE = 0;
+        this.completedHE = 0;
     }
 
     /**
@@ -212,6 +216,17 @@ public class Habit implements Serializable {
         return habitEvents.size();
     }
 
+    /** Return the ratio of completed habit events
+     *
+     * @return (int) ratio of completed vs needed habit events
+     */
+    public int ratioForVisualIndicator() {
+        if (supposedHE==0){
+            return 0;
+        }
+        return this.completedHE/this.supposedHE;
+    }
+
     public void setDaysList(ArrayList<Integer> daysList) {
         this.daysList = daysList;
     }
@@ -226,5 +241,41 @@ public class Habit implements Serializable {
 
     public void setPrivate(boolean isPrivate) {
         this.isPrivate = isPrivate;
+    }
+
+    public Integer getSupposedHE() { return supposedHE; }
+
+    public void setSupposedHE(Integer supposedHE) { this.supposedHE = supposedHE; }
+
+    public Integer getCompletedHE() { return completedHE; }
+
+    public void setCompletedHE(Integer completedHE) { this.completedHE = completedHE; }
+
+    /**
+     * Updates supposedHE to keep track of how many habit events were supposed to have happened
+     * Used in UserController in the process of setting up the user class when logging in/authenticating
+     * Grabs dayLastAccessed before it can update to today from the user, then loops through to today
+     * Checks for days after current day
+     * @param dayLastAccessed
+     * The last time the user logged in prior to today
+     * @param today
+     * the date for today, only passed so we don't have to get todays date every time within the function
+     */
+    public void updateVisualIndicatorDenominator(Date dayLastAccessed, Calendar today) {
+        //loop through days until we get to current day, translate this.daysList into which days
+        //of the week we need to update the denominator for
+        //first things first convert dayLastAccessed to a calendar object to make comparisons easier
+        Calendar start = Calendar.getInstance();
+        start.setTime(dayLastAccessed);
+        //now check today>start
+        if (start.before(today)&&start.get(Calendar.DAY_OF_WEEK)<today.get(Calendar.DAY_OF_WEEK)) {
+            //now we know at least one day has passed, loop through all days until we get to today
+            do {
+                start.add(Calendar.DAY_OF_WEEK,1);
+                if (daysList.contains(start.get(Calendar.DAY_OF_WEEK))) {
+                    this.supposedHE += 1;
+                }
+            } while (start.before(today)||(start.get(Calendar.DAY_OF_WEEK))==(today.get(Calendar.DAY_OF_WEEK)));
+        }
     }
 }

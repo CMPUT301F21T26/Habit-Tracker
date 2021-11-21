@@ -60,10 +60,11 @@ public class LoginTest {
 
         // Wait for splash screen to end
         solo.waitForActivity(LoginSignupActivity.class);
-
-
     }
 
+    /**
+     * Tests that the login page shows when clicking from the main login signup page
+     */
     @Test
     public void testLoginPageShows() {
         // Check that the main login/signup page is displayed
@@ -76,6 +77,9 @@ public class LoginTest {
         assertFragmentShown(loginFragment);
     }
 
+    /**
+     * Tests the login fields in the login page for correct input validation.
+     */
     @Test
     public void testLoginFieldsEntered() {
         // Go to login page
@@ -107,7 +111,14 @@ public class LoginTest {
 
     }
 
-    // Logs in user
+    /**
+     * Goes to the login page and logs in with the tester user,
+     * EspressoTester. It is important to note that in that user,
+     * it must have a habit that is planned for everyday, and has a title
+     * of "Test". As well, the timeline which shows all the user's habit events,
+     * should have at least one habit event.
+     * @throws InterruptedException
+     */
     public static void login() throws InterruptedException {
         onView(withId(R.id.loginButton)).perform(click());
         onView(withId(R.id.usernameET)).perform(typeText("EspressoTester"));
@@ -119,6 +130,10 @@ public class LoginTest {
         Thread.sleep(3000);
     }
 
+    /**
+     * Tests the functionality of the signout button.
+     * @throws InterruptedException
+     */
     @Test
     public void testSignout() throws InterruptedException {
         login();

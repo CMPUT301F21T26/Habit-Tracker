@@ -37,13 +37,11 @@ public class TimelineFragment extends Fragment {
     private List<Habit> habitsList;
     private ArrayList<HabitEvent> allHabitEventsList;
 
-    private TimelineViewModel timelineViewModel;
     private TimelineListAdapter timelineListAdapter;
     private ListView timelineListView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        timelineViewModel = new ViewModelProvider(this).get(TimelineViewModel.class);
 
         binding = FragmentTimelineBinding.inflate(inflater, container, false);
 

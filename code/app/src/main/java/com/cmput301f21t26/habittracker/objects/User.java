@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Observable;
+import java.util.TimeZone;
 
 /**
  * User class stores all user-related data
@@ -164,6 +165,7 @@ public class User extends Observable implements Serializable {
     public void addHabit(Habit habit) {
         habits.add(habit);
     }
+
 
     /**
      * Remove a habit from all habits list

@@ -25,6 +25,7 @@ import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -65,6 +66,7 @@ public class UserController {
             habitsSnapshotListener = getHabitsSnapshotListener();
 
             resetHabitsInDb(user1 -> {
+                updateVisuals();
                 updateUserLastAccessedDateInDb(callback);
             });
         });
@@ -293,6 +295,7 @@ public class UserController {
 
                             switch(dc.getType()) {
                                 case ADDED:
+                                    Log.d("AddHabitEvent", "listener");
                                     user.getHabit(parentHabitId).addHabitEvent(hEvent);
                                     break;
                                 case MODIFIED:
@@ -343,10 +346,6 @@ public class UserController {
                 .document(habit.getHabitId())
                 .set(habit)
                 .addOnSuccessListener(unused -> {
-                    // add snapshot listener for habit events collection associated to the given habit
-                    String parentHabitId = habit.getHabitId();
-                    //habitEventsSnapshotListenerMap.put(parentHabitId, getHabitEventsSnapshotListener(parentHabitId));
-
                     callback.onCallback(user);
                 })
                 .addOnFailureListener(e -> Log.w("addHabit", "Adding habit failed", e));
@@ -566,5 +565,19 @@ public class UserController {
                     });
                 })
                 .addOnFailureListener(e -> Log.d("storeProfilePicture", "Default profile pic was not stored"));
+    }
+
+    /**
+     * Loops through all user habits and updates their denominators for visual indicators
+     */
+    public static void updateVisuals() {
+        assert user != null;
+        Date lastAccessed = user.getDateLastAccessed();
+        Calendar now = Calendar.getInstance();
+        List<Habit> habits = user.getHabits();
+        for (int i=0;i<habits.size();i++){
+            habits.get(i).updateVisualIndicatorDenominator(lastAccessed, now);
+        }
+        user.notifyAllObservers();
     }
 }
