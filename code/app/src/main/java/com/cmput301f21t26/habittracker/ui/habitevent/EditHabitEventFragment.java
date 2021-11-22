@@ -76,7 +76,7 @@ public class EditHabitEventFragment extends Fragment {
     private EditText habitEventCommentET;
 
     private ImageView habitEventImage;
-    private Button habitEventChooseImageBtn;
+    private ImageButton habitEventChooseImageBtn;
     private ImageButton habitEventCameraBtn;
 
     private Habit habit;
@@ -154,7 +154,6 @@ public class EditHabitEventFragment extends Fragment {
         }
 
         if (hEvent.getPhotoUrl() != null) {
-            // TODO set image view to the image given by habit event
             if (getActivity() != null) {
                 Glide.with(getActivity())
                         .load(hEvent.getPhotoUrl())
@@ -275,14 +274,20 @@ public class EditHabitEventFragment extends Fragment {
             }
         });
 
+    /**
+     * Takes the given bitmap image and compresses it and converts it into a uri
+     * @param inContext the context of the EditHabitEventFragment {@link Context}
+     * @param inImage the image to be converted {@link Bitmap}
+     * @return
+     *  The converted bitmap into a {@link Uri}
+     */
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
 
-        public Uri getImageUri(Context inContext, Bitmap inImage) {
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-            String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-
-            return Uri.parse(path);
-        }
+        return Uri.parse(path);
+    }
 
     /** responds to clicks on the choose image button by launching the users file explorer to select an image
      *

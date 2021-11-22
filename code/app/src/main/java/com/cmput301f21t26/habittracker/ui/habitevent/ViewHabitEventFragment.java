@@ -21,6 +21,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
@@ -122,7 +123,12 @@ public class ViewHabitEventFragment extends Fragment {
             habitEventImageView.setImageResource(R.color.transparent);
         }
         else{
-            habitEventImageView.setImageURI(Uri.parse(hEvent.getPhotoUrl()));
+            if (getActivity() != null) {
+                Glide.with(getActivity())
+                        .load(hEvent.getPhotoUrl())
+                        .placeholder(R.drawable.default_image)
+                        .into(habitEventImageView);
+            }
         }
     }
 

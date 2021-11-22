@@ -54,7 +54,6 @@ public class UserListAdapter extends BaseAdapter {
 
         userUsernameTV.setText(otherUsername);
         // Set profile pic
-        Log.d(TAG, otherUser.getUsername());
         String pictureURL = otherUser.getPictureURL();
         if (mContext != null && pictureURL != null) {
             Glide.with(mContext)
