@@ -67,6 +67,20 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:id="@+id/isPrivateTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/activity_vertical_margin"
+                android:text="HABIT IS PRIVATE: "
+                android:fontFamily="@font/rubik_bold"
+                android:textColor="@color/blue"
+                android:textSize="16dp"
+                app:layout_constraintTop_toBottomOf="@id/habitReasoningLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
             <ProgressBar
                 android:layout_centerInParent="true"
                 android:id="@+id/habitProgressBar"
@@ -83,7 +97,7 @@
                 app:layout_constraintBottom_toTopOf="@id/divider"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/habitReasoningLayout"
+                app:layout_constraintTop_toBottomOf="@id/isPrivateTV"
                 app:layout_constraintHorizontal_bias="0.5"
                 />
 

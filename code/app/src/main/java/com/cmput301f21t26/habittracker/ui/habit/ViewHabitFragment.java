@@ -8,6 +8,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,6 +44,7 @@ public class ViewHabitFragment extends Fragment {
     private Button confirmHabitButton;
     private Button editHabitButton;
     private ChipGroup chipGroup;
+    private TextView isPrivateTV;
 
     public ViewHabitFragment() {
         // Required empty public constructor
@@ -64,6 +66,7 @@ public class ViewHabitFragment extends Fragment {
         chipGroup = binding.chipGroup;
         confirmHabitButton = binding.confirmHabitButton;
         editHabitButton = binding.editHabitButton;
+        isPrivateTV = binding.isPrivateTV;
 
         // Hide edit button if passed in user object is not the owner (i.e. not the current user)
         User userObject = ViewHabitFragmentArgs.fromBundle(getArguments()).getUser();
@@ -132,6 +135,12 @@ public class ViewHabitFragment extends Fragment {
 
         binding.habitTitle.setText(habit.getTitle());
         binding.habitReasoning.setText(habit.getReason());
+        if (habit.isPrivate()) {
+            binding.isPrivateTV.setText("HABIT IS PRIVATE: YES");
+        } else {
+            binding.isPrivateTV.setText("HABIT IS PRIVATE: NO");
+        }
+
 
         // TODO set percentage done
 
