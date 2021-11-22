@@ -31,7 +31,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 
-public class ProfileFragmentHabitsTab extends Fragment implements Observer {
+public class ProfileFragmentHabitsTab extends Fragment {
     private String TAG = "ProfileFragmentHabitsTab";
 
     private NavController navController;
@@ -55,7 +55,6 @@ public class ProfileFragmentHabitsTab extends Fragment implements Observer {
         ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
         userObject = parentProfileFrag.getOtherUser();
 
-        UserController.addObserverToCurrentUser(this);
     }
 
     @Override
@@ -90,10 +89,6 @@ public class ProfileFragmentHabitsTab extends Fragment implements Observer {
         updateRecyclerView();
     }
 
-    @Override
-    public void update(Observable observable, Object o) {
-        updateRecyclerView();
-    }
 
     /**
      * Updates the recycler view for cases when the current user
@@ -102,6 +97,7 @@ public class ProfileFragmentHabitsTab extends Fragment implements Observer {
     private void updateRecyclerView() {
         if (userObject.getUid().equals(UserController.getCurrentUserId())
                 || UserController.getCurrentUser().isFollowing(userObject)) {
+            updateFollowToSeeHabitText();
 
             // show habits only when the userObject is equal to current user
             // or current user is following userObject
@@ -125,6 +121,7 @@ public class ProfileFragmentHabitsTab extends Fragment implements Observer {
             habitAdapter.checkBoxVisibility(View.GONE);
 
         } else {
+            mRecyclerView.setAdapter(null);
             updateFollowToSeeHabitText();
         }
     }

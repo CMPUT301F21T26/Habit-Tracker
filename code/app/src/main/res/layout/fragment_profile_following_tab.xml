@@ -14,6 +14,9 @@
 
     <ListView
         android:id="@+id/profileFollowingListView"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="50dp"
+        android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

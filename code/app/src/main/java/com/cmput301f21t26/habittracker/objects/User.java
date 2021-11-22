@@ -130,6 +130,21 @@ public class User extends Observable implements Serializable {
     }
 
     /**
+     * Given a habit ID, returns if that habit with that ID is in the list
+     * @param habitId The {@link String} habit ID that is checked if there is a habit in the list with that ID
+     * @return A {@link boolean} where true if it is in the list and false otherwise
+     */
+    public boolean containsHabit(String habitId) {
+        boolean containsHabit = false;
+        for (Habit habit : habits) {
+            if (habit.getHabitId().equals(habitId)) {
+                containsHabit = true;
+            }
+        }
+        return containsHabit;
+    }
+
+    /**
      * Given a habit id, return the habit object from the habits list.
      * Return null if no such habit is in the list.
      *

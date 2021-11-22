@@ -1,5 +1,6 @@
 package com.cmput301f21t26.habittracker.ui.profile;
 
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +23,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.cmput301f21t26.habittracker.objects.FollowRequest;
 import com.cmput301f21t26.habittracker.objects.FollowRequestController;
 import com.cmput301f21t26.habittracker.objects.FollowStatus;
@@ -160,19 +165,6 @@ public class ProfileFragment extends Fragment implements Observer {
         }
     }
 
-    private int getInitialFollowButtonState() {
-
-        if (currentUser.isFollowing(otherUser)) {
-            /*
-            if (UserController.hasCurrUserSentFollowRequestTo(otherUser)) {
-                return 1;   // 1: sent a follow request
-            }
-            */
-            return 2;   // 2: following
-        }
-        return 0;      // 0: not following (default)
-    }
-
     /**
      * Sets up the tab layout and viewpager
      * located in the profile fragment.
@@ -244,6 +236,7 @@ public class ProfileFragment extends Fragment implements Observer {
             if (getActivity() != null) {
                 Glide.with(getActivity())
                         .load(profileImageUrl)
+                        .placeholder(R.drawable.default_profile_pic)
                         .into(profilePic);
                 Log.d(TAG, "Get profile picture success");
             }
@@ -338,6 +331,7 @@ public class ProfileFragment extends Fragment implements Observer {
                 ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
             }
+
         }
     }
 

@@ -92,7 +92,12 @@ public class OtherUserController {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot habit: task.getResult()) {
                             Log.d("otherUserHabits", "User: " + user.getUsername() + " habit: " + habit.getId());
-                            user.addHabit(habit.toObject(Habit.class));
+                            Habit tempHabit = habit.toObject(Habit.class);
+                            if (!user.containsHabit(tempHabit.getHabitId())) {
+                                // Issue with habit being duplicated when clicking user in search fragment, going back, and clicking on the same user again
+                                // See issue #141 in github
+                                user.addHabit(habit.toObject(Habit.class));
+                            }
                         }
                         callback.onCallback(user);
                     }
