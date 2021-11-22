@@ -10,6 +10,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -301,17 +302,10 @@ public class EditHabitEventFragment extends Fragment {
                     @Override
                     public void onActivityResult(Uri uri) {
                         if (uri != null) {
-                            picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
-                            habitEventController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> {
-                                // TODO refactor: set image right after the user chooses the image
-                                if (getActivity() != null) {
-                                    Glide.with(getActivity())
-                                            .load(hEvent.getPhotoUrl())
-                                            .placeholder(R.drawable.default_image)
-                                            .into(habitEventImage);
-                                }
-                            });
+                            habitEventImage.setImageURI(uri);
 
+                            picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
+                            habitEventController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> { });
                         }
                     }
                 });
