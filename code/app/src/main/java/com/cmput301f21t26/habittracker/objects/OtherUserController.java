@@ -49,6 +49,7 @@ public class OtherUserController {
      * the given text.
      * @param newText
      *  The query text, type {@link String}
+     * @param callback callback function to be called after adding all users into the list
      */
     public void getUsersList(String newText, UserListCallback callback) {
 
@@ -73,6 +74,27 @@ public class OtherUserController {
             // So we send back an empty list
             callback.onCallback(usersList);
         }
+    }
+
+    /**
+     * Loops through a given list of usernames and queries for those users in the database,
+     * and then converts those snapshots into User objects and adds it to the usersList.
+     * @param usernameList The {@link ArrayList} of usernames
+     * @param callback callback function to be called after adding all users into the list
+     */
+    public void getUsersList(ArrayList<String> usernameList, UserListCallback callback) {
+        ArrayList<User> usersList = new ArrayList<>();
+
+        for (String username : usernameList) {
+            usersRef.document(username).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    usersList.add(task.getResult().toObject(User.class));
+                    Log.d("getUsersListBefore", usersList.get(0).getUsername());
+                    callback.onCallback(usersList);
+                }
+            });
+        }
+
     }
 
     /**
