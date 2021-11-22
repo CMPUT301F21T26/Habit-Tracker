@@ -76,7 +76,7 @@ public class EditHabitEventFragment extends Fragment {
     private EditText habitEventCommentET;
 
     private ImageView habitEventImage;
-    private Button habitEventChooseImageBtn;
+    private ImageButton habitEventChooseImageBtn;
     private ImageButton habitEventCameraBtn;
 
     private Habit habit;
