@@ -59,6 +59,7 @@ public class UserListAdapter extends BaseAdapter {
         if (mContext != null && pictureURL != null) {
             Glide.with(mContext)
                     .load(otherUser.getPictureURL())
+                    .placeholder(R.drawable.default_profile_pic)
                     .into(userProfilePic);
             Log.d(TAG, "Get image success");
         }

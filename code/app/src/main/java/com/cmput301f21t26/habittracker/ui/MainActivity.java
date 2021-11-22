@@ -358,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         Glide.with(this)
                 .asBitmap()
                 .load(URL)
+                .placeholder(R.drawable.default_profile_pic)
                 .apply(RequestOptions.circleCropTransform().placeholder(R.drawable.ic_person))
                 .into(new CustomTarget<Bitmap>() {
                     @Override
