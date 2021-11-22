@@ -23,6 +23,7 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.Calendar;
+import java.util.Date;
 
 public class HabitController {
 
@@ -85,13 +86,14 @@ public class HabitController {
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
 
                             Habit habit = dc.getDocument().toObject(Habit.class);
+                            Date dateNow = Calendar.getInstance().getTime();
                             int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
 
                             switch (dc.getType()) {
                                 case ADDED:
                                     user.addHabit(habit);
 
-                                    if (habit.getDaysList().contains(today)) {
+                                    if (habit.getStartDate().before(dateNow) && habit.getDaysList().contains(today)) {
                                         user.addTodayHabit(habit);
                                     }
                                     habitEventController.initHabitEventsSnapshotListener(habit.getHabitId());
