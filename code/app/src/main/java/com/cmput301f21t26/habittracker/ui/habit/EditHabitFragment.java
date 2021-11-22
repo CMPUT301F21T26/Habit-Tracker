@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.cmput301f21t26.habittracker.objects.HabitController;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitBinding;
@@ -62,6 +63,8 @@ public class EditHabitFragment extends Fragment {
 
     private Habit habit;
 
+    private HabitController habitController;
+
     public EditHabitFragment() {
         // Required empty public constructor
     }
@@ -70,6 +73,8 @@ public class EditHabitFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        habitController = HabitController.getInstance();
     }
 
     @Override
@@ -142,7 +147,7 @@ public class EditHabitFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // update DB
-                            UserController.removeHabitFromDb(habit, cbUser -> {
+                            habitController.removeHabitFromDb(habit, cbUser -> {
                                 // go to previous fragment user was in
                                 navController.popBackStack();       // this goes back to view habit fragment
                                 navController.popBackStack();
@@ -260,7 +265,7 @@ public class EditHabitFragment extends Fragment {
                 habit.setStartDate(date);
                 habit.setPrivate(isPrivate);
 
-                UserController.updateHabitInDb(habit, cbUser -> {
+                habitController.updateHabitInDb(habit, cbUser -> {
                     // go to previous fragment user was in
                     navController.popBackStack();       // this goes back to view habit fragment
                     navController.popBackStack();

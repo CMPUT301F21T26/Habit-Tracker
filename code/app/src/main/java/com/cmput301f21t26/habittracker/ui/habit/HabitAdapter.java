@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.HabitController;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.HabitEventController;
 import com.cmput301f21t26.habittracker.objects.User;
@@ -47,6 +48,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     private Context mContext;
     private ItemTouchHelper touchHelper;
 
+    private HabitController habitController;
     private HabitEventController habitEventController;
 
     /**
@@ -62,6 +64,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
 
         UserController.addObserverToCurrentUser(this);
 
+        habitController = HabitController.getInstance();
         habitEventController = HabitEventController.getInstance();
     }
 
@@ -95,7 +98,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
             public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
                 habit.setDoneForToday(isChecked);
 
-                UserController.updateHabitInDb(habit, user -> {
+                habitController.updateHabitInDb(habit, user -> {
 
                     if (isChecked) {
 

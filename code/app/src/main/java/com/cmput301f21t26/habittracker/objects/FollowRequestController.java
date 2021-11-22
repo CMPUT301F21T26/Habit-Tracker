@@ -21,7 +21,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 public class FollowRequestController {
 
-    private static FollowRequestController instance = null;
+    private static FollowRequestController instance = new FollowRequestController();
 
     // private final UserController userController;
     private ListenerRegistration followRequestSnapshotListener;
@@ -43,9 +43,6 @@ public class FollowRequestController {
      * @return instance of FollowRequestController
      */
     public static FollowRequestController getInstance() {
-        if (instance == null) {
-            instance = new FollowRequestController();
-        }
         return instance;
     }
 

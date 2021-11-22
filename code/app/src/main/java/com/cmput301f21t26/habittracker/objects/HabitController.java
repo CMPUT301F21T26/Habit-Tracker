@@ -1,15 +1,37 @@
 package com.cmput301f21t26.habittracker.objects;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.cmput301f21t26.habittracker.interfaces.UserCallback;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
+
+import java.util.Calendar;
 
 public class HabitController {
 
-    private static HabitController instance = null;
+    private static HabitController instance = new HabitController();
 
     // private final UserController userController;
-    private ListenerRegistration habitSnapshotListener;
+    private HabitEventController habitEventController;
+
+    private ListenerRegistration habitsSnapshotListener;
 
     private final FirebaseFirestore mStore;
     private final CollectionReference usersRef;
@@ -20,6 +42,8 @@ public class HabitController {
     private HabitController() {
         mStore = FirebaseFirestore.getInstance();
         usersRef = mStore.collection("users");
+
+        habitEventController = HabitEventController.getInstance();
     }
 
     /**
@@ -28,18 +52,255 @@ public class HabitController {
      * @return instance of HabitController
      */
     public static HabitController getInstance() {
-        if (instance == null) {
-            instance = new HabitController();
-        }
         return instance;
     }
 
-    public void initHabitSnapshotListener() {
+    /**
+     * Initialize snapshot listener for user's habits collection.
+     * The listener notifies the observers when a habit is added, deleted, or edited
+     * When a habit is added, a snapshot listener for its habit events is added to the map.
+     * When a habit is removed, the snapshot listener for its habit events is removed from the map.
+     *
+     * @return snapshot listener for user's habits collection
+     */
+    public void initHabitsSnapshotListener() {
 
         User user = UserController.getCurrentUser();
         assert user != null;
 
+        final DocumentReference userRef = mStore.collection("users").document(user.getUid());
+
+        habitsSnapshotListener = userRef.collection("habits")
+                .orderBy("habitPosition", Query.Direction.ASCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
+                        if (error != null) {
+                            Log.w("habitUpdate", "Listening for habit collection update failed.", error);
+                            return;
+                        }
+                        if (snapshots == null) {
+                            return;
+                        }
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                            Habit habit = dc.getDocument().toObject(Habit.class);
+                            int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    user.addHabit(habit);
+
+                                    if (habit.getDaysList().contains(today)) {
+                                        user.addTodayHabit(habit);
+                                    }
+                                    habitEventController.initHabitEventsSnapshotListener(habit.getHabitId());
+                                    Log.d("habitAdded", "habit was added " + habit.getTitle());
+                                    break;
+                                case MODIFIED:
+                                    user.updateHabit(habit);
+                                    if (habit.getDaysList().contains(today)) {
+                                        user.updateTodayHabit(habit);
+                                    } else {
+                                        user.removeTodayHabit(habit);
+                                    }
+                                    break;
+                                case REMOVED:
+                                    user.removeHabit(habit);
+                                    if (habit.getDaysList().contains(today)) {
+                                        user.removeTodayHabit(habit);
+                                    }
+                                    // remove snapshot listener for habit events collection associated to the given habit
+                                    habitEventController.detachHabitEventsSnapshotListener(habit.getHabitId());
+                                    break;
+                                default:
+                                    Log.d("habitAdded", "Unexpected type: " + dc.getType());
+                            }
+                        }
+                        user.notifyAllObservers();
+                    }
+                });
     }
 
+    /**
+     * Detach the snapshot listener for follow requests collection
+     */
+    public void detachHabitsSnapshotListener() {
+        habitsSnapshotListener.remove();
+    }
+
+    /**
+     * Store habit in db.
+     * Call callback function after storing
+     *
+     * @param habit habit to store
+     * @param callback callback function to be called after storing habit in db
+     */
+    public void storeHabitInDb(Habit habit, UserCallback callback) {
+
+        User user = UserController.getCurrentUser();
+        assert user != null;
+
+        // TODO exclude habitevents array
+        mStore.collection("users").document(user.getUid()).collection("habits")
+                .document(habit.getHabitId())
+                .set(habit)
+                .addOnSuccessListener(unused -> {
+                    // add snapshot listener for habit events collection associated to the given habit
+                    String parentHabitId = habit.getHabitId();
+
+                    callback.onCallback(user);
+                })
+                .addOnFailureListener(e -> Log.w("addHabit", "Adding habit failed", e));
+    }
+
+    /**
+     * Update an existing habit to a given habit in the database then call the callback function
+     *
+     * @param habit updated habit to store
+     * @param callback callback function to be called after the update
+     */
+    public void updateHabitInDb(Habit habit, UserCallback callback) {
+
+        User user = UserController.getCurrentUser();
+        assert user != null;
+
+        mStore.collection("users").document(user.getUid()).collection("habits")
+                .document(habit.getHabitId())
+                .set(habit, SetOptions.merge())        // update the document, instead of overwriting it
+                .addOnSuccessListener(unused -> callback.onCallback(user))
+                .addOnFailureListener(e -> Log.w("updateHabit", "Updating habit failed", e));
+    }
+
+    /**
+     * Remove the given habit and all associated habit events from db.
+     * Call callback function after the removal.
+     *
+     * @param habit habit to remove from db
+     * @param callback callback function to be called after removal
+     * @throws IllegalArgumentException if habit does not exist in the snapshot map
+     */
+    public void removeHabitFromDb(Habit habit, UserCallback callback) {
+
+        User user = UserController.getCurrentUser();
+        assert user != null;
+
+        habitEventController.removeAllHabitEventsOfHabitFromDb(habit, cbUser -> {
+
+            // remove habit from db
+            mStore.collection("users").document(user.getUid()).collection("habits")
+                    .document(habit.getHabitId())
+                    .delete()
+                    .addOnSuccessListener(unused -> {
+                        // Remove the habit from the user's habit list and update the habitPosition of each habit in db
+                        updateHabitPositions();
+                        callback.onCallback(cbUser);
+                    })
+                    .addOnFailureListener(e -> Log.w("removeHabit", "Removing habit failed", e));
+        });
+    }
+
+    /**
+     * Gets the highest index and adds 1, then sets
+     * that index to the given habit's habitPosition.
+     * @param habit
+     *  The habit to set the new habit position to, {@link Habit}
+     * @param callback
+     *  call back function to be called after setting the new position
+     */
+    public void setNewHabitPosition(Habit habit, UserCallback callback) {
+
+        User user = UserController.getCurrentUser();
+        assert user != null;
+
+        Query highestIndexQuery = mStore.collection("users").document(user.getUid()).collection("habits")
+                .orderBy("habitPosition", Query.Direction.DESCENDING).limit(1);
+
+        highestIndexQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    int highestPosition = -1;
+                    for (DocumentSnapshot habit : task.getResult()) {
+                        highestPosition = ((Long) habit.get("habitPosition")).intValue();
+                        Log.d("UserController", "the highest position index is: "+highestPosition);
+                    }
+
+                    habit.setHabitPosition(highestPosition + 1);
+                    callback.onCallback(user);
+                }
+            }
+        });
+    }
+
+    /**
+     * Updates the habitPositions of each habit
+     */
+    public void updateHabitPositions() {
+
+        User user = UserController.getCurrentUser();
+        assert user != null;
+
+        for (Habit habit : user.getHabits()) {
+            habit.setHabitPosition(user.getHabits().indexOf(habit));
+            updateHabitInDb(habit, cbUser -> {});
+        }
+    }
+
+    /**
+     * Reset doneForToday of all habits to false if the current date is
+     * at least one day larger than user's dateLastAccessed
+     *
+     * @param callback callback function to be called after the update
+     */
+    public void resetHabitsInDb(UserCallback callback) {
+
+        User user = UserController.getCurrentUser();
+        assert user != null;
+
+        Calendar calNow = Calendar.getInstance();
+        int yearNow = calNow.get(Calendar.YEAR);
+        int monthNow = calNow.get(Calendar.MONTH);
+        int weekNow = calNow.get(Calendar.WEEK_OF_MONTH);
+        int dayNow = calNow.get(Calendar.DAY_OF_WEEK);
+
+        Calendar calLastAccessed = Calendar.getInstance();
+        calLastAccessed.setTime(user.getDateLastAccessed());
+        int yearLastAccessed = calLastAccessed.get(Calendar.YEAR);
+        int monthLastAccessed = calLastAccessed.get(Calendar.MONTH);
+        int weekLastAccessed = calLastAccessed.get(Calendar.WEEK_OF_MONTH);
+        int dayLastAccessed = calLastAccessed.get(Calendar.DAY_OF_WEEK);
+
+        final DocumentReference userRef = mStore.collection("users").document(user.getUid());
+        final CollectionReference habitsRef = userRef.collection("habits");
+
+        // get a new batch write
+        WriteBatch batch = mStore.batch();
+        habitsRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+
+                    if ( dayNow > dayLastAccessed
+                            || weekNow > weekLastAccessed
+                            || monthNow > monthLastAccessed
+                            || yearNow > yearLastAccessed ) {
+
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // reset doneForHabit of all habits to false
+                            DocumentReference habitRef = habitsRef.document(document.getId());
+                            batch.update(habitRef, "doneForToday", false);
+                        }
+                    }
+
+                    // commit batch then call callback function
+                    batch.commit().addOnCompleteListener(task1 -> callback.onCallback(user));
+
+                } else {
+                    Log.d("updateTodayHabits", "Error getting today habits: ", task.getException());
+                }
+            }
+        });
+    }
 
 }

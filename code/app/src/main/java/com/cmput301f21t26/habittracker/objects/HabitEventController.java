@@ -25,7 +25,9 @@ import java.util.Map;
 
 public class HabitEventController {
 
-    private static HabitEventController instance = null;
+    private static HabitEventController instance = new HabitEventController();
+
+    private HabitController habitController;
 
     private Map<String, ListenerRegistration> habitEventsSnapshotListenerMap;
 
@@ -37,6 +39,7 @@ public class HabitEventController {
      * Private constructor
      */
     private HabitEventController() {
+        habitController = HabitController.getInstance();
         habitEventsSnapshotListenerMap = new HashMap<>();
 
         mStore = FirebaseFirestore.getInstance();
@@ -50,9 +53,6 @@ public class HabitEventController {
      * @return instance of HabitEventController
      */
     public static HabitEventController getInstance() {
-        if (instance == null) {
-            instance = new HabitEventController();
-        }
         return instance;
     }
 
@@ -99,7 +99,7 @@ public class HabitEventController {
                                     if (hEvent.getHabitEventDateDay().equals(user.getDateLastAccessedDay())) {
                                         Habit habit = UserController.getHabit(parentHabitId);
                                         habit.setDoneForToday(false);
-                                        UserController.updateHabitInDb(habit, user -> { });
+                                        habitController.updateHabitInDb(habit, user -> { });
                                     }
                                     break;
                                 default:

@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.cmput301f21t26.habittracker.objects.HabitController;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
@@ -54,6 +55,8 @@ public class AddHabitFragment extends Fragment {
     private EditText habitTitleET;
     private EditText habitReasoningET;
 
+    private HabitController habitController;
+
     /**
      * No-argument empty constructor
      */
@@ -73,6 +76,8 @@ public class AddHabitFragment extends Fragment {
         habitReasoningET = binding.habitReasoningET;
         defaultDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         setHasOptionsMenu(true);
+
+        habitController = HabitController.getInstance();
 
         return binding.getRoot();
     }
@@ -157,9 +162,9 @@ public class AddHabitFragment extends Fragment {
 
                 newHabit = new Habit(title, reason, date, daysList);
                 newHabit.setPrivate(isPrivate);
-                UserController.setNewHabitPosition(newHabit, cbUser -> {
+                habitController.setNewHabitPosition(newHabit, cbUser -> {
                     Log.d(TAG, newHabit.getReason());
-                    UserController.storeHabitInDb(newHabit, cbUser2 -> {
+                    habitController.storeHabitInDb(newHabit, cbUser2 -> {
                         // Goes back to previous fragment user was in
                         navController.popBackStack();
                     });
