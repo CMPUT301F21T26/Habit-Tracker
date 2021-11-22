@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         notifDialog.getWindow().getAttributes().windowAnimations = R.style.notifPanelAnimation;
 
         // Set our list view and its adapter
-        ListView followRequestListView= (ListView) notifDialog.findViewById(R.id.followRequestListView);
+        ListView followRequestListView = (ListView) notifDialog.findViewById(R.id.followRequestListView);
         ArrayList<FollowRequest> followRequestList = (ArrayList<FollowRequest>) UserController.getCurrentUser().getFollowRequests();
 
         // Set item onclick listener so when user clicks on a follow request, go to user's profile

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.HabitController;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
 
@@ -16,8 +17,12 @@ public class HabitItemTouchHelper extends androidx.recyclerview.widget.ItemTouch
     private final ItemTouchHelperAdapter itemTouchHelperAdapter;
     private boolean draggable = true;
 
+    private HabitController habitController;
+
     public HabitItemTouchHelper(ItemTouchHelperAdapter itemTouchHelperAdapter) {
         this.itemTouchHelperAdapter = itemTouchHelperAdapter;
+
+        habitController = HabitController.getInstance();
     }
 
     // Handle long press in habit adapter
@@ -39,7 +44,7 @@ public class HabitItemTouchHelper extends androidx.recyclerview.widget.ItemTouch
         habitContentCardView.setCardBackgroundColor(ContextCompat.getColor(viewHolder.itemView.getContext(), R.color.white));
 
         // Update habitPosition for each habit in database
-        UserController.updateHabitPositions();
+        habitController.updateHabitPositions();
 
         super.clearView(recyclerView, viewHolder);
     }

@@ -24,6 +24,8 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.bumptech.glide.Glide;
 import com.cmput301f21t26.habittracker.objects.FollowRequest;
 import com.cmput301f21t26.habittracker.objects.FollowRequestController;
+import com.cmput301f21t26.habittracker.objects.FollowStatus;
+import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
@@ -56,6 +58,9 @@ public class ProfileFragment extends Fragment implements Observer {
     private User currentUser;
 
     private FollowRequestController followRequestController;
+    private OtherUserController otherUserController;
+
+    private FollowStatus followStatus;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -79,6 +84,7 @@ public class ProfileFragment extends Fragment implements Observer {
         otherUser = ProfileFragmentArgs.fromBundle(getArguments()).getUser();
         
         followRequestController = FollowRequestController.getInstance();
+        otherUserController = OtherUserController.getInstance();
 
         // otherUser dne i.e we want to view the current user's profile
         if (otherUser == currentUser) {
@@ -100,34 +106,48 @@ public class ProfileFragment extends Fragment implements Observer {
             // When the inputted userObject is not the current user (is the other user)
             setFields(otherUser);
             setProfilePicImageView(otherUser);
-            int initState = getInitialFollowButtonState();
 
-            if (initState == 0) {
-                followButton.setText("FOLLOW");
-            } else if (initState == 1) {
-                followButton.setText("REQUESTED");
-            } else {
-                followButton.setText("FOLLOWING");
-            }
+            otherUserController.getFollowStatusOfCurrentUserTo(otherUser, initStatus -> {
 
-            followButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    followRequestController.storeFollowRequestInDb(currentUser, otherUser, unused -> {
-                        if (initState == 0) {
+                followStatus = initStatus;
+
+                if (initStatus == FollowStatus.NOT_FOLLOWING) {
+                    followButton.setText("FOLLOW");
+                } else if (initStatus == FollowStatus.PENDING) {
+                    followButton.setText("REQUESTED");
+                } else {
+                    followButton.setText("FOLLOWING");
+                }
+
+                followButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (followStatus == FollowStatus.NOT_FOLLOWING) {
                             // sent a follow request
                             followButton.setText("REQUESTED");
-                        } else if (initState == 1) {
-                            // cancelled request
+                            followRequestController.sendFollowRequest(otherUser, user -> {
+                                followStatus = FollowStatus.PENDING;
+                            });
+                        } else if (followStatus == FollowStatus.PENDING) {
+                            // cancelled follow request
                             followButton.setText("FOLLOW");
+                            followRequestController.getFollowRequestSentBy(currentUser, otherUser, followRequest -> {
+                                followRequestController.undoFollowRequest(followRequest, user -> {
+                                    followStatus = FollowStatus.NOT_FOLLOWING;
+                                });
+                            });
                         } else {
-                            // unfollow
                             followButton.setText("FOLLOW");
+                            followRequestController.unfollow(otherUser.getUid(), user -> {
+                                followStatus = FollowStatus.NOT_FOLLOWING;
+                            });
                         }
-                    });
-                }
+                    }
+                });
             });
-            
+
+
+
         } else {
             // The other user is the current user
             setFields(otherUser);

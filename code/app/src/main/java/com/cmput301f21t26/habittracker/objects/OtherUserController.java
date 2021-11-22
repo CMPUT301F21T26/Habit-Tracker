@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.cmput301f21t26.habittracker.interfaces.FollowStatusCallback;
 import com.cmput301f21t26.habittracker.interfaces.UserCallback;
 import com.cmput301f21t26.habittracker.interfaces.UserListCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -114,6 +115,49 @@ public class OtherUserController {
                         if (task.isSuccessful()) {
                             User otherUser = task.getResult().toObject(User.class);
                             callback.onCallback(otherUser);
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Gets the follow status of current user to the given other user.
+     * Then call callback function with FollowStatus as input.
+     *
+     * @param otherUser User
+     * @param callback callback function to be called after retrieving status
+     */
+    public void getFollowStatusOfCurrentUserTo(User otherUser, FollowStatusCallback callback) {
+
+        User currentUser = UserController.getCurrentUser();
+
+        final DocumentReference otherUserReference = usersRef.document(otherUser.getUid());
+        otherUserReference.collection("followRequests")
+                .whereEqualTo("fromUid", currentUser.getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+
+                            FollowStatus status;
+
+                            if (currentUser.isFollowing(otherUser)) {
+                                status = FollowStatus.FOLLOWING;
+                            } else {
+                                if (task.getResult().size() <= 0) {
+                                    // current user did not send follow request to this other user
+                                    status = FollowStatus.NOT_FOLLOWING;
+                                } else {
+                                    // current user sent follow request
+                                    status = FollowStatus.PENDING;
+                                }
+                            }
+
+                            callback.onCallback(status);
+
+                        } else {
+                            Log.d("followStatus", "Error getting follow requests", task.getException());
                         }
                     }
                 });

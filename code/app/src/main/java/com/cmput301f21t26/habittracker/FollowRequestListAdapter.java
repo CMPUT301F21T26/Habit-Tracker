@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cmput301f21t26.habittracker.objects.FollowRequest;
+import com.cmput301f21t26.habittracker.objects.FollowRequestController;
 import com.cmput301f21t26.habittracker.objects.UserController;
 
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class FollowRequestListAdapter extends BaseAdapter implements Observer {
     private Context mContext;
     private OnDialogListClickListener dialogListClickListener;
 
+    private FollowRequestController followRequestController;
+
     /**
      * Allows clicking of follow request in the notification dialog
      */
@@ -35,9 +38,11 @@ public class FollowRequestListAdapter extends BaseAdapter implements Observer {
     public FollowRequestListAdapter(Context context, ArrayList<FollowRequest> permissionsList, OnDialogListClickListener listener) {
         this.mContext = context;
         this.permissionsList = permissionsList;
-        this. dialogListClickListener = listener;
+        this.dialogListClickListener = listener;
 
         UserController.addObserverToCurrentUser(this);
+
+        followRequestController = FollowRequestController.getInstance();
     }
 
     @Override
@@ -79,14 +84,16 @@ public class FollowRequestListAdapter extends BaseAdapter implements Observer {
         allowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO Allow the user to follow; Add user to followers in database, delete permission request in database
+                followRequestController.follow(tempFollowRequest, followRequest -> {
+                    followRequestController.undoFollowRequest(tempFollowRequest, user1 -> { });
+                });
             }
         });
 
         denyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO Deny the user the follow; delete permission request in database
+                followRequestController.undoFollowRequest(tempFollowRequest, user -> { });
             }
         });
 
