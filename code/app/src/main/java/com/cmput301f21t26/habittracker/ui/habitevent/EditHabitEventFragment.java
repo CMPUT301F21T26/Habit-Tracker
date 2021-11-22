@@ -154,7 +154,6 @@ public class EditHabitEventFragment extends Fragment {
         }
 
         if (hEvent.getPhotoUrl() != null) {
-            // TODO set image view to the image given by habit event
             if (getActivity() != null) {
                 Glide.with(getActivity())
                         .load(hEvent.getPhotoUrl())
