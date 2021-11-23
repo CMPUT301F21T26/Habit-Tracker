@@ -95,6 +95,8 @@ public class HabitEventController {
                                 case REMOVED:
                                     user.getHabit(parentHabitId).deleteHabitEvent(hEvent);
 
+                                    habitController = HabitController.getInstance();
+
                                     // if habit event to be removed is dated to today, set done for today of parent habit to false
                                     if (hEvent.getHabitEventDateDay().equals(user.getDateLastAccessedDay())) {
                                         Habit habit = UserController.getHabit(parentHabitId);
