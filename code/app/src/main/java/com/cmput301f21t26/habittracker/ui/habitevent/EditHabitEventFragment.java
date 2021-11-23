@@ -78,6 +78,7 @@ public class EditHabitEventFragment extends Fragment {
     private ImageView habitEventImage;
     private ImageButton habitEventChooseImageBtn;
     private ImageButton habitEventCameraBtn;
+    private ImageButton removeImageImageButton;
 
     private Habit habit;
     private HabitEvent hEvent;
@@ -115,6 +116,7 @@ public class EditHabitEventFragment extends Fragment {
         habitEventChooseImageBtn = binding.chooseImageButton;
         habitEventImage = binding.habitEventImage;
         habitEventCameraBtn = (ImageButton) binding.cameraButton;
+        removeImageImageButton = binding.removeImageImageButton;
         return binding.getRoot();
     }
 
@@ -128,6 +130,7 @@ public class EditHabitEventFragment extends Fragment {
         delBtn.setOnClickListener(deleteOnClickListener);
         habitEventCameraBtn.setOnClickListener(cameraBtnOnClickListener);
         habitEventChooseImageBtn.setOnClickListener(chooseImageOnClickListener);
+        removeImageImageButton.setOnClickListener(removeImageOnClickListener);
         setEditHabitEventFields();
 
 
@@ -160,6 +163,7 @@ public class EditHabitEventFragment extends Fragment {
                         .placeholder(R.drawable.default_image)
                         .into(habitEventImage);
             }
+            removeImageImageButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -264,6 +268,7 @@ public class EditHabitEventFragment extends Fragment {
                     // Handle the intent
                     Bitmap captureImage = (Bitmap) takePictureIntent.getExtras().get("data");
                     habitEventImage.setImageBitmap(captureImage);
+                    removeImageImageButton.setVisibility(View.VISIBLE);
 
                     uri = getImageUri(getContext(), captureImage);
                     picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
@@ -308,11 +313,24 @@ public class EditHabitEventFragment extends Fragment {
                     public void onActivityResult(Uri uri) {
                         if (uri != null) {
                             habitEventImage.setImageURI(uri);
+                            removeImageImageButton.setVisibility(View.VISIBLE);
 
                             picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
                             habitEventController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> { });
                         }
                     }
                 });
+
+    /**
+     * Removes the photo url from the habit event when remove image button is clicked
+     */
+    private View.OnClickListener removeImageOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            hEvent.setPhotoUrl(null);
+            habitEventController.updateHabitEventInDb(hEvent, user -> {});
+            habitEventImage.setImageResource(R.drawable.default_image);
+        }
+    };
 }
 
