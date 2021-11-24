@@ -48,6 +48,8 @@ import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitEventBinding
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.ui.MapFragmentDirections;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
@@ -79,6 +81,8 @@ public class EditHabitEventFragment extends Fragment {
     private ImageButton habitEventChooseImageBtn;
     private ImageButton habitEventCameraBtn;
     private ImageButton removeImageImageButton;
+
+    private Button chooseLocBtn;
 
     private Habit habit;
     private HabitEvent hEvent;
@@ -117,6 +121,8 @@ public class EditHabitEventFragment extends Fragment {
         habitEventImage = binding.habitEventImage;
         habitEventCameraBtn = (ImageButton) binding.cameraButton;
         removeImageImageButton = binding.removeImageImageButton;
+        chooseLocBtn = binding.chooseLocationButton;
+
         return binding.getRoot();
     }
 
@@ -131,6 +137,7 @@ public class EditHabitEventFragment extends Fragment {
         habitEventCameraBtn.setOnClickListener(cameraBtnOnClickListener);
         habitEventChooseImageBtn.setOnClickListener(chooseImageOnClickListener);
         removeImageImageButton.setOnClickListener(removeImageOnClickListener);
+        chooseLocBtn.setOnClickListener(chooseLocOnClickListener);
         setEditHabitEventFields();
 
 
@@ -330,6 +337,13 @@ public class EditHabitEventFragment extends Fragment {
             hEvent.setPhotoUrl(null);
             habitEventController.updateHabitEventInDb(hEvent, user -> {});
             habitEventImage.setImageResource(R.drawable.default_image);
+        }
+    };
+
+    private View.OnClickListener chooseLocOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            navController.navigate(R.id.action_editHabitEventFragment_to_mapFragment);
         }
     };
 }
