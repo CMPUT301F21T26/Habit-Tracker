@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker;
+package com.cmput301f21t26.habittracker.ui;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.FollowRequest;
 import com.cmput301f21t26.habittracker.objects.FollowRequestController;
 import com.cmput301f21t26.habittracker.objects.UserController;

@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.UserListAdapter;
+import com.cmput301f21t26.habittracker.ui.UserListAdapter;
 import com.cmput301f21t26.habittracker.interfaces.UserListCallback;
 import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.User;

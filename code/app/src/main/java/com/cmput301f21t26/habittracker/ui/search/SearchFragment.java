@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -22,12 +21,11 @@ import android.widget.ListView;
 
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.UserListAdapter;
+import com.cmput301f21t26.habittracker.ui.UserListAdapter;
 import com.cmput301f21t26.habittracker.interfaces.UserListCallback;
 import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
-import com.cmput301f21t26.habittracker.ui.timeline.TimelineListAdapter;
 
 import java.util.ArrayList;
 
