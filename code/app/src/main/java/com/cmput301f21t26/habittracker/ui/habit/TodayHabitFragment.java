@@ -24,6 +24,9 @@ import com.cmput301f21t26.habittracker.databinding.FragmentTodayHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.UserController;
 
+import org.w3c.dom.Text;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class TodayHabitFragment extends Fragment {
@@ -37,6 +40,7 @@ public class TodayHabitFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private HabitAdapter.RecyclerViewClickListener rvListener;
+    private TextView todayIsDay;
 
     private NavController navController;
 
@@ -46,6 +50,7 @@ public class TodayHabitFragment extends Fragment {
         binding = FragmentTodayHabitBinding.inflate(inflater, container, false);
         mRecyclerView = binding.todayHabitRV;
         mLayoutManager = new LinearLayoutManager(getActivity());
+        todayIsDay = binding.todayIsDayTV;
 
         return binding.getRoot();
     }
@@ -55,6 +60,9 @@ public class TodayHabitFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
+
+        // set today's day
+        todayIsDay.setText(LocalDate.now().getDayOfWeek().name());
 
         todayHabitList = (ArrayList<Habit>) UserController.getCurrentUser().getTodayHabits();
         // If there are no habits today, show text that says so
