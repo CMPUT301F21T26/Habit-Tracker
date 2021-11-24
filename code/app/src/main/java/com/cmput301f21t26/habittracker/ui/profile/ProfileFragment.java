@@ -1,5 +1,6 @@
 package com.cmput301f21t26.habittracker.ui.profile;
 
+import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -18,6 +20,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
@@ -142,10 +146,42 @@ public class ProfileFragment extends Fragment implements Observer {
                                 });
                             });
                         } else {
-                            followButton.setText("FOLLOW");
-                            followRequestController.unfollow(otherUser.getUid(), user -> {
-                                followStatus = FollowStatus.NOT_FOLLOWING;
-                            });
+                            // Ask user to confirm unfollow
+                            AlertDialog dialog = new AlertDialog.Builder(getContext())
+                                    .setTitle("Unfollow " + otherUser.getUsername())
+                                    .setMessage("Are you sure you want unfollow " + otherUser.getUsername() + "?")
+                                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // update DB
+                                            followRequestController.unfollow(otherUser.getUid(), user -> {
+                                                followButton.setText("FOLLOW");
+                                                followStatus = FollowStatus.NOT_FOLLOWING;
+                                            });
+                                        }
+                                    })
+                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                        }
+                                    })
+                                    .show();
+
+                            // Change buttons and background
+                            dialog.getWindow().setBackgroundDrawableResource(R.drawable.notif_panel_background);
+                            Button btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                            Button btnNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+                            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
+                            layoutParams.weight = 10;
+                            btnPositive.setLayoutParams(layoutParams);
+                            btnNegative.setLayoutParams(layoutParams);
+                            btnPositive.setTypeface(getResources().getFont(R.font.rubik_black));
+                            btnNegative.setTypeface(getResources().getFont(R.font.rubik_black));
+                            btnPositive.setTextColor(ContextCompat.getColor(getContext(), R.color.green));
+                            btnNegative.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
+
                         }
                     }
                 });
