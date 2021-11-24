@@ -89,7 +89,6 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
             @Override
             public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
                 habit.setDoneForToday(isChecked);
-
                 UserController.updateHabitInDb(habit, user -> {
 
                     if (isChecked) {

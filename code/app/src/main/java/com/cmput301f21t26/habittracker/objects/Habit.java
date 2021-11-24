@@ -143,6 +143,11 @@ public class Habit implements Serializable {
 
     public void setDoneForToday(boolean doneForToday) {
         isDoneForToday = doneForToday;
+        if (isDoneForToday) {
+            this.completedHE += 1;
+        } else {
+            this.completedHE -= 1;
+        }
     }
 
     /**

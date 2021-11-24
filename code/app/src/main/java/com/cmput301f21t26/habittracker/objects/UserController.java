@@ -305,11 +305,15 @@ public class UserController {
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
 
                             HabitEvent hEvent = dc.getDocument().toObject(HabitEvent.class);
+                            Habit habit = UserController.getHabit(parentHabitId);
 
                             switch(dc.getType()) {
                                 case ADDED:
                                     Log.d("AddHabitEvent", "listener");
                                     user.getHabit(parentHabitId).addHabitEvent(hEvent);
+                                    //habit event added, increase the indicator
+
+
                                     break;
                                 case MODIFIED:
                                     user.getHabit(parentHabitId).updateHabitEvent(hEvent);
@@ -319,7 +323,7 @@ public class UserController {
 
                                     // if habit event to be removed is dated to today, set done for today of parent habit to false
                                     if (hEvent.getHabitEventDateDay().equals(user.getDateLastAccessedDay())) {
-                                        Habit habit = UserController.getHabit(parentHabitId);
+
                                         habit.setDoneForToday(false);
                                         UserController.updateHabitInDb(habit, user -> { });
                                     }
@@ -630,8 +634,8 @@ public class UserController {
         List<Habit> habits = user.getHabits();
         for (int i = 0; i < habits.size(); i++) {
             habits.get(i).updateVisualIndicatorDenominator(lastAccessed, now);
+            UserController.updateHabitInDb(habits.get(i), user -> { });
         }
-        user.notifyAllObservers();
     }
 
     public static void updateHabitEventImageInDb(String habitId, String hEventId, String picturePath, Uri imageUri, UserCallback callback) {
