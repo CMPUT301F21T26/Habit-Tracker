@@ -120,26 +120,20 @@ public class ProfileFragment extends Fragment implements Observer {
 
                 followStatus = initStatus;
 
-                if (initStatus == FollowStatus.NOT_FOLLOWING) {
-                    followButton.setText("FOLLOW");
-                } else if (initStatus == FollowStatus.PENDING) {
-                    followButton.setText("REQUESTED");
-                } else {
-                    followButton.setText("FOLLOWING");
-                }
+                setFollowButton(followStatus);
 
                 followButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (followStatus == FollowStatus.NOT_FOLLOWING) {
-                            // sent a follow request
-                            followButton.setText("REQUESTED");
+                            // user sends follow request, change button to pending
+                            setFollowButton(FollowStatus.PENDING);
                             followRequestController.sendFollowRequest(otherUser, user -> {
                                 followStatus = FollowStatus.PENDING;
                             });
                         } else if (followStatus == FollowStatus.PENDING) {
-                            // cancelled follow request
-                            followButton.setText("FOLLOW");
+                            // cancelled follow request, change button back to follow
+                            setFollowButton(FollowStatus.NOT_FOLLOWING);
                             followRequestController.getFollowRequestSentBy(currentUser, otherUser, followRequest -> {
                                 followRequestController.undoFollowRequest(followRequest, user -> {
                                     followStatus = FollowStatus.NOT_FOLLOWING;
@@ -155,7 +149,7 @@ public class ProfileFragment extends Fragment implements Observer {
                                         public void onClick(DialogInterface dialog, int which) {
                                             // update DB
                                             followRequestController.unfollow(otherUser.getUid(), user -> {
-                                                followButton.setText("FOLLOW");
+                                                setFollowButton(FollowStatus.NOT_FOLLOWING);
                                                 followStatus = FollowStatus.NOT_FOLLOWING;
                                             });
                                         }
@@ -198,6 +192,24 @@ public class ProfileFragment extends Fragment implements Observer {
             profilePic.setOnClickListener(view1 -> {
                 mGetContent.launch("image/*");  // launch file explorer
             });
+        }
+    }
+
+    /**
+     * Given a follow status, will change the follow button accordingly
+     * @param initStatus the {@link FollowStatus} of the follow request.
+     */
+    private void setFollowButton(FollowStatus initStatus) {
+        if (initStatus == FollowStatus.NOT_FOLLOWING) {
+            followButton.setText("FOLLOW");
+            followButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.green));
+        } else if (initStatus == FollowStatus.PENDING) {
+            followButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.lighter_gray));
+            followButton.setText("REQUESTED");
+        } else {
+            followButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.dark_blue));
+            followButton.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+            followButton.setText("FOLLOWING");
         }
     }
 
