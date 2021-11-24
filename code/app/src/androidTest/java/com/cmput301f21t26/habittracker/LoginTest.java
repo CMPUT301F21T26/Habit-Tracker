@@ -1,9 +1,12 @@
 package com.cmput301f21t26.habittracker;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.junit.Assert.assertTrue;
 
 import android.widget.EditText;
@@ -52,7 +55,7 @@ public class LoginTest {
         username = "EspressoTester";
         password = "starbucksLuvr";
 
-        solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
+        solo = new Solo(getInstrumentation(), rule.getActivity());
 
         fragmentManager = rule.getActivity().getSupportFragmentManager();
         loginFragment = fragmentManager.findFragmentById(R.id.loginFragment);
@@ -128,6 +131,34 @@ public class LoginTest {
         onView(withId(R.id.loginConfirmButton)).perform(click());
         // sleep to allow time for login to process and view to switch
         Thread.sleep(3000);
+    }
+
+    /**
+     * Logins to user with the given username and password strings
+     * @param username the username of the user to login to, {@link String}
+     * @param password the password of the user to login to, {@link String}
+     * @throws InterruptedException
+     */
+    public static void login(String username, String password) throws InterruptedException {
+        onView(withId(R.id.loginButton)).perform(click());
+        onView(withId(R.id.usernameET)).perform(typeText(username));
+        onView(withId(R.id.passwordET)).perform(typeText(password));
+        onView(withId(R.id.passwordET)).perform(ViewActions.closeSoftKeyboard());
+
+        onView(withId(R.id.loginConfirmButton)).perform(click());
+        // sleep to allow time for login to process and view to switch
+        Thread.sleep(2000);
+    }
+
+    /**
+     * Signs out the current user by clicking on the signout button
+     */
+    public static void signout() {
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+
+        // Click the item.
+        onView(withText("Sign Out"))
+                .perform(click());
     }
 
     /**

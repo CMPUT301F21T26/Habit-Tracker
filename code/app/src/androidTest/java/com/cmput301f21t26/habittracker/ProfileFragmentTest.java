@@ -81,7 +81,7 @@ public class ProfileFragmentTest {
     // Credits to Gimberg: https://stackoverflow.com/users/2873824/gimberg
     // https://stackoverflow.com/questions/49626315/how-to-select-a-specific-tab-position-in-tab-layout-using-espresso-testing
     @NonNull
-    private static ViewAction selectTabAtPosition(final int position) {
+    public static ViewAction selectTabAtPosition(final int position) {
         return new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {
