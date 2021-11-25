@@ -4,8 +4,10 @@
     package="com.cmput301f21t26.habittracker">
     <uses-permission android:name="android.permission.SET_ANIMATION_SCALE"
         tools:ignore="ProtectedPermissions"/>
-    <uses-permission
-        android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+        />
+    <uses-permission android:name="android.permission.INTERNET"
+        />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
