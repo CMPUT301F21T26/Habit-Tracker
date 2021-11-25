@@ -113,6 +113,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                                     habitEventController.removeHabitEventFromDb(habit.getHabitEventByDate(Calendar.getInstance().getTime()), callback -> { });
                                     holder.getDoneTodayCB().setChecked(false);
                                     habit.setDoneForToday(false);
+                                    habitController.updateHabitInDb(habit, user -> {});
                                 }
                             })
                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
