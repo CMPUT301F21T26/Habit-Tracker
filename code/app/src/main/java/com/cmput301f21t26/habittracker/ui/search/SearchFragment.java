@@ -1,10 +1,10 @@
 package com.cmput301f21t26.habittracker.ui.search;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -17,17 +17,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.UserListAdapter;
+import com.cmput301f21t26.habittracker.ui.UserListAdapter;
 import com.cmput301f21t26.habittracker.interfaces.UserListCallback;
 import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
-import com.cmput301f21t26.habittracker.ui.timeline.TimelineListAdapter;
 
 import java.util.ArrayList;
 
@@ -137,6 +137,14 @@ public class SearchFragment extends Fragment {
         if (((MainActivity) getActivity()) != null) {
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
+            // close keyboard when going back
+            final InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+            if (inputMethodManager.isActive()) {
+                if (getActivity().getCurrentFocus() != null) {
+                    inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                }
+            }
         }
+
     }
 }

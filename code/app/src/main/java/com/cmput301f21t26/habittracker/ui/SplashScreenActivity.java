@@ -22,7 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
  */
 public class SplashScreenActivity extends AppCompatActivity {
 
-    private static int SPLASH_SCREEN_TIME = 2000;
+    private static int SPLASH_SCREEN_TIME = 1500;
     private AnimatedVectorDrawableCompat avd;
     private AnimatedVectorDrawable avd2;
     private AnimationDrawable ad;

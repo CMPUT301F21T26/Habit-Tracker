@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -140,7 +142,7 @@ public class EditHabitFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // prompt user to approve
-                new AlertDialog.Builder(getContext())
+                AlertDialog dialog = new AlertDialog.Builder(getContext())
                     .setTitle("Delete Habit")
                     .setMessage("Are you sure you want to delete this habit? The data will be lost forever.")
                     .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
@@ -161,6 +163,20 @@ public class EditHabitFragment extends Fragment {
                         }
                     })
                     .show();
+
+                // Change buttons and background
+                dialog.getWindow().setBackgroundDrawableResource(R.drawable.notif_panel_background);
+                Button btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                Button btnNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
+                layoutParams.weight = 10;
+                btnPositive.setLayoutParams(layoutParams);
+                btnNegative.setLayoutParams(layoutParams);
+                btnPositive.setTypeface(getResources().getFont(R.font.rubik_black));
+                btnNegative.setTypeface(getResources().getFont(R.font.rubik_black));
+                btnPositive.setTextColor(ContextCompat.getColor(getContext(), R.color.green));
+                btnNegative.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
             }
         });
     }

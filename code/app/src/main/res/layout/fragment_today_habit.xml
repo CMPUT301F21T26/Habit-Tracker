@@ -8,13 +8,15 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/todayHabitRV"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="8dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="-16dp"
+        android:paddingTop="24dp"
         android:paddingBottom="80dp"
         android:clipToPadding="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/todayIsBackground"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
         android:id="@+id/noHabitsTodayTV"
@@ -31,4 +33,41 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <ImageView
+        android:id="@+id/todayIsBackground"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:src="@drawable/tab_background"
+        app:tint="@color/green"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/todayIsTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TODAY IS: "
+        android:textColor="@color/black"
+        android:fontFamily="@font/rubik_black"
+        android:textSize="16dp"
+        android:padding="@dimen/activity_horizontal_margin"
+        app:layout_constraintTop_toTopOf="@id/todayIsBackground"
+        app:layout_constraintStart_toStartOf="@id/todayIsBackground"
+        app:layout_constraintEnd_toEndOf="@id/todayIsBackground"
+        app:layout_constraintBottom_toBottomOf="@id/todayIsBackground"
+        app:layout_constraintHorizontal_bias="0" />
+
+    <TextView
+        android:id="@+id/todayIsDayTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wednesday"
+        android:fontFamily="@font/rubik_bold"
+        android:textSize="16dp"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toEndOf="@id/todayIsTV"
+        app:layout_constraintEnd_toEndOf="@id/todayIsBackground"
+        app:layout_constraintBottom_toBottomOf="@id/todayIsBackground"
+        app:layout_constraintTop_toTopOf="@id/todayIsBackground"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintVertical_bias="0.53"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
