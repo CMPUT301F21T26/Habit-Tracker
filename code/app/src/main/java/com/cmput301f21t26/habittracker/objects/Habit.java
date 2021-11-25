@@ -1,5 +1,7 @@
 package com.cmput301f21t26.habittracker.objects;
 
+import com.google.firebase.firestore.Exclude;
+
 import java.io.Serializable;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ public class Habit implements Serializable {
     private Date startDate;
     private boolean isDoneForToday;
     private boolean isPrivate;
+    @Exclude
     private ArrayList<HabitEvent> habitEvents;
     private ArrayList<Integer> daysList;
     private int habitPosition;
@@ -148,6 +151,7 @@ public class Habit implements Serializable {
         return habitId;
     }
 
+    @Exclude
     public List<HabitEvent> getHabitEvents() {
         return habitEvents;
     }

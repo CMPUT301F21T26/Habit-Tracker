@@ -214,8 +214,9 @@ public class EditHabitEventFragment extends Fragment {
             hEvent.setComment(comment);
 
             habitEventController.updateHabitEventInDb(hEvent, user -> {
-                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                NavDirections action = (NavDirections) MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                 navController.navigate(action);
+                MainActivity.setTimelineItemSelected();
             });
         }
     };
@@ -236,8 +237,9 @@ public class EditHabitEventFragment extends Fragment {
                         public void onClick(DialogInterface dialog, int which) {
                             // update DB
                             habitEventController.removeHabitEventFromDb(hEvent, cbUser -> {
-                                NavDirections action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                                NavDirections action = (NavDirections) MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                                 navController.navigate(action);
+                                MainActivity.setTimelineItemSelected();
                             });
                         }
                     })
