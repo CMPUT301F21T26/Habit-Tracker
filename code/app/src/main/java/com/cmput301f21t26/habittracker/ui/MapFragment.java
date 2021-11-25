@@ -12,11 +12,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -26,6 +31,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentMapBinding;
+import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -52,8 +59,14 @@ public class MapFragment extends Fragment
 
     private FragmentMapBinding binding;
     private boolean locationPermissionGranted;
+    private Button locConfirmBtn;
+    private NavController navController;
+
+    private Habit habit;
+    private HabitEvent hEvent;
 
     private GoogleMap map;
+    private LatLng latLng;
 
     private LocationRequest locationRequest;
 
@@ -79,14 +92,28 @@ public class MapFragment extends Fragment
                              Bundle savedInstanceState) {
 
         binding = FragmentMapBinding.inflate(inflater, container, false);
+
+        habit = MapFragmentArgs.fromBundle(getArguments()).getHabit();
+        hEvent = MapFragmentArgs.fromBundle(getArguments()).getHabitEvent();
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        navController = Navigation.findNavController(view);
+
+        locConfirmBtn = binding.locationConfirmBtn;
+        locConfirmBtn.setOnClickListener(locConfirmBtnOnClickListener);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
 
-        return binding.getRoot();
     }
-
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -172,10 +199,6 @@ public class MapFragment extends Fragment
     }
 
     private void getDeviceLocation() {
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
         try {
             if (locationPermissionGranted) {
                 LocationServices.getFusedLocationProviderClient(this.getActivity())
@@ -192,8 +215,9 @@ public class MapFragment extends Fragment
                                     int index = locationResult.getLocations().size() - 1;
                                     double latitude = locationResult.getLocations().get(index).getLatitude();
                                     double longitude = locationResult.getLocations().get(index).getLongitude();
+                                    latLng = new LatLng(latitude, longitude);
                                     map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                            new LatLng(latitude, longitude), DEFAULT_ZOOM));
+                                            latLng, DEFAULT_ZOOM));
                                 }
                             }
                         }, Looper.getMainLooper());
@@ -217,37 +241,42 @@ public class MapFragment extends Fragment
         return false;
     }
 
-    private void getAddrLocatedAt(LatLng latLng) {
+    private View.OnClickListener locConfirmBtnOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
 
-        @SuppressLint("DefaultLocale")
-        String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&key=%s",
-                latLng.latitude,
-                latLng.longitude,
-                getResources().getString(R.string.google_maps_key));
-        Log.d(TAG, url);
+            @SuppressLint("DefaultLocale")
+            String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&key=%s",
+                    latLng.latitude,
+                    latLng.longitude,
+                    getResources().getString(R.string.google_maps_key));
+            Log.d(TAG, url);
 
-        RequestQueue queue = Volley.newRequestQueue(getContext());
+            RequestQueue queue = Volley.newRequestQueue(getContext());
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jObj = new JSONObject(response);
-                            JSONArray results = jObj.getJSONArray("results");
-                            String addr = results.getJSONObject(0).getString("formatted_address");
-                            Log.d(TAG, addr);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject jObj = new JSONObject(response);
+                                JSONArray results = jObj.getJSONArray("results");
+                                String addr = results.getJSONObject(0).getString("formatted_address");
+                                hEvent.setAddress(addr);
+                                NavDirections direction = MapFragmentDirections.actionMapFragmentToEditHabitEventFragment(hEvent, habit);
+                                navController.navigate(direction);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "", error);
-            }
-        });
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "", error);
+                }
+            });
 
-        queue.add(stringRequest);
-    }
+            queue.add(stringRequest);
+        }
+    };
 }
