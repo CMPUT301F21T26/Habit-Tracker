@@ -1,6 +1,7 @@
 package com.cmput301f21t26.habittracker.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -17,9 +18,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentMapBinding;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -29,11 +35,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MapFragment extends Fragment
         implements OnMapReadyCallback,
@@ -47,7 +51,6 @@ public class MapFragment extends Fragment
     private final LatLng defaultLocation = new LatLng(53.55285716258787, -113.48929457782268);      // Edmonton
 
     private FragmentMapBinding binding;
-    private FusedLocationProviderClient client;
     private boolean locationPermissionGranted;
 
     private GoogleMap map;
@@ -76,7 +79,6 @@ public class MapFragment extends Fragment
                              Bundle savedInstanceState) {
 
         binding = FragmentMapBinding.inflate(inflater, container, false);
-        client = LocationServices.getFusedLocationProviderClient(this.getActivity());
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
@@ -213,5 +215,39 @@ public class MapFragment extends Fragment
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
         return false;
+    }
+
+    private void getAddrLocatedAt(LatLng latLng) {
+
+        @SuppressLint("DefaultLocale")
+        String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&key=%s",
+                latLng.latitude,
+                latLng.longitude,
+                getResources().getString(R.string.google_maps_key));
+        Log.d(TAG, url);
+
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jObj = new JSONObject(response);
+                            JSONArray results = jObj.getJSONArray("results");
+                            String addr = results.getJSONObject(0).getString("formatted_address");
+                            Log.d(TAG, addr);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "", error);
+            }
+        });
+
+        queue.add(stringRequest);
     }
 }
