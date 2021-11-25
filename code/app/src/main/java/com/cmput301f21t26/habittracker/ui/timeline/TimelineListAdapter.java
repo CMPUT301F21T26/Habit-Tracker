@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.cmput301f21t26.habittracker.objects.UserController;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -25,7 +26,7 @@ import java.util.Observer;
  * adapt the size of the item depending on the
  * available info.
  */
-public class TimelineListAdapter extends BaseAdapter {
+public class TimelineListAdapter extends BaseAdapter implements Observer {
     private String TAG = "TimelineListAdapter";
     private ArrayList<HabitEvent> hEventsList;
     private Context mContext;
@@ -37,6 +38,7 @@ public class TimelineListAdapter extends BaseAdapter {
         if (mContext != null) {
             dpRatio = mContext.getResources().getDisplayMetrics().density;
         }
+        UserController.addObserverToCurrentUser(this);
     }
 
     @Override
@@ -123,5 +125,10 @@ public class TimelineListAdapter extends BaseAdapter {
         }
 
         return convertView;
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        notifyDataSetChanged();
     }
 }

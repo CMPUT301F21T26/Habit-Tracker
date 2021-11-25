@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 
-public class TimelineFragment extends Fragment implements Observer {
+public class TimelineFragment extends Fragment {
     private String TAG = "TimelineFragment";
 
     private FragmentTimelineBinding binding;
@@ -55,7 +55,7 @@ public class TimelineFragment extends Fragment implements Observer {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        UserController.addObserverToCurrentUser(this);
+
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
@@ -105,17 +105,5 @@ public class TimelineFragment extends Fragment implements Observer {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    @Override
-    public void update(Observable observable, Object obj) {
-        // TODO refactor update inplace, not just create new ArrayList
-
-        allHabitEventsList = new ArrayList<>();
-        // add all habit events into one list
-        for (Habit habit : habitsList) {
-            allHabitEventsList.addAll(habit.getHabitEvents());
-        }
-        timelineListAdapter.notifyDataSetChanged();
     }
 }
