@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
@@ -48,6 +50,8 @@ import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitEventBinding
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.ui.MapFragmentDirections;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
@@ -79,6 +83,8 @@ public class EditHabitEventFragment extends Fragment {
     private ImageButton habitEventChooseImageBtn;
     private ImageButton habitEventCameraBtn;
     private ImageButton removeImageImageButton;
+
+    private Button chooseLocBtn;
 
     private Habit habit;
     private HabitEvent hEvent;
@@ -117,6 +123,8 @@ public class EditHabitEventFragment extends Fragment {
         habitEventImage = binding.habitEventImage;
         habitEventCameraBtn = (ImageButton) binding.cameraButton;
         removeImageImageButton = binding.removeImageImageButton;
+        chooseLocBtn = binding.chooseLocationButton;
+
         return binding.getRoot();
     }
 
@@ -131,6 +139,7 @@ public class EditHabitEventFragment extends Fragment {
         habitEventCameraBtn.setOnClickListener(cameraBtnOnClickListener);
         habitEventChooseImageBtn.setOnClickListener(chooseImageOnClickListener);
         removeImageImageButton.setOnClickListener(removeImageOnClickListener);
+        chooseLocBtn.setOnClickListener(chooseLocOnClickListener);
         setEditHabitEventFields();
 
 
@@ -219,7 +228,7 @@ public class EditHabitEventFragment extends Fragment {
         @Override
         public void onClick(View view) {
             // prompt user to approve
-            new AlertDialog.Builder(getContext())
+            AlertDialog dialog = new AlertDialog.Builder(getContext())
                     .setTitle("Delete Habit Event")
                     .setMessage("Are you sure you want to delete this habit event? The data will be lost forever.")
                     .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
@@ -239,6 +248,20 @@ public class EditHabitEventFragment extends Fragment {
                         }
                     })
                     .show();
+
+            // Change buttons and background
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.notif_panel_background);
+            Button btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            Button btnNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
+            layoutParams.weight = 10;
+            btnPositive.setLayoutParams(layoutParams);
+            btnNegative.setLayoutParams(layoutParams);
+            btnPositive.setTypeface(getResources().getFont(R.font.rubik_black));
+            btnNegative.setTypeface(getResources().getFont(R.font.rubik_black));
+            btnPositive.setTextColor(ContextCompat.getColor(getContext(), R.color.green));
+            btnNegative.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
         }
     };
 
@@ -330,6 +353,13 @@ public class EditHabitEventFragment extends Fragment {
             hEvent.setPhotoUrl(null);
             habitEventController.updateHabitEventInDb(hEvent, user -> {});
             habitEventImage.setImageResource(R.drawable.default_image);
+        }
+    };
+
+    private View.OnClickListener chooseLocOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            navController.navigate(R.id.action_editHabitEventFragment_to_mapFragment);
         }
     };
 }

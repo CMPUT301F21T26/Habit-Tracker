@@ -226,8 +226,7 @@ public class HabitController {
                     for (DocumentSnapshot habit : task.getResult()) {
                         // this loop iterates only once
                         highestPosition = ((Long) habit.get("habitPosition")).intValue();
-                        Log.d("UserController", "the highest position index is: "+highestPosition);
-                        return;
+                        Log.d("HabitController", "the highest position index is: "+highestPosition);
                     }
 
                     habit.setHabitPosition(highestPosition + 1);

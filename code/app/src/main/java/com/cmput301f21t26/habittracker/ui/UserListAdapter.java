@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker;
+package com.cmput301f21t26.habittracker.ui;
 
 import android.content.Context;
 import android.util.Log;
@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.User;
 
 import java.util.ArrayList;

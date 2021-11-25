@@ -2,18 +2,24 @@ package com.cmput301f21t26.habittracker.ui.habit;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -92,16 +98,50 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         holder.getTitleTV().setText(habit.getTitle());
         holder.getPlanTV().setText(getPlanMsg(habit));
         holder.getDoneTodayCB().setChecked(habit.isDoneForToday());
-        holder.getDoneTodayCB().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
+        holder.getDoneTodayCB().setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
-                habit.setDoneForToday(isChecked);
+            public void onClick(View view) {
+                if (!holder.getDoneTodayCB().isChecked()) {
+                    // prompt user to approve deletion of habit event if habit is already checked
+                    AlertDialog dialog = new AlertDialog.Builder(mContext)
+                            .setTitle("Uncheck Habit")
+                            .setMessage("Are you sure you want to uncheck this habit? The corresponding habit event created for today will be deleted.")
+                            .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // update DB
+                                    habitEventController.removeHabitEventFromDb(habit.getHabitEventByDate(Calendar.getInstance().getTime()), callback -> { });
+                                    holder.getDoneTodayCB().setChecked(false);
+                                    habit.setDoneForToday(false);
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    holder.getDoneTodayCB().setChecked(true);
+                                    dialog.cancel();
+                                }
+                            })
+                            .show();
 
-                habitController.updateHabitInDb(habit, user -> {
+                    // Change buttons and background
+                    dialog.getWindow().setBackgroundDrawableResource(R.drawable.notif_panel_background);
+                    Button btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    Button btnNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
 
-                    if (isChecked) {
-
+                    LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
+                    layoutParams.weight = 10;
+                    btnPositive.setLayoutParams(layoutParams);
+                    btnNegative.setLayoutParams(layoutParams);
+                    btnPositive.setTypeface(ResourcesCompat.getFont(mContext, R.font.rubik_black));
+                    btnNegative.setTypeface(ResourcesCompat.getFont(mContext, R.font.rubik_black));
+                    btnPositive.setTextColor(ContextCompat.getColor(mContext, R.color.green));
+                    btnNegative.setTextColor(ContextCompat.getColor(mContext, R.color.red));
+                } else {
+                    // if check box is unchecked, set habit's done for today to true and update it in db
+                    habit.setDoneForToday(true);
+                    holder.getDoneTodayCB().setChecked(true);
+                    habitController.updateHabitInDb(habit, user -> {
                         HabitEvent hEvent = new HabitEvent(habit.getHabitId());
 
                         // Get the date for use in title
@@ -126,14 +166,10 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                                     navController.navigate(direction);
                                 });
                                 snackbar.show();
-                            };
+                            }
                         });
-                    } else {
-                        // if it gets unchecked delete habit event associated with todays date
-                        habitEventController.removeHabitEventFromDb(habit.getHabitEventByDate(Calendar.getInstance().getTime()), callback -> { });
-                    }
-
-                });
+                    });
+                }
 
             }
         });
