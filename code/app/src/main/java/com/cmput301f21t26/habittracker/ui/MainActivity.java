@@ -344,6 +344,17 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     /**
+     * Sets the timeline item in the bottom navigation as the item selected
+     * for the case when editing a habit event through clicking the edit
+     * button of the snackbar and clicking the confirm button. The timeline
+     * would show up, but the bottom navigation would still be on the today's
+     * habit item.
+     */
+    public static void setTimelineItemSelected() {
+        navView.setSelectedItemId(R.id.navigation_timeline);
+    }
+
+    /**
      * Sets the profile icon in the bottom navigation view
      * to the profile picture of the current user
      * @param URL
