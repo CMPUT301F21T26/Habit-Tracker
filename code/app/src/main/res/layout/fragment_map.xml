@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/mapConstraintLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,8 +12,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        map:layout_constraintTop_toTopOf="parent"
-        map:layout_constraintRight_toRightOf="parent" />
+        map:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/locationConfirmBtn"
