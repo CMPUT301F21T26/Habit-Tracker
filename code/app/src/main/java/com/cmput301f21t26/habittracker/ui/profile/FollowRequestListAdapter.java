@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker.ui;
+package com.cmput301f21t26.habittracker.ui.profile;
 
 import android.content.Context;
 import android.view.LayoutInflater;

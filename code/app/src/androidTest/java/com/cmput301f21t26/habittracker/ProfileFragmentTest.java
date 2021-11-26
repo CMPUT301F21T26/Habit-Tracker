@@ -17,7 +17,7 @@ import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.rule.ActivityTestRule;
 
-import com.cmput301f21t26.habittracker.ui.LoginSignupActivity;
+import com.cmput301f21t26.habittracker.ui.auth.LoginSignupActivity;
 import com.google.android.material.tabs.TabLayout;
 
 import org.hamcrest.Matcher;

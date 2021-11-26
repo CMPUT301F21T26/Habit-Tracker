@@ -1,14 +1,12 @@
 package com.cmput301f21t26.habittracker.ui.profile;
 
 import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,19 +25,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
-import com.cmput301f21t26.habittracker.objects.FollowRequest;
+import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
 import com.cmput301f21t26.habittracker.objects.FollowRequestController;
 import com.cmput301f21t26.habittracker.objects.FollowStatus;
 import com.cmput301f21t26.habittracker.objects.OtherUserController;
-import com.cmput301f21t26.habittracker.ui.MainActivity;
-import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.Observable;
@@ -58,13 +51,15 @@ public class ProfileFragment extends Fragment implements Observer {
     private TextView followersTV;
     private TextView followingTV;
     private CircleImageView profilePic;
-    private Button followButton;
     private Uri imageUri;
     private Uri newImageUri;
     private String picturePath;
     private String profileImageUrl;
     private User otherUser;
     private User currentUser;
+
+    private Button followButton;
+    private boolean isFollowButtonClicked;
 
     private FollowRequestController followRequestController;
     private OtherUserController otherUserController;
@@ -87,6 +82,8 @@ public class ProfileFragment extends Fragment implements Observer {
         followersTV = view.findViewById(R.id.followersNumberTV);
         followingTV = view.findViewById(R.id.followingNumberTV);
         followButton = view.findViewById(R.id.followButton);
+
+        isFollowButtonClicked = false;
 
         // Get users
         currentUser = UserController.getCurrentUser();
@@ -128,53 +125,67 @@ public class ProfileFragment extends Fragment implements Observer {
                         if (followStatus == FollowStatus.NOT_FOLLOWING) {
                             // user sends follow request, change button to pending
                             setFollowButton(FollowStatus.PENDING);
-                            followRequestController.sendFollowRequest(otherUser, user -> {
-                                followStatus = FollowStatus.PENDING;
-                            });
+                            if (!isFollowButtonClicked) {
+                                isFollowButtonClicked = true;
+                                followRequestController.sendFollowRequest(otherUser, user -> {
+                                    followStatus = FollowStatus.PENDING;
+                                    isFollowButtonClicked = false;
+                                });
+                            }
                         } else if (followStatus == FollowStatus.PENDING) {
                             // cancelled follow request, change button back to follow
                             setFollowButton(FollowStatus.NOT_FOLLOWING);
-                            followRequestController.getFollowRequestSentBy(currentUser, otherUser, followRequest -> {
-                                followRequestController.undoFollowRequest(followRequest, user -> {
-                                    followStatus = FollowStatus.NOT_FOLLOWING;
+                            if (!isFollowButtonClicked) {
+                                isFollowButtonClicked = true;
+                                followRequestController.getFollowRequestSentBy(currentUser, otherUser, followRequest -> {
+                                    followRequestController.undoFollowRequest(followRequest, user -> {
+                                        followStatus = FollowStatus.NOT_FOLLOWING;
+                                        isFollowButtonClicked = false;
+                                    });
                                 });
-                            });
+                            }
                         } else {
                             // Ask user to confirm unfollow
-                            AlertDialog dialog = new AlertDialog.Builder(getContext())
-                                    .setTitle("Unfollow " + otherUser.getUsername())
-                                    .setMessage("Are you sure you want unfollow " + otherUser.getUsername() + "?")
-                                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            // update DB
-                                            followRequestController.unfollow(otherUser.getUid(), user -> {
-                                                setFollowButton(FollowStatus.NOT_FOLLOWING);
-                                                followStatus = FollowStatus.NOT_FOLLOWING;
-                                            });
-                                        }
-                                    })
-                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.cancel();
-                                        }
-                                    })
-                                    .show();
+                            if (!isFollowButtonClicked) {
+                                isFollowButtonClicked = true;
 
-                            // Change buttons and background
-                            dialog.getWindow().setBackgroundDrawableResource(R.drawable.notif_panel_background);
-                            Button btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                            Button btnNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                                AlertDialog dialog = new AlertDialog.Builder(getContext())
+                                        .setTitle("Unfollow " + otherUser.getUsername())
+                                        .setMessage("Are you sure you want unfollow " + otherUser.getUsername() + "?")
+                                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // update DB
+                                                followRequestController.unfollow(otherUser.getUid(), user -> {
+                                                    setFollowButton(FollowStatus.NOT_FOLLOWING);
+                                                    followStatus = FollowStatus.NOT_FOLLOWING;
+                                                    isFollowButtonClicked = false;
+                                                });
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                isFollowButtonClicked = false;
+                                                dialog.cancel();
+                                            }
+                                        })
+                                        .show();
 
-                            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
-                            layoutParams.weight = 10;
-                            btnPositive.setLayoutParams(layoutParams);
-                            btnNegative.setLayoutParams(layoutParams);
-                            btnPositive.setTypeface(getResources().getFont(R.font.rubik_black));
-                            btnNegative.setTypeface(getResources().getFont(R.font.rubik_black));
-                            btnPositive.setTextColor(ContextCompat.getColor(getContext(), R.color.green));
-                            btnNegative.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
+                                // Change buttons and background
+                                dialog.getWindow().setBackgroundDrawableResource(R.drawable.notif_panel_background);
+                                Button btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                                Button btnNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+                                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
+                                layoutParams.weight = 10;
+                                btnPositive.setLayoutParams(layoutParams);
+                                btnNegative.setLayoutParams(layoutParams);
+                                btnPositive.setTypeface(getResources().getFont(R.font.rubik_black));
+                                btnNegative.setTypeface(getResources().getFont(R.font.rubik_black));
+                                btnPositive.setTextColor(ContextCompat.getColor(getContext(), R.color.green));
+                                btnNegative.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
+                            }
 
                         }
                     }
@@ -332,7 +343,7 @@ public class ProfileFragment extends Fragment implements Observer {
                 }
             });
 
-    public User getOtherUser() {
+    public User getAttachedUser() {
         return otherUser;
     }
 

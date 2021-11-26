@@ -150,7 +150,7 @@
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.cmput301f21t26.habittracker.ui.search.SearchFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.profile.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" />
     <action
@@ -158,7 +158,7 @@
         app:destination="@id/searchFragment"/>
     <fragment
         android:id="@+id/mapFragment"
-        android:name="com.cmput301f21t26.habittracker.ui.MapFragment"
+        android:name="com.cmput301f21t26.habittracker.ui.habitevent.MapFragment"
         android:label="MapFragment" >
         <action
             android:id="@+id/action_mapFragment_to_editHabitEventFragment"

@@ -1,10 +1,9 @@
-package com.cmput301f21t26.habittracker.ui;
+package com.cmput301f21t26.habittracker.ui.habitevent;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -15,9 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -34,6 +35,7 @@ import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentMapBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -43,7 +45,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -51,15 +52,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class MapFragment extends Fragment
-        implements OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener,
-        GoogleMap.OnMyLocationClickListener,
-        GoogleMap.OnCameraMoveListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveListener {
 
     private final String TAG = "MapFragment";
 
-    private final int PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
     private final int DEFAULT_ZOOM = 15;    // street
     private final LatLng defaultLocation = new LatLng(53.526733732510735, -113.52709359834766);      // Cmput building
 
@@ -84,21 +80,18 @@ public class MapFragment extends Fragment
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        binding = FragmentMapBinding.inflate(inflater, container, false);
         setHasOptionsMenu(true);
+
+        locationPermissionGranted = false;
 
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(5000);
         locationRequest.setFastestInterval(2000);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        binding = FragmentMapBinding.inflate(inflater, container, false);
 
         habit = MapFragmentArgs.fromBundle(getArguments()).getHabit();
         hEvent = MapFragmentArgs.fromBundle(getArguments()).getHabitEvent();
@@ -115,6 +108,8 @@ public class MapFragment extends Fragment
         locConfirmBtn = binding.locationConfirmBtn;
         locConfirmBtn.setOnClickListener(locConfirmBtnOnClickListener);
 
+        getLocationPermission();
+
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
@@ -129,10 +124,59 @@ public class MapFragment extends Fragment
         // Turn on the my location layer and the related control on the map.
         updateLocationUI();
 
+        moveMapToDefaultLocation();
+
         // Get the curr loc of the device and set the pos of the map
-        getDeviceLocation();
+        if (hEvent.getAddress() == null) {
+            getDeviceLocation();
+        } else {
+            getAddressLocation(hEvent.getAddress());
+        }
 
         map.setOnCameraMoveListener(this);
+    }
+
+    private void getAddressLocation(String address) {
+
+        @SuppressLint("DefaultLocale")
+        String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s",
+                address.replace(" ", "+"),
+                getResources().getString(R.string.google_maps_key));
+        Log.d(TAG, url);
+
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jObj = new JSONObject(response);
+                            JSONArray results = jObj.getJSONArray("results");
+                            JSONObject geometry = results.getJSONObject(0).getJSONObject("geometry");
+                            JSONObject location = geometry.getJSONObject("location");
+                            double lat = location.getDouble("lat");
+                            double lng = location.getDouble("lng");
+                            latLng = new LatLng(lat, lng);
+
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    latLng, DEFAULT_ZOOM));
+                            marker = map.addMarker(
+                                    new MarkerOptions()
+                                            .position(latLng));
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "", error);
+            }
+        });
+
+        queue.add(stringRequest);
     }
 
     /**
@@ -160,30 +204,53 @@ public class MapFragment extends Fragment
     }
 
     private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this.getActivity().getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        boolean hasPermissionForFineLocation = ContextCompat.checkSelfPermission(this.getActivity().getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean hasPermissionForCoarseLocation = ContextCompat.checkSelfPermission(this.getActivity().getApplicationContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+        if (hasPermissionForFineLocation || hasPermissionForCoarseLocation) {
             locationPermissionGranted = true;
-            updateLocationUI();
         } else {
-            ActivityCompat.requestPermissions(this.getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_LOCATION);
+            permissionResult.launch(Manifest.permission.ACCESS_FINE_LOCATION);      // only request for accessing fine location
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        locationPermissionGranted = false;
-        if (requestCode == PERMISSIONS_REQUEST_ACCESS_LOCATION) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                locationPermissionGranted = true;
+    private ActivityResultLauncher<String> permissionResult = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            new ActivityResultCallback<Boolean>() {
+                @Override
+                public void onActivityResult(Boolean isGranted) {
+                    locationPermissionGranted = isGranted;
+
+                    if (!isGranted) {
+                        // check whether the user has granted for accessing coarse location
+                        boolean hasPermissionForCoarseLocation = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
+                                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                        if (hasPermissionForCoarseLocation) {
+                            locationPermissionGranted = true;
+                        }
+                    }
+
+                    if (locationPermissionGranted) {
+                        Log.d(TAG, "Permission granted!");
+
+                        if (map == null) {
+                            return;
+                        }
+
+                        updateLocationUI();
+                        if (hEvent.getAddress() == null) {
+                            getDeviceLocation();
+                        }
+
+                    } else {
+                        Log.d(TAG, "Permission request denied");
+
+                    }
+                }
             }
-        }
-        updateLocationUI();
-    }
+    );
 
     private void updateLocationUI() {
         if (map == null) {
@@ -196,9 +263,8 @@ public class MapFragment extends Fragment
             } else {
                 map.setMyLocationEnabled(false);
                 map.getUiSettings().setMyLocationButtonEnabled(false);
-                getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e(TAG, e.getMessage());
         }
     }
@@ -212,13 +278,15 @@ public class MapFragment extends Fragment
                             public void onLocationResult(@NonNull LocationResult locationResult) {
                                 super.onLocationResult(locationResult);
 
-                                // We only want to call this once
-                                LocationServices.getFusedLocationProviderClient(getActivity())
-                                        .removeLocationUpdates(this);
+                                // call this callback only once
+                                if (getActivity() != null) {
+                                    LocationServices.getFusedLocationProviderClient(getActivity())
+                                            .removeLocationUpdates(this);
+                                }
 
                                 latLng = defaultLocation;
 
-                                if (locationResult != null && locationResult.getLocations().size() > 0) {
+                                if (locationResult.getLocations().size() > 0) {
                                     int index = locationResult.getLocations().size() - 1;
                                     double latitude = locationResult.getLocations().get(index).getLatitude();
                                     double longitude = locationResult.getLocations().get(index).getLongitude();
@@ -229,33 +297,26 @@ public class MapFragment extends Fragment
                                         latLng, DEFAULT_ZOOM));
                                 marker = map.addMarker(
                                         new MarkerOptions()
-                                                .position(latLng)
-                                                .draggable(true));
+                                                .position(latLng));
                             }
                         }, Looper.getMainLooper());
-            } else {
-                latLng = defaultLocation;
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        latLng, DEFAULT_ZOOM));
-                marker = map.addMarker(
-                        new MarkerOptions()
-                                .position(latLng)
-                                .draggable(true));
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
 
-    @Override
-    public void onMyLocationClick(@NonNull Location location) {
-    }
-
-    @Override
-    public boolean onMyLocationButtonClick() {
-        // Return false so that we don't consume the event and the default behavior still occurs
-        // (the camera animates to the user's current position).
-        return false;
+    private void moveMapToDefaultLocation() {
+        if (map == null) {
+            return;
+        }
+        // move the map to the default location
+        latLng = defaultLocation;
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                latLng, DEFAULT_ZOOM));
+        marker = map.addMarker(
+                new MarkerOptions()
+                        .position(latLng));
     }
 
     @Override

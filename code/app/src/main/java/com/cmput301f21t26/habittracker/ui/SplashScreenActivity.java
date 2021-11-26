@@ -1,10 +1,6 @@
 package com.cmput301f21t26.habittracker.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
-
 import android.content.Intent;
-import android.graphics.drawable.AnimatedStateListDrawable;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
@@ -13,8 +9,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.ImageView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.ui.auth.LoginSignupActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 /**
@@ -59,9 +59,6 @@ public class SplashScreenActivity extends AppCompatActivity {
             ad.setExitFadeDuration(500);
             ad.start();
         }
-
-        // TODO we want user information to be retrievable even if offline, which is default setting for
-        // our database
     }
 
     /**

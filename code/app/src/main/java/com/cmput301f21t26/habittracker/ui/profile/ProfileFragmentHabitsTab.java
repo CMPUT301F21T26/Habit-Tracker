@@ -19,16 +19,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
+import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.cmput301f21t26.habittracker.ui.habit.HabitAdapter;
-import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.ui.habit.HabitItemTouchHelper;
 
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 
 
 public class ProfileFragmentHabitsTab extends Fragment {
@@ -53,8 +51,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
         super.onCreate(savedInstanceState);
         // get the user to instantiate this fragment with
         ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
-        userObject = parentProfileFrag.getOtherUser();
-
+        userObject = parentProfileFrag.getAttachedUser();
     }
 
     @Override

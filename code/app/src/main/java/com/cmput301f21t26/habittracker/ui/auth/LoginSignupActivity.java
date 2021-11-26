@@ -1,8 +1,8 @@
-package com.cmput301f21t26.habittracker.ui;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.cmput301f21t26.habittracker.ui.auth;
 
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.cmput301f21t26.habittracker.databinding.ActivityLoginSignupBinding;
 

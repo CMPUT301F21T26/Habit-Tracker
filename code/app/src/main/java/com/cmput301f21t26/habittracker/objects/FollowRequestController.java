@@ -94,7 +94,7 @@ public class FollowRequestController {
 
     /**
      * Send a FollowRequest to the given user and store it in db.
-     * Call callback function after storing.
+     * Call callback function with an input as current user after storing.
      *
      * @param toUser User who receives the follow request
      * @param callback callback function to be called after storing
@@ -108,10 +108,7 @@ public class FollowRequestController {
         usersRef.document(fr.getToUid()).collection("followRequests")
                 .document(fr.getId())
                 .set(fr)
-                .addOnSuccessListener(unused -> {
-                    // TODO change callback param
-                    callback.onCallback(currentUser);
-                });
+                .addOnSuccessListener(unused -> callback.onCallback(currentUser));
     }
 
     /**
@@ -171,9 +168,6 @@ public class FollowRequestController {
      * @param callback callback function to be called after the update
      */
     public void follow(FollowRequest fr, FollowRequestCallback callback) {
-
-        // TODO could use transaction
-
         usersRef.document(fr.getToUid())
                 .update("followers", FieldValue.arrayUnion(fr.getFromUid()))
                 .addOnSuccessListener(unused -> {
@@ -183,7 +177,6 @@ public class FollowRequestController {
                             .addOnFailureListener(error -> Log.d("follow", "Error following user", error));
                 })
                 .addOnFailureListener(error -> Log.d("follow", "Error following user", error));
-
     }
 
     /**
@@ -195,8 +188,6 @@ public class FollowRequestController {
     public void unfollow(String targetUserId, UserCallback callback) {
 
         User currentUser = UserController.getCurrentUser();
-
-        // TODO could use transaction
 
         usersRef.document(targetUserId)
                 .update("followers", FieldValue.arrayRemove(currentUser.getUid()))

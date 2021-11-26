@@ -8,10 +8,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitController;
-import com.cmput301f21t26.habittracker.objects.User;
-import com.cmput301f21t26.habittracker.objects.UserController;
 
 public class HabitItemTouchHelper extends androidx.recyclerview.widget.ItemTouchHelper.Callback {
     private final ItemTouchHelperAdapter itemTouchHelperAdapter;
