@@ -71,6 +71,7 @@ public class ProfileFragmentFollowersTab extends Fragment {
         if (userObject.getUid().equals(UserController.getCurrentUserId())
                 || UserController.getCurrentUser().isFollowing(userObject)) {
 
+            profileFollowersListView.setVisibility(View.VISIBLE);
             // get list of users from user's following list and display it
             otherUserController.getUsersList((ArrayList<String>) userObject.getFollowers(), new UserListCallback() {
                 @Override
@@ -97,7 +98,7 @@ public class ProfileFragmentFollowersTab extends Fragment {
                 }
             });
         } else {
-            profileFollowersListView.setAdapter(null);
+            profileFollowersListView.setVisibility(View.GONE);
         }
     }
 

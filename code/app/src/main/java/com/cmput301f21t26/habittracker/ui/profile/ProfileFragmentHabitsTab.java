@@ -72,7 +72,6 @@ public class ProfileFragmentHabitsTab extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
-
         habitList = (ArrayList<Habit>) userObject.getHabits();
         rvlistener = new HabitAdapter.RecyclerViewClickListener() {
             @Override
@@ -82,10 +81,9 @@ public class ProfileFragmentHabitsTab extends Fragment {
                 navController.navigate(action);
             }
         };
-
+        updateFollowToSeeHabitText();
         updateRecyclerView();
     }
-
 
     /**
      * Updates the recycler view for cases when the current user
@@ -94,8 +92,8 @@ public class ProfileFragmentHabitsTab extends Fragment {
     private void updateRecyclerView() {
         if (userObject.getUid().equals(UserController.getCurrentUserId())
                 || UserController.getCurrentUser().isFollowing(userObject)) {
-            updateFollowToSeeHabitText();
 
+            mRecyclerView.setVisibility(View.VISIBLE);
             // show habits only when the userObject is equal to current user
             // or current user is following userObject
             habitAdapter = new HabitAdapter(habitList, getActivity(), rvlistener);
@@ -118,8 +116,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
             habitAdapter.checkBoxVisibility(View.GONE);
 
         } else {
-            mRecyclerView.setAdapter(null);
-            updateFollowToSeeHabitText();
+            mRecyclerView.setVisibility(View.GONE);
         }
     }
 
