@@ -66,10 +66,18 @@ public class SearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 User otherUser = (User) adapterView.getItemAtPosition(i);
-                otherUserController.getHabitList(otherUser, updatedOtheruser -> {
-                    NavDirections action = MobileNavigationDirections.actionGlobalNavigationProfile(updatedOtheruser);
-                    navController.navigate(action);
+                otherUserController.getUser(otherUser.getUsername(), updatedOtheruser1 -> {
+                    // Re-get other user for cases where current user views the other user's profile from search
+                    // and follows or unfollows that user. Then since other users don't have a snapshot listener
+                    // the current user can go back to the search and reclick the other user to "refresh" the
+                    // other user's info (since we're re-getting the user after every click)
+                    otherUserController.getHabitList(updatedOtheruser1, updatedOtheruser2 -> {
+                        // then we get the habit list of the user and add it to the local User object
+                        NavDirections action = MobileNavigationDirections.actionGlobalNavigationProfile(updatedOtheruser2);
+                        navController.navigate(action);
+                    });
                 });
+
             }
         });
         return view;
