@@ -159,6 +159,9 @@ public class ProfileFragment extends Fragment implements Observer {
                                                 followRequestController.unfollow(otherUser.getUid(), user -> {
                                                     setFollowButton(FollowStatus.NOT_FOLLOWING);
                                                     followStatus = FollowStatus.NOT_FOLLOWING;
+                                                    // reset the tabs and viewpager so then user cannot
+                                                    // view the other user's habits/followers/following after unfollowing
+                                                    setTabsAndViewPager();
                                                     isFollowButtonClicked = false;
                                                 });
                                             }
@@ -213,6 +216,7 @@ public class ProfileFragment extends Fragment implements Observer {
     private void setFollowButton(FollowStatus initStatus) {
         if (initStatus == FollowStatus.NOT_FOLLOWING) {
             followButton.setText("FOLLOW");
+            followButton.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
             followButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.green));
         } else if (initStatus == FollowStatus.PENDING) {
             followButton.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.lighter_gray));
@@ -233,7 +237,8 @@ public class ProfileFragment extends Fragment implements Observer {
         FragmentManager fragmentManager = getChildFragmentManager();
         fragmentAdapter = new ProfileFragmentAdapter(fragmentManager, getLifecycle());
         viewPager.setAdapter(fragmentAdapter);
-
+        viewPager.setOffscreenPageLimit(2);     // so we're not creating new pages constantly
+        tabLayout.removeAllTabs();
         tabLayout.addTab(tabLayout.newTab().setText("Habits"));
         tabLayout.addTab(tabLayout.newTab().setText("Followers"));
         tabLayout.addTab(tabLayout.newTab().setText("Following"));
