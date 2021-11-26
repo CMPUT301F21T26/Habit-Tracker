@@ -124,6 +124,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         // Turn on the my location layer and the related control on the map.
         updateLocationUI();
 
+        moveMapToDefaultLocation();
+
         // Get the curr loc of the device and set the pos of the map
         if (hEvent.getAddress() == null) {
             getDeviceLocation();
@@ -135,6 +137,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void getAddressLocation(String address) {
+
         @SuppressLint("DefaultLocale")
         String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s",
                 address.replace(" ", "+"),
@@ -160,8 +163,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                                     latLng, DEFAULT_ZOOM));
                             marker = map.addMarker(
                                     new MarkerOptions()
-                                            .position(latLng)
-                                            .draggable(true));
+                                            .position(latLng));
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -262,7 +264,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 map.setMyLocationEnabled(false);
                 map.getUiSettings().setMyLocationButtonEnabled(false);
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e(TAG, e.getMessage());
         }
     }
@@ -295,22 +297,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                                         latLng, DEFAULT_ZOOM));
                                 marker = map.addMarker(
                                         new MarkerOptions()
-                                                .position(latLng)
-                                                .draggable(true));
+                                                .position(latLng));
                             }
                         }, Looper.getMainLooper());
-            } else {
-                latLng = defaultLocation;
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        latLng, DEFAULT_ZOOM));
-                marker = map.addMarker(
-                        new MarkerOptions()
-                                .position(latLng)
-                                .draggable(true));
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage(), e);
         }
+    }
+
+    private void moveMapToDefaultLocation() {
+        if (map == null) {
+            return;
+        }
+        // move the map to the default location
+        latLng = defaultLocation;
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                latLng, DEFAULT_ZOOM));
+        marker = map.addMarker(
+                new MarkerOptions()
+                        .position(latLng));
     }
 
     @Override
