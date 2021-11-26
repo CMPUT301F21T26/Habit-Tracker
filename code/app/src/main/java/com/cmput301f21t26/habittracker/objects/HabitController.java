@@ -151,7 +151,6 @@ public class HabitController {
         User user = UserController.getCurrentUser();
         assert user != null;
 
-        // TODO exclude habitevents array
         mStore.collection("users").document(user.getUid()).collection("habits")
                 .document(habit.getHabitId())
                 .set(habit)

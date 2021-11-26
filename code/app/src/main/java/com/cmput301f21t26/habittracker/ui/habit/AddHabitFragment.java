@@ -138,7 +138,7 @@ public class AddHabitFragment extends Fragment {
                 final String dateStr = dateFormatMessageTV.getText().toString();
 
                 SimpleDateFormat format = new SimpleDateFormat(datePattern);
-                Date date;       // TODO add date
+                Date date;
 
                 try {
                     date = format.parse(dateStr);
