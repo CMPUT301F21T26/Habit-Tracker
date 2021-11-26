@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.cmput301f21t26.habittracker.interfaces.UserCallback;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -13,6 +14,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
@@ -86,8 +88,9 @@ public class HabitEventController {
 
                             switch (dc.getType()) {
                                 case ADDED:
-                                    Log.d("AddHabitEvent", "listener");
                                     user.getHabit(parentHabitId).addHabitEvent(hEvent);
+                                    Log.d("AddHabitEvent", "HabitEventFragment: " + user.getHabit(parentHabitId).toString());
+                                    Log.d("AddHabitEvent", user.getHabit(parentHabitId).getHabitEvents().toString());
                                     break;
                                 case MODIFIED:
                                     user.getHabit(parentHabitId).updateHabitEvent(hEvent);
@@ -241,4 +244,33 @@ public class HabitEventController {
                 .addOnFailureListener(e -> Log.d("storeHabitEventImage", "Habit Event Image was not stored"));
     }
 
+    public void getAllHabitEvents(Habit habit, UserCallback callback) {
+
+
+        User user = UserController.getCurrentUser();
+        assert user != null;
+
+        callback.onCallback(user);
+        return;
+
+        /*
+        final DocumentReference userRef = mStore.collection("users").document(user.getUid());
+        final DocumentReference habitRef = userRef.collection("habits").document(habit.getHabitId());
+
+        habitRef.collection("habitEvents")
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            HabitEvent hEvent = document.toObject(HabitEvent.class);
+
+                            habit.addHabitEvent(hEvent);
+                        }
+                        callback.onCallback(user);
+                    }
+                }).addOnFailureListener(e -> Log.w("getHabits", e));
+
+         */
+    }
 }

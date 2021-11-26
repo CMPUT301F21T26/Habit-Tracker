@@ -110,10 +110,11 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     // update DB
-                                    habitEventController.removeHabitEventFromDb(habit.getHabitEventByDate(Calendar.getInstance().getTime()), callback -> { });
-                                    holder.getDoneTodayCB().setChecked(false);
-                                    habit.setDoneForToday(false);
-                                    habitController.updateHabitInDb(habit, user -> {});
+                                    habitEventController.removeHabitEventFromDb(habit.getHabitEventByDate(Calendar.getInstance().getTime()), callback -> {
+                                        holder.getDoneTodayCB().setChecked(false);
+                                        habit.setDoneForToday(false);
+                                        habitController.updateHabitInDb(habit, user -> {});
+                                    });
                                 }
                             })
                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -142,32 +143,30 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                     // if check box is unchecked, set habit's done for today to true and update it in db
                     habit.setDoneForToday(true);
                     holder.getDoneTodayCB().setChecked(true);
-                    habitController.updateHabitInDb(habit, user -> {
-                        HabitEvent hEvent = new HabitEvent(habit.getHabitId());
 
-                        // Get the date for use in title
-                        String datePattern = "yyyy-MM-dd";
-                        SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
-                        String habitEventDateFormat = format.format(hEvent.getHabitEventDate());
-                        // Set the title of the habit event
-                        hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
+                    HabitEvent hEvent = new HabitEvent(habit.getHabitId());
 
-                        habitEventController.storeHabitEventInDb(hEvent, new UserCallback() {
-                            @Override
-                            public void onCallback(User user) {
-                                // show snackbar after storing an habit event in db
-                                Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
-                                        "Empty habit event is created", Snackbar.LENGTH_SHORT);
-                                snackbar.setAnchorView(activity.findViewById(R.id.addHabitButton));
-                                snackbar.setAction("EDIT", view -> {
+                    // Get the date for use in title
+                    String datePattern = "yyyy-MM-dd";
+                    SimpleDateFormat format = new SimpleDateFormat(datePattern, Locale.ROOT);
+                    String habitEventDateFormat = format.format(hEvent.getHabitEventDate());
+                    // Set the title of the habit event
+                    hEvent.setTitle(mContext.getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
 
-                                    NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_activity_main);
-                                    @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
+                    habitEventController.storeHabitEventInDb(hEvent, user -> {
+                        habitController.updateHabitInDb(habit, user1 -> {
+                            // show snackbar after storing an habit event in db
+                            Snackbar snackbar = Snackbar.make(activity.findViewById(R.id.mainActivityConstraintLayout),
+                                    "Empty habit event is created", Snackbar.LENGTH_SHORT);
+                            snackbar.setAnchorView(activity.findViewById(R.id.addHabitButton));
+                            snackbar.setAction("EDIT", view1 -> {
 
-                                    navController.navigate(direction);
-                                });
-                                snackbar.show();
-                            }
+                                NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_activity_main);
+                                @NonNull NavDirections direction = MobileNavigationDirections.actionGlobalEditHabitEventFragment(hEvent, habit);
+
+                                navController.navigate(direction);
+                            });
+                            snackbar.show();
                         });
                     });
                 }
