@@ -343,7 +343,7 @@ public class ProfileFragment extends Fragment implements Observer {
                 }
             });
 
-    public User getOtherUser() {
+    public User getAttachedUser() {
         return otherUser;
     }
 

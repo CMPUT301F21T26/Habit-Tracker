@@ -51,8 +51,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
         super.onCreate(savedInstanceState);
         // get the user to instantiate this fragment with
         ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
-        userObject = parentProfileFrag.getOtherUser();
-
+        userObject = parentProfileFrag.getAttachedUser();
     }
 
     @Override

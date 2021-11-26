@@ -1,7 +1,6 @@
 package com.cmput301f21t26.habittracker.ui.profile;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,7 @@ public class ProfileFragmentFollowingTab extends Fragment {
         super.onCreate(savedInstanceState);
         // get the user to instantiate this fragment with
         ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
-        userObject = parentProfileFrag.getOtherUser();
+        userObject = parentProfileFrag.getAttachedUser();
         usersList = new ArrayList<>();
         otherUserController = OtherUserController.getInstance();
     }
@@ -58,8 +57,8 @@ public class ProfileFragmentFollowingTab extends Fragment {
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
+        updateFollowToSeeFollowingText();
         updateListView();
-
         return view;
     }
 
@@ -68,44 +67,40 @@ public class ProfileFragmentFollowingTab extends Fragment {
      * is granted permission to view the other user's following
      */
     private void updateListView() {
+
         if (userObject.getUid().equals(UserController.getCurrentUserId())
                 || UserController.getCurrentUser().isFollowing(userObject)) {
-            updateFollowToSeeFollowingText();
-
-            if (getActivity() != null) {
-                userListAdapter = new UserListAdapter(getActivity(), usersList);
-                profileFollowingListView.setAdapter(userListAdapter);
-            }
-
-            // When clicking, get their habit lists which stores it in the user object, then go to user profile
-            profileFollowingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    User otherUser = (User) adapterView.getItemAtPosition(i);
-                    otherUserController.getHabitList(otherUser, updatedOtheruser -> {
-                        NavDirections action = MobileNavigationDirections.actionGlobalNavigationProfile(updatedOtheruser);
-                        navController.navigate(action);
-                    });
-                }
-            });
 
             // get list of users from user's following list and display it
             otherUserController.getUsersList((ArrayList<String>) userObject.getFollowings(), new UserListCallback() {
                 @Override
                 public void onCallback(ArrayList<User> listOfUsers) {
+
                     usersList = listOfUsers;
-                    Log.d("ProfileFollowingTab", usersList.toString());
-                    userListAdapter = new UserListAdapter(getActivity(), usersList);
-                    profileFollowingListView.setAdapter(userListAdapter);
+
+                    if (getActivity() != null) {
+                        userListAdapter = new UserListAdapter(getActivity(), usersList);
+                        profileFollowingListView.setAdapter(userListAdapter);
+                    }
+
+                    // When clicking, get their habit lists which stores it in the user object, then go to user profile
+                    profileFollowingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            User otherUser = (User) adapterView.getItemAtPosition(i);
+                            otherUserController.getHabitList(otherUser, updatedOtheruser -> {
+                                NavDirections action = MobileNavigationDirections.actionGlobalNavigationProfile(updatedOtheruser);
+                                navController.navigate(action);
+                            });
+                        }
+                    });
                 }
             });
 
         } else {
             profileFollowingListView.setAdapter(null);
-            updateFollowToSeeFollowingText();
         }
     }
-
 
     /**
      * Reveals the text "FOLLOW THIS USER TO SEE THEIR FOLLOWING"
