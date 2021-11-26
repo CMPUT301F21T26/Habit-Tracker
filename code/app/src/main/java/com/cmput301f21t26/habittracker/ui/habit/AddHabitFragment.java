@@ -21,12 +21,11 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.cmput301f21t26.habittracker.objects.HabitController;
-import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentAddHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
-import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.objects.HabitController;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.datepicker.MaterialDatePicker;

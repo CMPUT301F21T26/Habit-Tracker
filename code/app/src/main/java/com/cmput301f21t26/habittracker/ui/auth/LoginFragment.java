@@ -14,10 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;

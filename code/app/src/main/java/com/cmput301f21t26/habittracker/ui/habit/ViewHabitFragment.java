@@ -8,7 +8,6 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,13 +18,12 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
-import com.cmput301f21t26.habittracker.objects.User;
-import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentViewHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
-import com.cmput301f21t26.habittracker.ui.habitevent.ViewHabitEventFragmentArgs;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 

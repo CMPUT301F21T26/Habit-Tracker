@@ -3,19 +3,11 @@ package com.cmput301f21t26.habittracker.ui.habitevent;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-
-import static android.app.Activity.RESULT_OK;
-
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,21 +34,16 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import com.cmput301f21t26.habittracker.objects.HabitEventController;
-import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitEventBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
-import com.cmput301f21t26.habittracker.objects.UserController;
-import com.cmput301f21t26.habittracker.ui.habitevent.MapFragmentDirections;
-import com.google.android.gms.maps.SupportMapFragment;
+import com.cmput301f21t26.habittracker.objects.HabitEventController;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 

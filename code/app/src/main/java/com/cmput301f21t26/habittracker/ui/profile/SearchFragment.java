@@ -2,14 +2,6 @@ package com.cmput301f21t26.habittracker.ui.profile;
 
 import android.app.Activity;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SearchView;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,9 +13,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.ui.profile.UserListAdapter;
 import com.cmput301f21t26.habittracker.interfaces.UserListCallback;
 import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.User;

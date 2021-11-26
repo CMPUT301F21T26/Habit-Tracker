@@ -1,14 +1,12 @@
 package com.cmput301f21t26.habittracker.ui.profile;
 
 import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,19 +25,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
-import com.cmput301f21t26.habittracker.objects.FollowRequest;
+import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
 import com.cmput301f21t26.habittracker.objects.FollowRequestController;
 import com.cmput301f21t26.habittracker.objects.FollowStatus;
 import com.cmput301f21t26.habittracker.objects.OtherUserController;
-import com.cmput301f21t26.habittracker.ui.MainActivity;
-import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.databinding.FragmentProfileBinding;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.Observable;

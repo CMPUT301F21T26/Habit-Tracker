@@ -1,7 +1,6 @@
 package com.cmput301f21t26.habittracker.ui.habitevent;
 
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,11 +21,11 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
