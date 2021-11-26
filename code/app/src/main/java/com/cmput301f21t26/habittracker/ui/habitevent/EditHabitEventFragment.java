@@ -70,6 +70,7 @@ public class EditHabitEventFragment extends Fragment {
     private ImageButton habitEventChooseImageBtn;
     private ImageButton habitEventCameraBtn;
     private ImageButton removeImageImageButton;
+    private ImageButton removeLocationImageButton;
 
     private Button chooseLocBtn;
 
@@ -111,6 +112,7 @@ public class EditHabitEventFragment extends Fragment {
         habitEventCameraBtn = (ImageButton) binding.cameraButton;
         removeImageImageButton = binding.removeImageImageButton;
         chooseLocBtn = binding.chooseLocationButton;
+        removeLocationImageButton = binding.removeLocationImageButton;
 
         return binding.getRoot();
     }
@@ -127,6 +129,7 @@ public class EditHabitEventFragment extends Fragment {
         habitEventChooseImageBtn.setOnClickListener(chooseImageOnClickListener);
         removeImageImageButton.setOnClickListener(removeImageOnClickListener);
         chooseLocBtn.setOnClickListener(chooseLocOnClickListener);
+        removeLocationImageButton.setOnClickListener(removeLocationOnClickListener);
         setEditHabitEventFields();
 
 
@@ -150,6 +153,7 @@ public class EditHabitEventFragment extends Fragment {
 
         if (hEvent.getAddress() != null) {
             habitEventLocationTV.setText(hEvent.getAddress());
+            removeLocationImageButton.setVisibility(View.VISIBLE);
         }
 
         if (hEvent.getPhotoUrl() != null) {
@@ -314,6 +318,7 @@ public class EditHabitEventFragment extends Fragment {
                 mGetContent.launch("image/*");  // launch file explorer
             }
         };
+
     /**
      * sets the image chosen from the users library to the image view of the habit event, and updates the
      * PhotoUrl parameter of the respective habit event
@@ -349,6 +354,18 @@ public class EditHabitEventFragment extends Fragment {
         public void onClick(View view) {
             NavDirections direction = EditHabitEventFragmentDirections.actionEditHabitEventFragmentToMapFragment(habit, hEvent);
             navController.navigate(direction);
+        }
+    };
+
+    /**
+     * Removes the location from the habit event when remove image button is clicked
+     */
+    private View.OnClickListener removeLocationOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            hEvent.setAddress(null);
+            habitEventController.updateHabitEventInDb(hEvent, user -> {});
+            habitEventLocationTV.setText("NONE");
         }
     };
 }
