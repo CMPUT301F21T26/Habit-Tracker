@@ -50,7 +50,7 @@ import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitEventBinding
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.UserController;
-import com.cmput301f21t26.habittracker.ui.MapFragmentDirections;
+import com.cmput301f21t26.habittracker.ui.habitevent.MapFragmentDirections;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.textfield.TextInputEditText;
 

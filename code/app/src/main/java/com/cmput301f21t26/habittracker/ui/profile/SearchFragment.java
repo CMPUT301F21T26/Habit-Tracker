@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker.ui.search;
+package com.cmput301f21t26.habittracker.ui.profile;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -23,7 +23,7 @@ import android.widget.ListView;
 
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
-import com.cmput301f21t26.habittracker.ui.UserListAdapter;
+import com.cmput301f21t26.habittracker.ui.profile.UserListAdapter;
 import com.cmput301f21t26.habittracker.interfaces.UserListCallback;
 import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.User;

@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker.ui;
+package com.cmput301f21t26.habittracker.ui.habitevent;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -35,6 +35,7 @@ import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentMapBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;

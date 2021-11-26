@@ -14,10 +14,9 @@ import android.widget.EditText;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.test.espresso.action.ViewActions;
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.cmput301f21t26.habittracker.ui.LoginSignupActivity;
+import com.cmput301f21t26.habittracker.ui.auth.LoginSignupActivity;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.robotium.solo.Solo;
 

@@ -30,7 +30,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".ui.LoginSignupActivity"
+            android:name=".ui.auth.LoginSignupActivity"
             android:exported="true"
             android:theme="@style/Theme.HabitTracker"/>
         <activity

@@ -2,14 +2,12 @@ package com.cmput301f21t26.habittracker;
 
 import android.util.Log;
 
-import com.cmput301f21t26.habittracker.ui.habit.ViewHabitFragment;
-import com.cmput301f21t26.habittracker.ui.LoginSignupActivity;
+import com.cmput301f21t26.habittracker.ui.auth.LoginSignupActivity;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.rule.ActivityTestRule;
 
 import static androidx.test.espresso.Espresso.onView;

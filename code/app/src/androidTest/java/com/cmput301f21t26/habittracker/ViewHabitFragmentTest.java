@@ -1,6 +1,5 @@
 package com.cmput301f21t26.habittracker;
 
-import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -15,14 +14,12 @@ import android.util.Log;
 
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.UserController;
-import com.cmput301f21t26.habittracker.ui.habit.TodayHabitFragment;
 
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.rule.ActivityTestRule;
 
 
-import com.cmput301f21t26.habittracker.ui.LoginSignupActivity;
+import com.cmput301f21t26.habittracker.ui.auth.LoginSignupActivity;
 
 import org.junit.Before;
 import org.junit.Rule;

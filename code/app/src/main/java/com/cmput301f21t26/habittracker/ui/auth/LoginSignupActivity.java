@@ -1,4 +1,4 @@
-package com.cmput301f21t26.habittracker.ui;
+package com.cmput301f21t26.habittracker.ui.auth;
 
 import androidx.appcompat.app.AppCompatActivity;
 

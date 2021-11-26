@@ -4,7 +4,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.cmput301f21t26.habittracker.ui.LoginSignupActivity;
+import com.cmput301f21t26.habittracker.ui.auth.LoginSignupActivity;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -20,7 +20,6 @@ import java.util.TimeZone;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.action.ViewActions;
-import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.rule.ActivityTestRule;
 
 import static androidx.test.espresso.Espresso.onView;
