@@ -94,7 +94,7 @@ public class FollowRequestController {
 
     /**
      * Send a FollowRequest to the given user and store it in db.
-     * Call callback function after storing.
+     * Call callback function with an input as current user after storing.
      *
      * @param toUser User who receives the follow request
      * @param callback callback function to be called after storing
@@ -108,10 +108,7 @@ public class FollowRequestController {
         usersRef.document(fr.getToUid()).collection("followRequests")
                 .document(fr.getId())
                 .set(fr)
-                .addOnSuccessListener(unused -> {
-                    // TODO change callback param
-                    callback.onCallback(currentUser);
-                });
+                .addOnSuccessListener(unused -> callback.onCallback(currentUser));
     }
 
     /**
