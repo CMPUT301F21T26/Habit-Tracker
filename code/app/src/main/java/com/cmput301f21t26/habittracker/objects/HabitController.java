@@ -89,7 +89,6 @@ public class HabitController {
 
                             Date dateNow = Calendar.getInstance().getTime();
                             int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
-                            Log.d("AddHabitEvent", habit.toString());
 
                             switch (dc.getType()) {
                                 case ADDED:
@@ -102,9 +101,11 @@ public class HabitController {
                                     Log.d("habitAdded", "habit was added " + habit.getTitle());
                                     break;
                                 case MODIFIED:
+                                    Log.d("updateHabit", habit.getDaysList().toString());
                                     // modified habit obj does not contain any habit events
                                     user.updateHabit(habit);
                                     if (habit.getDaysList().contains(today)) {
+                                        Log.d("updateHabit", "added to the today habits");
                                         user.updateTodayHabit(habit);
                                     } else {
                                         user.removeTodayHabit(habit);
