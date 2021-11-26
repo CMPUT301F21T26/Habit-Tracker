@@ -43,7 +43,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -84,21 +83,18 @@ public class MapFragment extends Fragment
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        binding = FragmentMapBinding.inflate(inflater, container, false);
         setHasOptionsMenu(true);
+
+        locationPermissionGranted = false;
 
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(5000);
         locationRequest.setFastestInterval(2000);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        binding = FragmentMapBinding.inflate(inflater, container, false);
 
         habit = MapFragmentArgs.fromBundle(getArguments()).getHabit();
         hEvent = MapFragmentArgs.fromBundle(getArguments()).getHabitEvent();
@@ -115,6 +111,8 @@ public class MapFragment extends Fragment
         locConfirmBtn = binding.locationConfirmBtn;
         locConfirmBtn.setOnClickListener(locConfirmBtnOnClickListener);
 
+        getLocationPermission();
+
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
@@ -130,9 +128,56 @@ public class MapFragment extends Fragment
         updateLocationUI();
 
         // Get the curr loc of the device and set the pos of the map
-        getDeviceLocation();
+        if (hEvent.getAddress() == null) {
+            getDeviceLocation();
+        } else {
+            getAddressLocation(hEvent.getAddress());
+        }
 
         map.setOnCameraMoveListener(this);
+    }
+
+    private void getAddressLocation(String address) {
+        @SuppressLint("DefaultLocale")
+        String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s",
+                address.replace(" ", "+"),
+                getResources().getString(R.string.google_maps_key));
+        Log.d(TAG, url);
+
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jObj = new JSONObject(response);
+                            JSONArray results = jObj.getJSONArray("results");
+                            JSONObject geometry = results.getJSONObject(0).getJSONObject("geometry");
+                            JSONObject location = geometry.getJSONObject("location");
+                            double lat = location.getDouble("lat");
+                            double lng = location.getDouble("lng");
+                            latLng = new LatLng(lat, lng);
+
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    latLng, DEFAULT_ZOOM));
+                            marker = map.addMarker(
+                                    new MarkerOptions()
+                                            .position(latLng)
+                                            .draggable(true));
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "", error);
+            }
+        });
+
+        queue.add(stringRequest);
     }
 
     /**
@@ -163,7 +208,6 @@ public class MapFragment extends Fragment
         if (ContextCompat.checkSelfPermission(this.getActivity().getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
-            updateLocationUI();
         } else {
             ActivityCompat.requestPermissions(this.getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
@@ -180,6 +224,9 @@ public class MapFragment extends Fragment
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 locationPermissionGranted = true;
+                if (map != null) {
+                    getDeviceLocation();
+                }
             }
         }
         updateLocationUI();
@@ -212,13 +259,15 @@ public class MapFragment extends Fragment
                             public void onLocationResult(@NonNull LocationResult locationResult) {
                                 super.onLocationResult(locationResult);
 
-                                // We only want to call this once
-                                LocationServices.getFusedLocationProviderClient(getActivity())
-                                        .removeLocationUpdates(this);
+                                // call this callback only once
+                                if (getActivity() != null) {
+                                    LocationServices.getFusedLocationProviderClient(getActivity())
+                                            .removeLocationUpdates(this);
+                                }
 
                                 latLng = defaultLocation;
 
-                                if (locationResult != null && locationResult.getLocations().size() > 0) {
+                                if (locationResult.getLocations().size() > 0) {
                                     int index = locationResult.getLocations().size() - 1;
                                     double latitude = locationResult.getLocations().get(index).getLatitude();
                                     double longitude = locationResult.getLocations().get(index).getLongitude();
