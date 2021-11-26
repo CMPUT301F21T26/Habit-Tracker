@@ -168,9 +168,6 @@ public class FollowRequestController {
      * @param callback callback function to be called after the update
      */
     public void follow(FollowRequest fr, FollowRequestCallback callback) {
-
-        // TODO could use transaction
-
         usersRef.document(fr.getToUid())
                 .update("followers", FieldValue.arrayUnion(fr.getFromUid()))
                 .addOnSuccessListener(unused -> {
@@ -180,7 +177,6 @@ public class FollowRequestController {
                             .addOnFailureListener(error -> Log.d("follow", "Error following user", error));
                 })
                 .addOnFailureListener(error -> Log.d("follow", "Error following user", error));
-
     }
 
     /**
@@ -192,8 +188,6 @@ public class FollowRequestController {
     public void unfollow(String targetUserId, UserCallback callback) {
 
         User currentUser = UserController.getCurrentUser();
-
-        // TODO could use transaction
 
         usersRef.document(targetUserId)
                 .update("followers", FieldValue.arrayRemove(currentUser.getUid()))
