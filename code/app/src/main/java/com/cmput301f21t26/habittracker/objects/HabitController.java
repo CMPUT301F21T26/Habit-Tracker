@@ -85,7 +85,8 @@ public class HabitController {
                         }
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
 
-                            Habit habit = dc.getDocument().toObject(Habit.class);
+                            Habit habit = dc.getDocument().toObject(Habit.class);       // habit object does not contain any habit events
+
                             Date dateNow = Calendar.getInstance().getTime();
                             int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
 
@@ -100,12 +101,18 @@ public class HabitController {
                                     Log.d("habitAdded", "habit was added " + habit.getTitle());
                                     break;
                                 case MODIFIED:
+                                    Log.d("updateHabit", habit.getDaysList().toString());
+                                    // modified habit obj does not contain any habit events
                                     user.updateHabit(habit);
                                     if (habit.getDaysList().contains(today)) {
+                                        Log.d("updateHabit", "added to the today habits");
                                         user.updateTodayHabit(habit);
                                     } else {
                                         user.removeTodayHabit(habit);
                                     }
+                                    habitEventController.detachHabitEventsSnapshotListener(habit.getHabitId());
+                                    // initializing habit events snapshot listener will add back all the habit events in db
+                                    habitEventController.initHabitEventsSnapshotListener(habit.getHabitId());
                                     break;
                                 case REMOVED:
                                     user.removeHabit(habit);
@@ -118,8 +125,9 @@ public class HabitController {
                                 default:
                                     Log.d("habitAdded", "Unexpected type: " + dc.getType());
                             }
-                        }
+
                         user.notifyAllObservers();
+                        }
                     }
                 });
     }

@@ -75,14 +75,14 @@ public class TimelineListAdapter extends BaseAdapter implements Observer {
 
         // Assign habit event's attributes to the corresponding views
         habitEventTitleTV.setText(tempHEvent.getTitle());
-        if (tempHEvent.getLocation() == null) {
+        if (tempHEvent.getAddress() == null) {
             locationTV.setText("");
 
             // Change bottom margin of the top linear layout that houses the title and location
             RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) linearLayout.getLayoutParams();
             params2.bottomMargin = 0;
         } else {
-            locationTV.setText(tempHEvent.getLocation().toString());
+            locationTV.setText(tempHEvent.getAddress());
         }
         if (tempHEvent.getComment().isEmpty()) {
             // When there is no comment, get rid of it so content only shows habit title
@@ -111,7 +111,7 @@ public class TimelineListAdapter extends BaseAdapter implements Observer {
             params.addRule(RelativeLayout.BELOW, R.id.habitEventTopLayout);
 
             // If location doesn't exist then move the comment up close to title for looks
-            if (tempHEvent.getLocation() == null) {
+            if (tempHEvent.getAddress() == null) {
                 params.topMargin = 0;
             }
 

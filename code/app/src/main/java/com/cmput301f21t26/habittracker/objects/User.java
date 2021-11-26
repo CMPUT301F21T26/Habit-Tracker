@@ -265,7 +265,8 @@ public class User extends Observable implements Serializable {
     }
 
     /**
-     * Update a habit in today habits list
+     * Update a habit in today habits list.
+     * Adds habit to the list if the list does not contain the habit.
      *
      * @param habit today habit to update
      */
@@ -277,6 +278,7 @@ public class User extends Observable implements Serializable {
                 return;
             }
         }
+        todayHabits.add(habit);
     }
 
     /**

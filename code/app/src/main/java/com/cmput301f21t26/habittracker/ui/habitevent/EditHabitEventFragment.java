@@ -161,8 +161,8 @@ public class EditHabitEventFragment extends Fragment {
 
         habitEventCommentET.setText(hEvent.getComment());
 
-        if (hEvent.getLocation() != null) {
-            habitEventLocationTV.setText(hEvent.getLocation().toString());
+        if (hEvent.getAddress() != null) {
+            habitEventLocationTV.setText(hEvent.getAddress());
         }
 
         if (hEvent.getPhotoUrl() != null) {
@@ -361,7 +361,8 @@ public class EditHabitEventFragment extends Fragment {
     private View.OnClickListener chooseLocOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            navController.navigate(R.id.action_editHabitEventFragment_to_mapFragment);
+            NavDirections direction = EditHabitEventFragmentDirections.actionEditHabitEventFragmentToMapFragment(habit, hEvent);
+            navController.navigate(direction);
         }
     };
 }

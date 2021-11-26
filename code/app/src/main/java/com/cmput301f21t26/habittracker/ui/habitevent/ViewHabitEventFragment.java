@@ -115,8 +115,8 @@ public class ViewHabitEventFragment extends Fragment {
         habitEventTitleTV.setText(hEvent.getTitle());
 
         habitEventCommentET.setText(hEvent.getComment());
-        if (hEvent.getLocation() != null) {
-            habitEventLocationTV.setText(hEvent.getLocation().toString());
+        if (hEvent.getAddress() != null) {
+            habitEventLocationTV.setText(hEvent.getAddress());
         }
 
         if (hEvent.getPhotoUrl() == null) {

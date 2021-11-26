@@ -1,9 +1,5 @@
 package com.cmput301f21t26.habittracker.objects;
 
-import android.location.Location;
-
-import androidx.annotation.Nullable;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -17,7 +13,7 @@ import java.util.UUID;
 public class HabitEvent implements Serializable {
 
     private String comment;
-    private Location loc;
+    private String address;
     private String photoUrl;
     private Date hEventDate;
     private final String habitEventId;
@@ -29,18 +25,18 @@ public class HabitEvent implements Serializable {
      *
      * @param parentHabitId id of habit that owns this habit event
      * @param comment optional string comment up to 20 characters
-     * @param loc optional location information
+     * @param address optional location information
      * @param photoUrl optional photo url, which is obtained from StorageReference.getDownloadUrl();
      * @param hEventDate date at which the event occurred
      * @param title habit event title
      * @throws IllegalArgumentException if habit event comment is too long
      */
-    public HabitEvent(String parentHabitId, String comment, @Nullable Location loc, String photoUrl, Date hEventDate, String title) {
+    public HabitEvent(String parentHabitId, String comment, String address, String photoUrl, Date hEventDate, String title) {
         if (comment.length() > 20) {
             throw new IllegalArgumentException("Habit event comment must be up to 20 characters");
         }
         this.comment = comment;
-        this.loc = loc;
+        this.address = address;
         this.photoUrl = photoUrl;
         this.hEventDate = hEventDate;
         this.habitEventId = UUID.randomUUID().toString();
@@ -116,12 +112,12 @@ public class HabitEvent implements Serializable {
         this.comment = comment;
     }
 
-    public Location getLocation() {
-        return loc;
+    public String getAddress() {
+        return address;
     }
 
-    public void setLocation(Location loc) {
-        this.loc = loc;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Date getHabitEventDate() {
