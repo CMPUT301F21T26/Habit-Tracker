@@ -196,7 +196,6 @@ public class EditHabitEventFragment extends Fragment {
         public void onClick(View view) {
 
             String comment = commentET.getText().toString();
-            // TODO get location, photograph from the user
 
             hEvent.setComment(comment);
 

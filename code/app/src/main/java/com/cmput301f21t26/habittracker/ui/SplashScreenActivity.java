@@ -59,9 +59,6 @@ public class SplashScreenActivity extends AppCompatActivity {
             ad.setExitFadeDuration(500);
             ad.start();
         }
-
-        // TODO we want user information to be retrievable even if offline, which is default setting for
-        // our database
     }
 
     /**
