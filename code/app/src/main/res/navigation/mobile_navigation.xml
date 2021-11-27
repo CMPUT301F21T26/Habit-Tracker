@@ -159,7 +159,7 @@
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.cmput301f21t26.habittracker.ui.habitevent.MapFragment"
-        android:label="MapFragment" >
+        android:label="CHOOSE LOCATION" >
         <action
             android:id="@+id/action_mapFragment_to_editHabitEventFragment"
             app:destination="@id/editHabitEventFragment"

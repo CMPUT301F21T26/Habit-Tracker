@@ -15,12 +15,16 @@
 
     <Button
         android:id="@+id/locationConfirmBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="CONFIRM"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/custom_rounded_square_button"
+        map:elevation="10dp"
+        map:icon="@drawable/ic_checkmark"
+        map:iconSize="38dp"
         map:layout_constraintBottom_toBottomOf="parent"
-        map:layout_constraintEnd_toEndOf="parent" />
+        map:layout_constraintRight_toRightOf="parent"
+        map:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

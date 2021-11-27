@@ -36,7 +36,6 @@ public class ProfileFragmentFollowingTab extends Fragment {
     private OtherUserController otherUserController;
     private ArrayList<User> usersList;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +70,7 @@ public class ProfileFragmentFollowingTab extends Fragment {
         if (userObject.getUid().equals(UserController.getCurrentUserId())
                 || UserController.getCurrentUser().isFollowing(userObject)) {
 
+            profileFollowingListView.setVisibility(View.VISIBLE);
             // get list of users from user's following list and display it
             otherUserController.getUsersList((ArrayList<String>) userObject.getFollowings(), new UserListCallback() {
                 @Override
@@ -98,7 +98,7 @@ public class ProfileFragmentFollowingTab extends Fragment {
             });
 
         } else {
-            profileFollowingListView.setAdapter(null);
+            profileFollowingListView.setVisibility(View.GONE);
         }
     }
 
