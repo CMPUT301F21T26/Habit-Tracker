@@ -39,10 +39,14 @@ public class TimelineFragment extends Fragment implements Observer {
     private TimelineListAdapter timelineListAdapter;
     private ListView timelineListView;
 
+    private UserController userController;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentTimelineBinding.inflate(inflater, container, false);
+
+        userController = UserController.getInstance();
 
         return binding.getRoot();
     }
@@ -55,7 +59,7 @@ public class TimelineFragment extends Fragment implements Observer {
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
-        habitsList = UserController.getCurrentUser().getHabits();
+        habitsList = userController.getCurrentUser().getHabits();
         allHabitEventsList = new ArrayList<>();
         // add all habit events into one list
         for (Habit habit : habitsList) {
@@ -88,7 +92,7 @@ public class TimelineFragment extends Fragment implements Observer {
                 // Get the habit event from clicked, and its associated habit
                 // to prepare it to be sent to view habit event fragment
                 HabitEvent hEvent = (HabitEvent) adapterView.getItemAtPosition(i);
-                Habit habit = UserController.getHabit(hEvent.getParentHabitId());
+                Habit habit = userController.getHabit(hEvent.getParentHabitId());
 
                 // Navigate to view habit event fragment
                 NavDirections action = MobileNavigationDirections.actionGlobalViewHabitEventFragment(hEvent, habit);
@@ -105,7 +109,7 @@ public class TimelineFragment extends Fragment implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        habitsList = UserController.getCurrentUser().getHabits();
+        habitsList = userController.getCurrentUser().getHabits();
         allHabitEventsList = new ArrayList<>();
 
         // add all habit events into one list

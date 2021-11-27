@@ -42,6 +42,8 @@ public class ProfileFragmentHabitsTab extends Fragment {
     private ImageView lockHabitsImageView;
     private TextView followToSeeHabitsTV;
 
+    private UserController userController;
+
     public ProfileFragmentHabitsTab() {
         // Required empty public constructor
     }
@@ -52,6 +54,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
         // get the user to instantiate this fragment with
         ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
         userObject = parentProfileFrag.getAttachedUser();
+        userController = UserController.getInstance();
     }
 
     @Override
@@ -90,8 +93,8 @@ public class ProfileFragmentHabitsTab extends Fragment {
      * is granted permission to view the other user's public habits
      */
     private void updateRecyclerView() {
-        if (userObject.getUid().equals(UserController.getCurrentUserId())
-                || UserController.getCurrentUser().isFollowing(userObject)) {
+        if (userObject.getUid().equals(userController.getCurrentUserId())
+                || userController.getCurrentUser().isFollowing(userObject)) {
 
             mRecyclerView.setVisibility(View.VISIBLE);
             // show habits only when the userObject is equal to current user
@@ -100,7 +103,7 @@ public class ProfileFragmentHabitsTab extends Fragment {
 
             // Set ItemTouchHelper to allow rearranging habits
             HabitItemTouchHelper habitItemTouchHelper = new HabitItemTouchHelper(habitAdapter);
-            if (UserController.getCurrentUser().isFollowing(userObject)) {
+            if (userController.getCurrentUser().isFollowing(userObject)) {
                 // don't allow current user to drag and drop other user's habits
                 habitItemTouchHelper.setDraggable(false);
             }
@@ -128,8 +131,8 @@ public class ProfileFragmentHabitsTab extends Fragment {
         // If the passed in user object is not the current user and
         // the current user is following the user they are following, update
         // the "FOLLOW THIS USER TO SEE THEIR HABITS" text
-        if (!userObject.getUid().equals(UserController.getCurrentUserId())) {
-            if (UserController.getCurrentUser().isFollowing(userObject)) {
+        if (!userObject.getUid().equals(userController.getCurrentUserId())) {
+            if (userController.getCurrentUser().isFollowing(userObject)) {
                 lockHabitsImageView.setVisibility(View.GONE);
                 followToSeeHabitsTV.setVisibility(View.GONE);
             } else {

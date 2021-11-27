@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
 
 import java.util.ArrayList;
@@ -32,13 +33,17 @@ public class TimelineListAdapter extends BaseAdapter implements Observer {
     private Context mContext;
     private float dpRatio;
 
+    private UserController userController;
+
     public TimelineListAdapter(Context context, ArrayList<HabitEvent> habitEvents) {
         this.mContext = context;
         this.hEventsList = habitEvents;
         if (mContext != null) {
             dpRatio = mContext.getResources().getDisplayMetrics().density;
         }
-        UserController.addObserverToCurrentUser(this);
+        userController = UserController.getInstance();
+
+        userController.addObserverToCurrentUser(this);
     }
 
     @Override

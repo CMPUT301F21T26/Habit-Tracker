@@ -40,6 +40,8 @@ public class LoginFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseFirestore mStore;
 
+    private UserController userController;
+
     private final View.OnClickListener loginConfirmOnClickListener = view -> {
         username = usernameET.getText().toString();
         password = passwordET.getText().toString();
@@ -68,6 +70,7 @@ public class LoginFragment extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
         mStore = FirebaseFirestore.getInstance();
+        userController = UserController.getInstance();
     }
 
     @Override
@@ -117,7 +120,7 @@ public class LoginFragment extends Fragment {
                                     Toast.makeText(getActivity(), "Logging in", Toast.LENGTH_LONG).show();
 
                                     // initialize user before moving to MainActivity
-                                    UserController.initCurrentUser(currUser -> {        // get user data then start activity
+                                    userController.initCurrentUser(currUser -> {        // get user data then start activity
                                         Intent intent = new Intent(getActivity(), MainActivity.class);
                                         // Close existing activity stack and create new root activity
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

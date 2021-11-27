@@ -33,8 +33,10 @@ public class ProfileFragmentFollowersTab extends Fragment {
     private ListView profileFollowersListView;
     private UserListAdapter userListAdapter;
     private NavController navController;
-    private OtherUserController otherUserController;
     private ArrayList<User> usersList;
+
+    private UserController userController;
+    private OtherUserController otherUserController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,7 @@ public class ProfileFragmentFollowersTab extends Fragment {
         userObject = parentProfileFrag.getAttachedUser();
         usersList = new ArrayList<>();
         otherUserController = OtherUserController.getInstance();
+        userController = UserController.getInstance();
     }
 
     @Override
@@ -68,8 +71,8 @@ public class ProfileFragmentFollowersTab extends Fragment {
      */
     private void updateListView() {
 
-        if (userObject.getUid().equals(UserController.getCurrentUserId())
-                || UserController.getCurrentUser().isFollowing(userObject)) {
+        if (userObject.getUid().equals(userController.getCurrentUserId())
+                || userController.getCurrentUser().isFollowing(userObject)) {
 
             profileFollowersListView.setVisibility(View.VISIBLE);
             // get list of users from user's following list and display it
@@ -108,8 +111,8 @@ public class ProfileFragmentFollowersTab extends Fragment {
      * if user is not following, shown otherwise.
      */
     private void updateFollowToSeeFollowingText() {
-        if (!userObject.getUid().equals(UserController.getCurrentUserId())) {
-            if (UserController.getCurrentUser().isFollowing(userObject)) {
+        if (!userObject.getUid().equals(userController.getCurrentUserId())) {
+            if (userController.getCurrentUser().isFollowing(userObject)) {
                 lockFollowersImageView.setVisibility(View.GONE);
                 followToSeeFollowersTV.setVisibility(View.GONE);
             } else {

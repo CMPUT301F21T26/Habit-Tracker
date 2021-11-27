@@ -40,15 +40,26 @@ import java.util.Observer;
  */
 public class UserController {
 
-    private static User user;
-    private static ListenerRegistration userSnapshotListener;
+    private User user;
+    private ListenerRegistration userSnapshotListener;
 
-    private static HabitController habitController;
-    private static HabitEventController habitEventController;
-    private static FollowRequestController followRequestController;
+    private HabitController habitController;
+    private HabitEventController habitEventController;
+    private FollowRequestController followRequestController;
 
-    private static final FirebaseFirestore mStore = FirebaseFirestore.getInstance();
-    private static final FirebaseStorage mStorage = FirebaseStorage.getInstance();
+    private FirebaseFirestore mStore;
+    private FirebaseStorage mStorage;
+
+    private final static UserController instance = new UserController();
+
+    private UserController() {
+        mStore = FirebaseFirestore.getInstance();
+        mStorage = FirebaseStorage.getInstance();
+    }
+
+    public static UserController getInstance() {
+        return instance;
+    }
 
     /**
      * Initialize current user and attach snapshot listeners.
@@ -58,7 +69,7 @@ public class UserController {
      *
      * @param callback callback function to be called after the initialization
      */
-    public static void initCurrentUser(UserCallback callback) {
+    public void initCurrentUser(UserCallback callback) {
 
         // initialize the instances of controllers with lazy construction
         habitController = HabitController.getInstance();
@@ -68,7 +79,7 @@ public class UserController {
         readUserDataFromDb(user -> {
 
             // add snapshot listeners
-            userSnapshotListener = getUserSnapshotListener();
+            initUserSnapshotListener();
             habitController.initHabitsSnapshotListener();
             followRequestController.initFollowRequestSnapshotListener();
 
@@ -78,11 +89,11 @@ public class UserController {
         });
     }
 
-    public static String getCurrentUserId() {
+    public String getCurrentUserId() {
         return Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
     }
 
-    public static User getCurrentUser() {
+    public User getCurrentUser() {
         return user;
     }
 
@@ -91,7 +102,7 @@ public class UserController {
      *
      * @param callback callback function to be called after the update
      */
-    private static void updateUserLastAccessedDateInDb(UserCallback callback) {
+    private void updateUserLastAccessedDateInDb(UserCallback callback) {
 
         assert user != null;
 
@@ -106,7 +117,7 @@ public class UserController {
      *
      * @param observer observer to attach to the current user
      */
-    public static void addObserverToCurrentUser(Observer observer) {
+    public void addObserverToCurrentUser(Observer observer) {
         if (user != null) {
             // only add observer when the user exists
             user.addObserver(observer);
@@ -117,7 +128,7 @@ public class UserController {
      * Remove the input observer from the current user
      * @param observer observer to remove
      */
-    public static void deleteObserverFromCurrentUser(Observer observer) {
+    public void deleteObserverFromCurrentUser(Observer observer) {
         if (user != null) {
             // only remove observer when the user exists
             user.deleteObserver(observer);
@@ -127,7 +138,7 @@ public class UserController {
     /**
      * Remove all observers from the current user
      */
-    public static void deleteAllObserversFromCurrentUser() {
+    public void deleteAllObserversFromCurrentUser() {
         if (user != null) {
             // only remove all observers when the user exists
             user.deleteObservers();
@@ -137,7 +148,7 @@ public class UserController {
     /**
      * Detach all snapshot listeners attached to user
      */
-    public static void detachSnapshotListeners() {
+    public void detachSnapshotListeners() {
         if (user != null) {
             // only detach when user exists
             userSnapshotListener.remove();
@@ -153,7 +164,7 @@ public class UserController {
      *
      * @param callback callback function to be called after reading data from db
      */
-    private static void readUserDataFromDb(UserCallback callback) {
+    private void readUserDataFromDb(UserCallback callback) {
 
         final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
 
@@ -174,17 +185,17 @@ public class UserController {
     }
 
     /**
-     * Return the user document snapshot listener
+     * Initialize the user document snapshot listener
      *
      * @return snapshot listener for user doc
      */
-    private static ListenerRegistration getUserSnapshotListener() {
+    private void initUserSnapshotListener() {
 
         assert user != null;
 
         final DocumentReference userRef = mStore.collection("users").document(getCurrentUserId());
 
-        return userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        userSnapshotListener = userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
@@ -217,7 +228,7 @@ public class UserController {
      * @param habitId String habit id
      * @return Habit if habit exists. Otherwise, return null
      */
-    public static Habit getHabit(String habitId) {
+    public Habit getHabit(String habitId) {
         return user.getHabit(habitId);
     }
 
@@ -229,7 +240,7 @@ public class UserController {
      * @param imageUri uri of the new profile picture
      * @param callback callback function to be called after the update
      */
-    public static void updateProfilePicInDb(String picturePath, Uri imageUri, UserCallback callback) {
+    public void updateProfilePicInDb(String picturePath, Uri imageUri, UserCallback callback) {
 
         assert user != null;
 

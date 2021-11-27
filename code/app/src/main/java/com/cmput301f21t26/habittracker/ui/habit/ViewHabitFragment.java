@@ -45,6 +45,8 @@ public class ViewHabitFragment extends Fragment {
     private ChipGroup chipGroup;
     private SwitchCompat isPrivateSwitch;
 
+    private UserController userController;
+
     public ViewHabitFragment() {
         // Required empty public constructor
     }
@@ -67,12 +69,15 @@ public class ViewHabitFragment extends Fragment {
         editHabitButton = binding.editHabitButton;
         isPrivateSwitch = binding.privacySwitch;
 
+        userController = UserController.getInstance();
+
         // Hide edit button if passed in user object is not the owner (i.e. not the current user)
         User userObject = ViewHabitFragmentArgs.fromBundle(getArguments()).getUser();
-        if (userObject != UserController.getCurrentUser() &&
-                !userObject.getUsername().equals(UserController.getCurrentUser().getUsername())) {           // for the case of viewing one's own profile
+        if (userObject != userController.getCurrentUser() &&
+                !userObject.getUsername().equals(userController.getCurrentUser().getUsername())) {           // for the case of viewing one's own profile
             editHabitButton.setVisibility(View.GONE);
         }
+
 
         // Inflate the layout for this fragment
         return binding.getRoot();
