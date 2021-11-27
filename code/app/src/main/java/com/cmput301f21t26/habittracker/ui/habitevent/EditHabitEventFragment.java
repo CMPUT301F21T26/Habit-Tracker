@@ -346,6 +346,8 @@ public class EditHabitEventFragment extends Fragment {
             hEvent.setPhotoUrl(null);
             habitEventController.updateHabitEventInDb(hEvent, user -> {});
             habitEventImage.setImageResource(R.drawable.default_image);
+
+            removeImageImageButton.setVisibility(View.GONE);
         }
     };
 
@@ -366,6 +368,8 @@ public class EditHabitEventFragment extends Fragment {
             hEvent.setAddress(null);
             habitEventController.updateHabitEventInDb(hEvent, user -> {});
             habitEventLocationTV.setText("NONE");
+
+            removeLocationImageButton.setVisibility(View.GONE);
         }
     };
 }
