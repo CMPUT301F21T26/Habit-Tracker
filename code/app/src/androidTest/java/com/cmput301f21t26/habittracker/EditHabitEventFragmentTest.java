@@ -36,6 +36,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 
 import androidx.test.InstrumentationRegistry;
 import androidx.test.core.app.ApplicationProvider;
@@ -219,10 +220,9 @@ public class EditHabitEventFragmentTest {
                 hasAction(Intent.ACTION_CHOOSER));
         Intents.init();
         intending(expectedIntent).respondWith(result);
-        Thread.sleep(1000);
         // Click choose image button
         onView(withId(R.id.chooseImageButton)).perform(click());
-
+        onView(withId(R.id.habitEventImage)).check(matches(hasDrawable()));
     }
 
     /**
@@ -251,11 +251,19 @@ public class EditHabitEventFragmentTest {
 
         Intents.init();
         intending(hasData(MediaStore.ACTION_IMAGE_CAPTURE)).respondWith(result);
-        Thread.sleep(1000);
         // Click camera button
         onView(withId(R.id.cameraButton)).perform(click());
-
+        onView(withId(R.id.habitEventImage)).check(matches(hasDrawable()));
     }
 
+    /**
+     * Used to check if an image view has a drawable (in our case, the habit event image view)
+     * Ref: https://stackoverflow.com/questions/38867613/espresso-testing-that-imageview-contains-a-drawable/38896816
+     * Ref: https://medium.com/@dbottillo/android-ui-test-espresso-matcher-for-imageview-1a28c832626f#.zem2ltpr7
+     * @return {@link DrawableMatcher}
+     */
+    public static Matcher<View> hasDrawable() {
+        return new DrawableMatcher(DrawableMatcher.ANY);
+    }
 
 }
