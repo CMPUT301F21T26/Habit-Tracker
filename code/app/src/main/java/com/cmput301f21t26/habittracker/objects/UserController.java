@@ -257,7 +257,6 @@ public class UserController {
                 .getDownloadUrl()
                 .addOnSuccessListener(uri ->{
                     // if the image file already exists, download that url and store it in user
-                    Log.d("UserControllerPP", "The URL after getting is: " + uri.toString());
                     mStore.collection("users").document(getCurrentUserId())
                             .update("pictureURL", uri.toString())
                             .addOnSuccessListener(unused -> callback.onCallback(user))
@@ -271,7 +270,6 @@ public class UserController {
                                 .putFile(imageUri)
                                 .addOnSuccessListener(taskSnapshot -> {
                                     storageRef.getDownloadUrl().addOnCompleteListener(task -> {
-                                        Log.d("UserControllerPP", "The URL after storing is: " + task.getResult().toString());
                                         mStore.collection("users").document(getCurrentUserId())
                                                 .update("pictureURL", task.getResult().toString())
                                                 .addOnSuccessListener(unused -> callback.onCallback(user))

@@ -248,7 +248,6 @@ public class HabitEventController {
                 .getDownloadUrl()
                 .addOnSuccessListener(uri ->{
                     // if the image file already exists, download that url and store it in habit event
-                    Log.d("HabitEventImage", "The URL after getting is: " + uri.toString());
                     hEvent.setPhotoUrl(uri.toString());
                     updateHabitEventInDb(hEvent, callback);
                 })
@@ -260,7 +259,6 @@ public class HabitEventController {
                                 .putFile(imageUri)
                                 .addOnSuccessListener(taskSnapshot -> {
                                     storageRef.getDownloadUrl().addOnCompleteListener(task -> {
-                                        Log.d("HabitEventImage", "The URL after storing is: " + task.getResult().toString());
                                         hEvent.setPhotoUrl(task.getResult().toString());
                                         updateHabitEventInDb(hEvent, callback);
                                     });

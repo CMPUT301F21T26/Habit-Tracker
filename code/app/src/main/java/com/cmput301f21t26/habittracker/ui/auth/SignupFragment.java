@@ -283,7 +283,6 @@ public class SignupFragment extends Fragment {
                 .addOnSuccessListener(uri -> {
                     // if the image file already exists, download that url and store it in user
                     profileImageUrl = uri.toString();
-                    Log.d(TAG, "The profile pic url after getting is : " + profileImageUrl);
                     createUserFirebaseFirestore(profileImageUrl, firstName, lastName, email, username);
 
                 })
@@ -297,7 +296,6 @@ public class SignupFragment extends Fragment {
                                     @Override
                                     public void onComplete(@NonNull Task<Uri> task) {
                                         profileImageUrl = task.getResult().toString();
-                                        Log.d(TAG, "The profile pic url after storing is : " + profileImageUrl);
                                         createUserFirebaseFirestore(profileImageUrl, firstName, lastName, email, username);
                                     }
                                 });
