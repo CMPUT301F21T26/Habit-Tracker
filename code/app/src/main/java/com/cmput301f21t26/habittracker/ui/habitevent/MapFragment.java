@@ -52,6 +52,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveListener {
 
     private final String TAG = "MapFragment";
@@ -139,9 +143,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private void getAddressLocation(String address) {
 
         @SuppressLint("DefaultLocale")
-        String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s",
-                address.replace(" ", "+"),
-                getResources().getString(R.string.google_maps_key));
+        String url = null;
+        try {
+            url = String.format("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s",
+                    URLEncoder.encode(address, "utf-8"),
+                    getResources().getString(R.string.google_maps_key));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         Log.d(TAG, url);
 
         RequestQueue queue = Volley.newRequestQueue(getContext());
@@ -158,6 +167,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                             double lat = location.getDouble("lat");
                             double lng = location.getDouble("lng");
                             latLng = new LatLng(lat, lng);
+
+                            if (marker != null) {
+                                marker.remove();
+                            }
 
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     latLng, DEFAULT_ZOOM));
@@ -295,6 +308,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         latLng, DEFAULT_ZOOM));
+
+                                if (marker != null) {
+                                    marker.remove();
+                                }
+
                                 marker = map.addMarker(
                                         new MarkerOptions()
                                                 .position(latLng));
