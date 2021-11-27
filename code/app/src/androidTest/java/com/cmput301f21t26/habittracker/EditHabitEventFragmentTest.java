@@ -252,7 +252,7 @@ public class EditHabitEventFragmentTest {
         Intents.init();
         intending(hasData(MediaStore.ACTION_IMAGE_CAPTURE)).respondWith(result);
         Thread.sleep(1000);
-        // Click choose image button
+        // Click camera button
         onView(withId(R.id.cameraButton)).perform(click());
 
     }
