@@ -86,13 +86,14 @@ public class ProfileFragment extends Fragment implements Observer {
 
         isFollowButtonClicked = false;
 
+        userController = UserController.getInstance();
+
         // Get users
         currentUser = userController.getCurrentUser();
         otherUser = ProfileFragmentArgs.fromBundle(getArguments()).getUser();
         
         followRequestController = FollowRequestController.getInstance();
         otherUserController = OtherUserController.getInstance();
-        userController = UserController.getInstance();
 
         // otherUser dne i.e we want to view the current user's profile
         if (otherUser == currentUser) {
