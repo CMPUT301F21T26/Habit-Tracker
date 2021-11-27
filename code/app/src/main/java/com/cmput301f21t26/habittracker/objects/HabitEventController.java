@@ -3,9 +3,11 @@ package com.cmput301f21t26.habittracker.objects;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.cmput301f21t26.habittracker.interfaces.UserCallback;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
@@ -227,6 +229,13 @@ public class HabitEventController {
         batch.commit().addOnSuccessListener(unused -> callback.onCallback(user));
     }
 
+    /**
+     * Updates the habit event image url field in the database
+     * @param hEvent The {@link HabitEvent} to be updated in the db
+     * @param picturePath The {@link String} path of the picture in Firebase Storage
+     * @param imageUri The {@link Uri} of the image
+     * @param callback callback function to be called after the update
+     */
     public void updateHabitEventImageInDb(HabitEvent hEvent, String picturePath, Uri imageUri, UserCallback callback) {
 
         User user = userController.getCurrentUser();
@@ -234,16 +243,30 @@ public class HabitEventController {
 
         final StorageReference storageRef = mStorage.getReference(picturePath);
 
-        storageRef
-                .putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // If successful, get the download url and store it in pictureURL
-                    storageRef.getDownloadUrl().addOnSuccessListener(url -> {
-                        hEvent.setPhotoUrl(url.toString());
-                        updateHabitEventInDb(hEvent, callback);
-                    });
+        mStorage.getReference()
+                .child(picturePath)
+                .getDownloadUrl()
+                .addOnSuccessListener(uri ->{
+                    // if the image file already exists, download that url and store it in habit event
+                    hEvent.setPhotoUrl(uri.toString());
+                    updateHabitEventInDb(hEvent, callback);
                 })
-                .addOnFailureListener(e -> Log.d("storeHabitEventImage", "Habit Event Image was not stored"));
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // If image file doesn't exist, add it to storage and get its url
+                        storageRef
+                                .putFile(imageUri)
+                                .addOnSuccessListener(taskSnapshot -> {
+                                    storageRef.getDownloadUrl().addOnCompleteListener(task -> {
+                                        hEvent.setPhotoUrl(task.getResult().toString());
+                                        updateHabitEventInDb(hEvent, callback);
+                                    });
+                                })
+                                .addOnFailureListener(e2 -> Log.d("storeHabitEventImage", "Habit Event Image was not stored"));
+                    }
+                });
+
     }
 
     public void getAllHabitEvents(Habit habit, UserCallback callback) {
