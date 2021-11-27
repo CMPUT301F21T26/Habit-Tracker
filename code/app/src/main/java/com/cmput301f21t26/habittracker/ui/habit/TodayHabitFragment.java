@@ -21,6 +21,7 @@ import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentTodayHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
 
 import java.time.LocalDate;
@@ -41,6 +42,8 @@ public class TodayHabitFragment extends Fragment {
 
     private NavController navController;
 
+    private UserController userController;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -48,6 +51,8 @@ public class TodayHabitFragment extends Fragment {
         mRecyclerView = binding.todayHabitRV;
         mLayoutManager = new LinearLayoutManager(getActivity());
         todayIsDay = binding.todayIsDayTV;
+
+        userController = UserController.getInstance();
 
         return binding.getRoot();
     }
@@ -61,7 +66,7 @@ public class TodayHabitFragment extends Fragment {
         // set today's day
         todayIsDay.setText(LocalDate.now().getDayOfWeek().name());
 
-        todayHabitList = (ArrayList<Habit>) UserController.getCurrentUser().getTodayHabits();
+        todayHabitList = (ArrayList<Habit>) userController.getCurrentUser().getTodayHabits();
         // If there are no habits today, show text that says so
         if (todayHabitList.isEmpty()) {
             binding.noHabitsTodayTV.setVisibility(View.VISIBLE);
@@ -72,7 +77,7 @@ public class TodayHabitFragment extends Fragment {
             @Override
             public void onClick(int position) {
                 Habit habit = todayHabitList.get(position);     // retrieve habit in this pos
-                NavDirections action = MobileNavigationDirections.actionGlobalViewHabitFragment(habit, UserController.getCurrentUser());
+                NavDirections action = MobileNavigationDirections.actionGlobalViewHabitFragment(habit, userController.getCurrentUser());
                 navController.navigate(action);
             }
         };

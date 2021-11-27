@@ -23,7 +23,7 @@ public class FollowRequestController {
 
     private static FollowRequestController instance = new FollowRequestController();
 
-    // private final UserController userController;
+    private UserController userController;
     private ListenerRegistration followRequestSnapshotListener;
 
     private final FirebaseFirestore mStore;
@@ -35,6 +35,8 @@ public class FollowRequestController {
     private FollowRequestController() {
         mStore = FirebaseFirestore.getInstance();
         usersRef = mStore.collection("users");
+
+        userController = UserController.getInstance();
     }
 
     /**
@@ -51,7 +53,7 @@ public class FollowRequestController {
      */
     public void initFollowRequestSnapshotListener() {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         followRequestSnapshotListener = usersRef.document(user.getUid()).collection("followRequests")
@@ -101,7 +103,7 @@ public class FollowRequestController {
      */
     public void sendFollowRequest(User toUser, UserCallback callback) {
 
-        User currentUser = UserController.getCurrentUser();
+        User currentUser = userController.getCurrentUser();
 
         FollowRequest fr = new FollowRequest(currentUser, toUser);
 
@@ -150,7 +152,7 @@ public class FollowRequestController {
      */
     public void undoFollowRequest(FollowRequest fr, UserCallback callback) {
 
-        User currentUser = UserController.getCurrentUser();
+        User currentUser = userController.getCurrentUser();
 
         final CollectionReference followRequestsRef =
                 usersRef.document(fr.getToUid()).collection("followRequests");
@@ -187,7 +189,7 @@ public class FollowRequestController {
      */
     public void unfollow(String targetUserId, UserCallback callback) {
 
-        User currentUser = UserController.getCurrentUser();
+        User currentUser = userController.getCurrentUser();
 
         usersRef.document(targetUserId)
                 .update("followers", FieldValue.arrayRemove(currentUser.getUid()))

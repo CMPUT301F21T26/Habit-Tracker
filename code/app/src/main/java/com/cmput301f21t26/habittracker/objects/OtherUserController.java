@@ -31,12 +31,16 @@ public class OtherUserController {
     // Singleton
     private final static OtherUserController instance = new OtherUserController();
 
+    private UserController userController;
+
     /**
      * Private constructor
      */
     private OtherUserController() {
         mStore = FirebaseFirestore.getInstance();
         usersRef = mStore.collection("users");
+
+        userController = UserController.getInstance();
     }
 
     public static OtherUserController getInstance() {
@@ -53,7 +57,7 @@ public class OtherUserController {
      */
     public void getUsersList(String newText, UserListCallback callback) {
 
-        User currentUser = UserController.getCurrentUser();
+        User currentUser = userController.getCurrentUser();
 
         ArrayList<User> usersList = new ArrayList<>();
         if (!newText.isEmpty()) {
@@ -156,7 +160,7 @@ public class OtherUserController {
      */
     public void getFollowStatusOfCurrentUserTo(User otherUser, FollowStatusCallback callback) {
 
-        User currentUser = UserController.getCurrentUser();
+        User currentUser = userController.getCurrentUser();
 
         final DocumentReference otherUserReference = usersRef.document(otherUser.getUid());
         otherUserReference.collection("followRequests")

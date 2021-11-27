@@ -63,6 +63,7 @@ public class ProfileFragment extends Fragment implements Observer {
 
     private FollowRequestController followRequestController;
     private OtherUserController otherUserController;
+    private UserController userController;
 
     private FollowStatus followStatus;
 
@@ -86,15 +87,16 @@ public class ProfileFragment extends Fragment implements Observer {
         isFollowButtonClicked = false;
 
         // Get users
-        currentUser = UserController.getCurrentUser();
+        currentUser = userController.getCurrentUser();
         otherUser = ProfileFragmentArgs.fromBundle(getArguments()).getUser();
         
         followRequestController = FollowRequestController.getInstance();
         otherUserController = OtherUserController.getInstance();
+        userController = UserController.getInstance();
 
         // otherUser dne i.e we want to view the current user's profile
         if (otherUser == currentUser) {
-            UserController.addObserverToCurrentUser(this);
+            userController.addObserverToCurrentUser(this);
         }
 
         return view;
@@ -310,7 +312,7 @@ public class ProfileFragment extends Fragment implements Observer {
             imageUri = Uri.parse("android.resource://com.cmput301f21t26.habittracker/drawable/default_profile_pic");
             picturePath = "image/" + imageUri.hashCode() + ".jpeg";
 
-            UserController.updateProfilePicInDb(picturePath, imageUri, user -> {
+            userController.updateProfilePicInDb(picturePath, imageUri, user -> {
                 if (getActivity() != null) {
                     ((MainActivity) getActivity()).setProfileIconToProfilePic(profileImageUrl);
                 }
@@ -338,7 +340,7 @@ public class ProfileFragment extends Fragment implements Observer {
                             profilePic.setImageURI(newImageUri);
                             imageUri = newImageUri;
 
-                            UserController.updateProfilePicInDb(picturePath, imageUri, user -> {
+                            userController.updateProfilePicInDb(picturePath, imageUri, user -> {
                                 if (getActivity() != null) {
                                    ((MainActivity) getActivity()).setProfileIconToProfilePic(profileImageUrl);
                                 }
@@ -356,7 +358,7 @@ public class ProfileFragment extends Fragment implements Observer {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-        UserController.deleteObserverFromCurrentUser(this);
+        userController.deleteObserverFromCurrentUser(this);
     }
 
     @Override

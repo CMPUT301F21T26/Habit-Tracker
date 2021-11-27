@@ -29,6 +29,7 @@ import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitController;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.HabitEventController;
+import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -49,6 +50,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
     private Context mContext;
     private ItemTouchHelper touchHelper;
 
+    private UserController userController;
     private HabitController habitController;
     private HabitEventController habitEventController;
 
@@ -63,10 +65,11 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         this.habitList = habitList;
         this.listener = listener;
 
-        UserController.addObserverToCurrentUser(this);
-
+        userController = UserController.getInstance();
         habitController = HabitController.getInstance();
         habitEventController = HabitEventController.getInstance();
+
+        userController.addObserverToCurrentUser(this);
     }
 
     // Create new views (invoked by the layout manager)

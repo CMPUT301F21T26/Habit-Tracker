@@ -29,6 +29,7 @@ public class HabitEventController {
 
     private static HabitEventController instance = new HabitEventController();
 
+    private UserController userController;
     private HabitController habitController;
 
     private Map<String, ListenerRegistration> habitEventsSnapshotListenerMap;
@@ -41,6 +42,7 @@ public class HabitEventController {
      * Private constructor
      */
     private HabitEventController() {
+        userController = UserController.getInstance();
         habitController = HabitController.getInstance();
         habitEventsSnapshotListenerMap = new HashMap<>();
 
@@ -66,7 +68,7 @@ public class HabitEventController {
      */
     public void initHabitEventsSnapshotListener(String parentHabitId) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         final DocumentReference userRef = usersRef.document(user.getUid());
@@ -102,7 +104,7 @@ public class HabitEventController {
 
                                     // if habit event to be removed is dated to today, set done for today of parent habit to false
                                     if (hEvent.getHabitEventDateDay().equals(user.getDateLastAccessedDay())) {
-                                        Habit habit = UserController.getHabit(parentHabitId);
+                                        Habit habit = userController.getHabit(parentHabitId);
                                         habit.setDoneForToday(false);
                                         habitController.updateHabitInDb(habit, user -> { });
                                     }
@@ -138,7 +140,7 @@ public class HabitEventController {
      */
     public void storeHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         final DocumentReference userRef = mStore.collection("users").document(user.getUid());
@@ -160,7 +162,7 @@ public class HabitEventController {
      */
     public void updateHabitEventInDb(HabitEvent hEvent, UserCallback callback) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         final DocumentReference userRef = mStore.collection("users").document(user.getUid());
@@ -184,7 +186,7 @@ public class HabitEventController {
      */
     public void removeHabitEventFromDb(HabitEvent hEvent, UserCallback callback) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         final DocumentReference userRef = mStore.collection("users").document(user.getUid());
@@ -207,7 +209,7 @@ public class HabitEventController {
      */
     public void removeAllHabitEventsOfHabitFromDb(Habit habit, UserCallback callback) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         final DocumentReference userRef = mStore.collection("users").document(user.getUid());
@@ -227,7 +229,7 @@ public class HabitEventController {
 
     public void updateHabitEventImageInDb(HabitEvent hEvent, String picturePath, Uri imageUri, UserCallback callback) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         final StorageReference storageRef = mStorage.getReference(picturePath);
@@ -247,7 +249,7 @@ public class HabitEventController {
     public void getAllHabitEvents(Habit habit, UserCallback callback) {
 
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         callback.onCallback(user);

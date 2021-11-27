@@ -29,6 +29,8 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
 
+    private UserController userController;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +61,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             ad.setExitFadeDuration(500);
             ad.start();
         }
+
     }
 
     /**
@@ -71,12 +74,14 @@ public class SplashScreenActivity extends AppCompatActivity {
     @Override
     protected void onStart(){
         super.onStart();
+        userController = UserController.getInstance();
+
         // Delays the splash screen and then goes to either the main activity or login/signup page
         // based on auth tokens
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (mAuth.getCurrentUser() != null) {
                 // initialize user before moving to MainActivity
-                UserController.initCurrentUser(user -> {        // get user data then start activity
+                userController.initCurrentUser(user -> {        // get user data then start activity
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);

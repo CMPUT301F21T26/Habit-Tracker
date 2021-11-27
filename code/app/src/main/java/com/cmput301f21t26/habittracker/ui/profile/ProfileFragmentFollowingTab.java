@@ -33,8 +33,10 @@ public class ProfileFragmentFollowingTab extends Fragment {
     private ListView profileFollowingListView;
     private UserListAdapter userListAdapter;
     private NavController navController;
-    private OtherUserController otherUserController;
     private ArrayList<User> usersList;
+
+    private UserController userController;
+    private OtherUserController otherUserController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,7 @@ public class ProfileFragmentFollowingTab extends Fragment {
         ProfileFragment parentProfileFrag = (ProfileFragment) getParentFragment();
         userObject = parentProfileFrag.getAttachedUser();
         usersList = new ArrayList<>();
+        userController = UserController.getInstance();
         otherUserController = OtherUserController.getInstance();
     }
 
@@ -67,8 +70,8 @@ public class ProfileFragmentFollowingTab extends Fragment {
      */
     private void updateListView() {
 
-        if (userObject.getUid().equals(UserController.getCurrentUserId())
-                || UserController.getCurrentUser().isFollowing(userObject)) {
+        if (userObject.getUid().equals(userController.getCurrentUserId())
+                || userController.getCurrentUser().isFollowing(userObject)) {
 
             profileFollowingListView.setVisibility(View.VISIBLE);
             // get list of users from user's following list and display it
@@ -107,8 +110,8 @@ public class ProfileFragmentFollowingTab extends Fragment {
      * if user is not following, shown otherwise.
      */
     private void updateFollowToSeeFollowingText() {
-        if (!userObject.getUid().equals(UserController.getCurrentUserId())) {
-            if (UserController.getCurrentUser().isFollowing(userObject)) {
+        if (!userObject.getUid().equals(userController.getCurrentUserId())) {
+            if (userController.getCurrentUser().isFollowing(userObject)) {
                 lockFollowingImageView.setVisibility(View.GONE);
                 followToSeeFollowingTV.setVisibility(View.GONE);
             } else {

@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private ImageView redCircle;
     private ImageView searchIcon;
     private FirebaseAuth mAuth;
+
+    private UserController userController;
     private OtherUserController otherUserController;
 
     @Override
@@ -74,11 +76,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         // Get our instances
         mAuth = FirebaseAuth.getInstance();
-        UserController.addObserverToCurrentUser(this);
+        userController = UserController.getInstance();
         otherUserController = OtherUserController.getInstance();
 
+        userController.addObserverToCurrentUser(this);
+
         // Set profile icon to current user's profile picture in bottom nav
-        setProfileIconToProfilePic(UserController.getCurrentUser().getPictureURL());
+        setProfileIconToProfilePic(userController.getCurrentUser().getPictureURL());
 
         // Setting up navController
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
@@ -115,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     return true;
                 }
                 if (id == R.id.navigation_profile) {
-                    action = MobileNavigationDirections.actionGlobalNavigationProfile(UserController.getCurrentUser());
+                    action = MobileNavigationDirections.actionGlobalNavigationProfile(userController.getCurrentUser());
                     navController.navigate(action);
                     return true;
                 }
@@ -233,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         // Set our list view and its adapter
         ListView followRequestListView = (ListView) notifDialog.findViewById(R.id.followRequestListView);
-        ArrayList<FollowRequest> followRequestList = (ArrayList<FollowRequest>) UserController.getCurrentUser().getFollowRequests();
+        ArrayList<FollowRequest> followRequestList = (ArrayList<FollowRequest>) userController.getCurrentUser().getFollowRequests();
 
         // Set item onclick listener so when user clicks on a follow request, go to user's profile
         FollowRequestListAdapter.OnDialogListClickListener onDialogListClickListener = new FollowRequestListAdapter.OnDialogListClickListener() {
@@ -268,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
      */
     private void updateBellIcon() {
         // Set red circle to appear on bell icon if there are follow requests
-        if (!UserController.getCurrentUser().getFollowRequests().isEmpty()) {
+        if (!userController.getCurrentUser().getFollowRequests().isEmpty()) {
             redCircle.setVisibility(View.VISIBLE);
         } else {
             redCircle.setVisibility(View.INVISIBLE);
@@ -291,8 +295,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        UserController.detachSnapshotListeners();
-        UserController.deleteAllObserversFromCurrentUser();
+        userController.detachSnapshotListeners();
+        userController.deleteAllObserversFromCurrentUser();
     }
 
     /**

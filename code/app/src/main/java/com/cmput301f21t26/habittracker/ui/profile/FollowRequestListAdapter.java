@@ -27,6 +27,7 @@ public class FollowRequestListAdapter extends BaseAdapter implements Observer {
     private Context mContext;
     private OnDialogListClickListener dialogListClickListener;
 
+    private UserController userController;
     private FollowRequestController followRequestController;
 
     /**
@@ -41,9 +42,10 @@ public class FollowRequestListAdapter extends BaseAdapter implements Observer {
         this.permissionsList = permissionsList;
         this.dialogListClickListener = listener;
 
-        UserController.addObserverToCurrentUser(this);
-
+        userController = UserController.getInstance();
         followRequestController = FollowRequestController.getInstance();
+
+        userController.addObserverToCurrentUser(this);
     }
 
     @Override

@@ -29,7 +29,7 @@ public class HabitController {
 
     private static HabitController instance = new HabitController();
 
-    // private final UserController userController;
+    private UserController userController;
     private HabitEventController habitEventController;
 
     private ListenerRegistration habitsSnapshotListener;
@@ -44,6 +44,7 @@ public class HabitController {
         mStore = FirebaseFirestore.getInstance();
         usersRef = mStore.collection("users");
 
+        userController = UserController.getInstance();
         habitEventController = HabitEventController.getInstance();
     }
 
@@ -66,7 +67,7 @@ public class HabitController {
      */
     public void initHabitsSnapshotListener() {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         final DocumentReference userRef = mStore.collection("users").document(user.getUid());
@@ -148,7 +149,7 @@ public class HabitController {
      */
     public void storeHabitInDb(Habit habit, UserCallback callback) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         mStore.collection("users").document(user.getUid()).collection("habits")
@@ -171,7 +172,7 @@ public class HabitController {
      */
     public void updateHabitInDb(Habit habit, UserCallback callback) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         mStore.collection("users").document(user.getUid()).collection("habits")
@@ -191,7 +192,7 @@ public class HabitController {
      */
     public void removeHabitFromDb(Habit habit, UserCallback callback) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         habitEventController.removeAllHabitEventsOfHabitFromDb(habit, cbUser -> {
@@ -219,7 +220,7 @@ public class HabitController {
      */
     public void setNewHabitPosition(Habit habit, UserCallback callback) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         Query highestIndexQuery = mStore.collection("users").document(user.getUid()).collection("habits")
@@ -248,7 +249,7 @@ public class HabitController {
      */
     public void updateHabitPositions() {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         for (Habit habit : user.getHabits()) {
@@ -265,7 +266,7 @@ public class HabitController {
      */
     public void resetHabitsInDb(UserCallback callback) {
 
-        User user = UserController.getCurrentUser();
+        User user = userController.getCurrentUser();
         assert user != null;
 
         Calendar calNow = Calendar.getInstance();
