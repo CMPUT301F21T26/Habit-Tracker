@@ -20,6 +20,10 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.cmput301f21t26.habittracker.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,8 +32,12 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,7 +70,7 @@ public class SignupFragment extends Fragment {
     private Boolean creatingUser = false;
     // Make it so the default profile pic is...the default profile pic. So user doesn't have to necessarily choose one.
     private Uri imageUri = Uri.parse("android.resource://com.cmput301f21t26.habittracker/drawable/default_profile_pic");
-    private String picturePath = "image/" + imageUri.hashCode() + ".jpeg";
+    private String picturePath = "image/" + "default_profile_pic" + ".jpeg";
     private String profileImageUrl;
 
     private NavController navController = null;
@@ -234,7 +242,7 @@ public class SignupFragment extends Fragment {
                         }
 
                         // User created in Firebase Authentication, now to add its data into Firestore database
-                        createUserFirebaseFirestore(firstName, lastName, email, username);
+                        storeOrGetProfilePicture(firstName, lastName, email, username);
                     } else {
                         Log.w(TAG, "Creation of User with email failed. " + Objects.requireNonNull(task.getException()).getMessage());
                         if (getActivity() != null) {
@@ -246,8 +254,15 @@ public class SignupFragment extends Fragment {
     }
 
     /**
-     * Creates a Firestore document for the newly signed up user with
-     * all userdata in it.
+     * stores or gets the profile picture in Firebase Storage. If the given picture path
+     * already exists in Firebase Storage, it will retrieve that download URL and store it
+     * into the user's pictureURL field. This is so then we aren't replacing the old image
+     * with the new image and thus changing the tokens, which caused loading errors when
+     * using Glide
+     * @see <a href="https://stackoverflow.com/questions/41943860/getting-403-forbidden-error-when-trying-to-load-image-from-firebase-storage">Source</a>
+     *
+     * After storing or getting the picture url, we send the downloaded URL to createUserFirebaseFirestore
+     * to store the rest of the data into Firestore.
      *
      * @param firstName
      *  The name entered in the firstNameET EditText, type {@link String}
@@ -258,51 +273,86 @@ public class SignupFragment extends Fragment {
      * @param username
      *  The username entered in the usernameET EditText, type {@link String}
      */
-    public void createUserFirebaseFirestore(String firstName, String lastName, String email, String username) {
+    public void storeOrGetProfilePicture(String firstName, String lastName, String email, String username) {
 
         final CollectionReference usersRef = mStore.collection("users");
-        mStorageReference = mStorage.getReference(picturePath);
 
-        mStorageReference
-                .putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // If successful, get the download url and store it in pictureURL
-                    mStorageReference.getDownloadUrl().addOnCompleteListener(task -> {
+        mStorage.getReference()
+                .child(picturePath)
+                .getDownloadUrl()
+                .addOnSuccessListener(uri -> {
+                    // if the image file already exists, download that url and store it in user
+                    profileImageUrl = uri.toString();
+                    Log.d(TAG, "The profile pic url after getting is : " + profileImageUrl);
+                    createUserFirebaseFirestore(profileImageUrl, firstName, lastName, email, username);
 
-                        profileImageUrl = Objects.requireNonNull(task.getResult()).toString();
-                        Map<String, Object> user = new HashMap<>();
-
-                        user.put("firstName", firstName);
-                        user.put("lastName", lastName);
-                        user.put("email", email);
-                        user.put("username", username);
-                        user.put("pictureURL", profileImageUrl);
-                        user.put("dateLastAccessed", Calendar.getInstance().getTime());
-                        user.put("followings", new ArrayList<String>());
-                        user.put("followers", new ArrayList<String>());
-
-                        usersRef
-                                .document(username)     // user id: username
-                                .set(user)
-                                .addOnSuccessListener(unused -> {
-                                    Log.d(TAG, "Data added succesfully");
-                                    // Notify user that account was created successfully
-                                    if (getActivity() != null) {
-                                        Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
-                                    }
-                                    // Go to login fragment once data has been added
-                                    navController.navigate(R.id.action_signupFragment_to_loginFragment);
-                                    creatingUser = false;
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.d(TAG, "Data failed to add.");
-                                    if (getActivity() != null) {
-                                        Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
+                })
+                .addOnFailureListener(e ->  {
+                    // If image file doesn't exist, add it and get its url
+                    mStorageReference = mStorage.getReference(picturePath);
+                    mStorageReference
+                            .putFile(imageUri)
+                            .addOnSuccessListener(taskSnapshot -> {
+                                mStorageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Uri> task) {
+                                        profileImageUrl = task.getResult().toString();
+                                        Log.d(TAG, "The profile pic url after storing is : " + profileImageUrl);
+                                        createUserFirebaseFirestore(profileImageUrl, firstName, lastName, email, username);
                                     }
                                 });
-                    });
+
+                            });
+
+                });
+    }
+
+    /**
+     * Creates a Firestore document for the newly signed up user with
+     * all userdata in it.
+     * @param profileImageUrl
+     *  The profile picture's url, type {@link String}
+     * @param firstName
+     *  The name entered in the firstNameET EditText, type {@link String}
+     * @param lastName
+     *  The name entered in the lastNameET EditText, type {@link String}
+     * @param email
+     *  The email entered in the emailET EditText, type {@link String}
+     * @param username
+     *  The username entered in the usernameET EditText, type {@link String}
+     */
+    private void createUserFirebaseFirestore(String profileImageUrl, String firstName, String lastName, String email, String username) {
+        final CollectionReference usersRef = mStore.collection("users");
+        Map<String, Object> user = new HashMap<>();
+
+        user.put("firstName", firstName);
+        user.put("lastName", lastName);
+        user.put("email", email);
+        user.put("username", username);
+        user.put("pictureURL", profileImageUrl);
+        user.put("dateLastAccessed", Calendar.getInstance().getTime());
+        user.put("followings", new ArrayList<String>());
+        user.put("followers", new ArrayList<String>());
+
+        usersRef
+                .document(username)     // user id: username
+                .set(user)
+                .addOnSuccessListener(unused -> {
+                    Log.d(TAG, "Data added succesfully");
+                    // Notify user that account was created successfully
+                    if (getActivity() != null) {
+                        Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
+                    }
+                    // Go to login fragment once data has been added
+                    navController.navigate(R.id.action_signupFragment_to_loginFragment);
+                    creatingUser = false;
                 })
-                .addOnFailureListener(e -> Log.d(TAG, "Default profile picture was not stored"));
+                .addOnFailureListener(e -> {
+                    Log.d(TAG, "Data failed to add.");
+                    if (getActivity() != null) {
+                        Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     /**

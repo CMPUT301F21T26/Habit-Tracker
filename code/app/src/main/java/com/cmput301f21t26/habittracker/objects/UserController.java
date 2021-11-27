@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 
 import com.cmput301f21t26.habittracker.interfaces.UserCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -25,6 +27,7 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -235,6 +238,9 @@ public class UserController {
     /**
      * Update the profile picture and pictureURL in db.
      * Call callback function after the update.
+     * Rather than replacing an image that already exists in the storage,
+     * we check if the image already exists and if so, gets the download URL instead of replacing.
+     * @see <a href="https://stackoverflow.com/questions/41943860/getting-403-forbidden-error-when-trying-to-load-image-from-firebase-storage">Source</a>
      *
      * @param picturePath String path to the new profile picture
      * @param imageUri uri of the new profile picture
@@ -246,17 +252,34 @@ public class UserController {
 
         final StorageReference storageRef = mStorage.getReference(picturePath);
 
-        storageRef
-                .putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // If successful, get the download url and store it in pictureURL
-                    storageRef.getDownloadUrl().addOnSuccessListener(url -> {
-                        mStore.collection("users").document(getCurrentUserId())
-                                .update("pictureURL", url.toString())
-                                .addOnSuccessListener(unused -> callback.onCallback(user))
-                                .addOnFailureListener(e -> Log.d("updateUser", "Updating user failed"));
-                    });
+        mStorage.getReference()
+                .child(picturePath)
+                .getDownloadUrl()
+                .addOnSuccessListener(uri ->{
+                    // if the image file already exists, download that url and store it in user
+                    Log.d("UserControllerPP", "The URL after getting is: " + uri.toString());
+                    mStore.collection("users").document(getCurrentUserId())
+                            .update("pictureURL", uri.toString())
+                            .addOnSuccessListener(unused -> callback.onCallback(user))
+                            .addOnFailureListener(e -> Log.d("updateUser", "Updating profile pic failed"));
                 })
-                .addOnFailureListener(e -> Log.d("storeProfilePicture", "Default profile pic was not stored"));
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // If image file doesn't exist, add it and get its url
+                        storageRef
+                                .putFile(imageUri)
+                                .addOnSuccessListener(taskSnapshot -> {
+                                    storageRef.getDownloadUrl().addOnCompleteListener(task -> {
+                                        Log.d("UserControllerPP", "The URL after storing is: " + task.getResult().toString());
+                                        mStore.collection("users").document(getCurrentUserId())
+                                                .update("pictureURL", task.getResult().toString())
+                                                .addOnSuccessListener(unused -> callback.onCallback(user))
+                                                .addOnFailureListener(e2 -> Log.d("updateUser", "Updating profile pic failed"));
+                                    });
+
+                                });
+                    }
+                });
     }
 }
