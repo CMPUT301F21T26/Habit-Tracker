@@ -27,7 +27,7 @@ import java.util.Observer;
  * adapt the size of the item depending on the
  * available info.
  */
-public class TimelineListAdapter extends BaseAdapter implements Observer {
+public class TimelineListAdapter extends BaseAdapter {
     private String TAG = "TimelineListAdapter";
     private ArrayList<HabitEvent> hEventsList;
     private Context mContext;
@@ -43,7 +43,6 @@ public class TimelineListAdapter extends BaseAdapter implements Observer {
         }
         userController = UserController.getInstance();
 
-        userController.addObserverToCurrentUser(this);
     }
 
     @Override
@@ -130,10 +129,5 @@ public class TimelineListAdapter extends BaseAdapter implements Observer {
         }
 
         return convertView;
-    }
-
-    @Override
-    public void update(Observable observable, Object o) {
-        notifyDataSetChanged();
     }
 }
