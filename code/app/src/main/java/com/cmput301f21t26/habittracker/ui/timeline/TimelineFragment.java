@@ -45,17 +45,15 @@ public class TimelineFragment extends Fragment implements Observer {
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentTimelineBinding.inflate(inflater, container, false);
-
+        timelineListView = binding.timelineListView;
         userController = UserController.getInstance();
-
+        userController.addObserverToCurrentUser(this);
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
@@ -70,8 +68,6 @@ public class TimelineFragment extends Fragment implements Observer {
         if (allHabitEventsList.isEmpty()) {
             binding.noHabitEventsTV.setVisibility(View.VISIBLE);
         }
-
-        timelineListView = binding.timelineListView;
 
         if (getActivity() != null) {
             // Sort habitEventsList in chronological order
@@ -116,5 +112,7 @@ public class TimelineFragment extends Fragment implements Observer {
         for (Habit habit : habitsList) {
             allHabitEventsList.addAll(habit.getHabitEvents());
         }
+
+        timelineListAdapter.notifyDataSetChanged();
     }
 }
