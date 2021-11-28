@@ -8,6 +8,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import static com.cmput301f21t26.habittracker.CheckViewExists.exists;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
@@ -42,7 +43,25 @@ public class MapFragmentTest {
         onView(withId(R.id.navigation_timeline)).perform(click());
         onView(withId(R.id.navigation_timeline)).check(matches(isDisplayed()));
 
+        ViewAction itemViewAction = ActionOnItemView.actionOnItemView(withId(R.id.habitCheckbox), click());
+        onView(withId(R.id.todayHabitRV))
+                .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Test")), itemViewAction));
+        // if dialog pops up, then the habit event already exists, click confirm and recreate the habit event.
+        if (exists(onView(withText("CANCEL")))) {
+            onView(withText("CONFIRM")).perform(click());
+            onView(withId(R.id.todayHabitRV))
+                    .perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Test")), itemViewAction));
+        }
 
+        // Check that the snackbar shows
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(withText("Empty habit event is created")));
+        onView(withId(com.google.android.material.R.id.snackbar_action)).perform(click());
+        // Check if edit habit event fragment is displayed
+        onView(withId(R.id.editHabitEventTitleTV)).check(matches(isDisplayed()));
+        // Check that the habit event is the right one (since we created the habit event based
+        // off of the "Test" habit)
+        onView(withId(R.id.editHabitEventTitleTV)).check(matches(withText(containsString("Test"))));
 
     }
 
