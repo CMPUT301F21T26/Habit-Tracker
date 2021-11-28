@@ -35,14 +35,12 @@ public class HabitController {
     private ListenerRegistration habitsSnapshotListener;
 
     private final FirebaseFirestore mStore;
-    private final CollectionReference usersRef;
 
     /**
      * Private constructor
      */
     private HabitController() {
         mStore = FirebaseFirestore.getInstance();
-        usersRef = mStore.collection("users");
 
         userController = UserController.getInstance();
         habitEventController = HabitEventController.getInstance();
