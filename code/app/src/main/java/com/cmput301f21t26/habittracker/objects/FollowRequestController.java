@@ -114,7 +114,7 @@ public class FollowRequestController {
     }
 
     /**
-     * Retrieve follow request send from fromUser to toUser.
+     * Retrieve follow request sent from fromUser to toUser.
      * Call callback function with the follow request
      *
      * @param fromUser user who sent the follow request
