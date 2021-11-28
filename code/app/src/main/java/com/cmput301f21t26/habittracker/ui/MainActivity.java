@@ -39,10 +39,8 @@ import com.cmput301f21t26.habittracker.objects.FollowRequest;
 import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.cmput301f21t26.habittracker.ui.auth.LoginSignupActivity;
-import com.cmput301f21t26.habittracker.ui.profile.FollowRequestListAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.Observable;
