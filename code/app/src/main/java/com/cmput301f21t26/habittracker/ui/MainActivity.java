@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 .build();
 
         NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
 
         // Clicking on icons navigate to the selected fragments
         navView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -107,17 +108,17 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 NavDirections action = null;
 
                 int id = item.getItemId();
-                if (id == R.id.todays_habits) {
+                if (id == R.id.todays_habits && !navView.getMenu().findItem(R.id.todays_habits).isChecked()) {
                     action = MobileNavigationDirections.actionGlobalTodaysHabits(null);
                     navController.navigate(action);
                     return true;
                 }
-                if (id == R.id.navigation_timeline) {
+                if (id == R.id.navigation_timeline && !navView.getMenu().findItem(R.id.navigation_timeline).isChecked()) {
                     action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                     navController.navigate(action);
                     return true;
                 }
-                if (id == R.id.navigation_profile) {
+                if (id == R.id.navigation_profile && !navView.getMenu().findItem(R.id.navigation_profile).isChecked()) {
                     action = MobileNavigationDirections.actionGlobalNavigationProfile(userController.getCurrentUser());
                     navController.navigate(action);
                     return true;
