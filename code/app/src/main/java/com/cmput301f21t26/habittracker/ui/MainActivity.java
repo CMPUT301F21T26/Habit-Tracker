@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +40,8 @@ import com.cmput301f21t26.habittracker.objects.FollowRequest;
 import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.cmput301f21t26.habittracker.ui.auth.LoginSignupActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationItemView;
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -58,6 +61,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private Toolbar toolbar;
     private ImageView redCircle;
     private ImageView searchIcon;
+    private BottomNavigationItemView profileItemView;
+    private MenuItem profileItem;
+    private ImageView profilePicIV;
+    private ImageView profilePicOutline;
+    private View profile_badge;
 
     private UserController userController;
     private OtherUserController otherUserController;
@@ -72,6 +80,18 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // find views
         addHabitButton = findViewById(R.id.addHabitButton);
         navView = findViewById(R.id.nav_view);
+
+        // Get profile icon view
+        profileItem = navView.getMenu().findItem(R.id.navigation_profile);
+        BottomNavigationMenuView mbottomNavigationMenuView =
+                (BottomNavigationMenuView) navView.getChildAt(0);
+        View view = mbottomNavigationMenuView.getChildAt(2);
+        profileItemView = (BottomNavigationItemView) view;
+        profile_badge = LayoutInflater.from(this)
+                .inflate(R.layout.profile_pic_icon,
+                        mbottomNavigationMenuView, false);
+        profilePicIV = profile_badge.findViewById(R.id.profilePicIV);
+        profilePicOutline = profile_badge.findViewById(R.id.outline);
 
         // Get our instances
         userController = UserController.getInstance();
@@ -110,16 +130,19 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 int id = item.getItemId();
                 if (id == R.id.todays_habits && !navView.getMenu().findItem(R.id.todays_habits).isChecked()) {
                     action = MobileNavigationDirections.actionGlobalTodaysHabits(null);
+                    profilePicOutline.setVisibility(View.INVISIBLE);
                     navController.navigate(action);
                     return true;
                 }
                 if (id == R.id.navigation_timeline && !navView.getMenu().findItem(R.id.navigation_timeline).isChecked()) {
                     action = MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                    profilePicOutline.setVisibility(View.INVISIBLE);
                     navController.navigate(action);
                     return true;
                 }
                 if (id == R.id.navigation_profile && !navView.getMenu().findItem(R.id.navigation_profile).isChecked()) {
                     action = MobileNavigationDirections.actionGlobalNavigationProfile(userController.getCurrentUser());
+                    profilePicOutline.setVisibility(View.VISIBLE);
                     navController.navigate(action);
                     return true;
                 }
@@ -134,6 +157,17 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 navController.navigate(action);
             }
         });
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (profileItem.isChecked()) {
+            profilePicOutline.setVisibility(View.VISIBLE);
+        } else {
+            profilePicOutline.setVisibility(View.INVISIBLE);
+        }
     }
 
     /**
@@ -367,8 +401,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
      *  The URL that contains an image of the user's profile picture {@link String}
      */
     public void setProfileIconToProfilePic(String URL) {
-
-        MenuItem profileItem = navView.getMenu().findItem(R.id.navigation_profile);
         Glide.with(this)
                 .asBitmap()
                 .load(URL)
@@ -377,8 +409,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        navView.setItemIconTintList(null);                  // issue with tinting covering image
-                        profileItem.setIcon(new BitmapDrawable(getResources(), resource));
+                        // if profile pic is loaded properly, then set the OG icon to null and make the profile pic the "icon"
+                        profileItem.setIcon(null);
+                        profilePicIV.setImageBitmap(resource);
+                        profileItemView.addView(profile_badge);
                     }
 
                     @Override
