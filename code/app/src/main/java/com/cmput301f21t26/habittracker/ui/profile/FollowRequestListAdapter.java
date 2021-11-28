@@ -78,9 +78,9 @@ public class FollowRequestListAdapter extends BaseAdapter implements Observer {
         Button denyButton = (Button) view.findViewById(R.id.denyButton);
 
         followRequestUsernameTV.setText(tempFollowRequest.getFromUid());
-        if (tempFollowRequest.getPictureURL() != null && mContext != null) {
+        if (tempFollowRequest.getSenderProfilePictureUrl() != null && mContext != null) {
             Glide.with(mContext)
-                    .load(tempFollowRequest.getPictureURL())
+                    .load(tempFollowRequest.getSenderProfilePictureUrl())
                     .into(profilePicFollowRequestImageView);
         }
 
