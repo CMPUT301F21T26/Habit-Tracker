@@ -104,7 +104,7 @@ public class HabitEventController {
 
                                     // if habit event to be removed is dated to today, set done for today of parent habit to false
                                     if (hEvent.getHabitEventDateDay().equals(user.getDateLastAccessedDay())) {
-                                        Habit habit = userController.getHabit(parentHabitId);
+                                        Habit habit = user.getHabit(parentHabitId);
                                         habit.setDoneForToday(false);
                                         habitController.updateHabitInDb(habit, user -> { });
                                     }

@@ -220,18 +220,6 @@ public class UserController {
         });
     }
 
-
-    /**
-     * Given a habit id, return the habit object from the habits list.
-     * Return null if no such habit is in the list.
-     *
-     * @param habitId String habit id
-     * @return Habit if habit exists. Otherwise, return null
-     */
-    public Habit getHabit(String habitId) {
-        return user.getHabit(habitId);
-    }
-
     /**
      * Update the profile picture and pictureURL in db.
      * Call callback function after the update.
