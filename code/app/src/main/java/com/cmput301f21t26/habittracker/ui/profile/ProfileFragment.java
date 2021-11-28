@@ -37,6 +37,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.Observable;
 import java.util.Observer;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -336,8 +337,8 @@ public class ProfileFragment extends Fragment implements Observer {
                     // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
                     if (uri != null) {
                         newImageUri = uri;
-                        if (newImageUri != imageUri && newImageUri != null) {
-                            picturePath = "image/" + newImageUri.hashCode() + ".jpeg";
+                        if (newImageUri != imageUri) {
+                            picturePath = "image/" + UUID.randomUUID().toString() + ".jpeg";
                             profilePic.setImageURI(newImageUri);
                             imageUri = newImageUri;
 

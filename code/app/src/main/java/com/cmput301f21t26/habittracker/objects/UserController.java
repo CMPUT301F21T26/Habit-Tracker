@@ -226,9 +226,6 @@ public class UserController {
     /**
      * Update the profile picture and pictureURL in db.
      * Call callback function after the update.
-     * Rather than replacing an image that already exists in the storage,
-     * we check if the image already exists and if so, gets the download URL instead of replacing.
-     * @see <a href="https://stackoverflow.com/questions/41943860/getting-403-forbidden-error-when-trying-to-load-image-from-firebase-storage">Source</a>
      *
      * @param picturePath String path to the new profile picture
      * @param imageUri uri of the new profile picture
@@ -237,35 +234,21 @@ public class UserController {
     public void updateProfilePicInDb(String picturePath, Uri imageUri, UserCallback callback) {
 
         assert user != null;
-
         final StorageReference storageRef = mStorage.getReference(picturePath);
 
-        mStorage.getReference()
-                .child(picturePath)
-                .getDownloadUrl()
-                .addOnSuccessListener(uri ->{
-                    // if the image file already exists, download that url and store it in user
-                    mStore.collection("users").document(getCurrentUserId())
-                            .update("pictureURL", uri.toString())
-                            .addOnSuccessListener(unused -> callback.onCallback(user))
-                            .addOnFailureListener(e -> Log.d("updateUser", "Updating profile pic failed"));
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // If image file doesn't exist, add it and get its url
-                        storageRef
-                                .putFile(imageUri)
-                                .addOnSuccessListener(taskSnapshot -> {
-                                    storageRef.getDownloadUrl().addOnCompleteListener(task -> {
-                                        mStore.collection("users").document(getCurrentUserId())
-                                                .update("pictureURL", task.getResult().toString())
-                                                .addOnSuccessListener(unused -> callback.onCallback(user))
-                                                .addOnFailureListener(e2 -> Log.d("updateUser", "Updating profile pic failed"));
-                                    });
+        // Add image file to storage and get it's URL to store in user
+        storageRef
+                .putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    storageRef.getDownloadUrl().addOnCompleteListener(task -> {
+                        mStore.collection("users").document(getCurrentUserId())
+                                .update("pictureURL", task.getResult().toString())
+                                .addOnSuccessListener(unused -> callback.onCallback(user))
+                                .addOnFailureListener(e2 -> Log.d("updateUser", "Updating profile pic failed"));
+                    });
 
-                                });
-                    }
                 });
+
+
     }
 }

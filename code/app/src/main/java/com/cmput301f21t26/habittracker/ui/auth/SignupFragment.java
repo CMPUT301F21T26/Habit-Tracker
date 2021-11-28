@@ -45,6 +45,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -187,7 +188,7 @@ public class SignupFragment extends Fragment {
                 public void onActivityResult(Uri uri) {
                     // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
                     if (uri != null) {
-                        picturePath = "image/" + uri.hashCode() + ".jpeg";
+                        picturePath = "image/" + UUID.randomUUID().toString() + ".jpeg";
                         imageUri = uri;
                         setProfilePic.setImageURI(uri);
                     }
