@@ -92,7 +92,7 @@ public class TimelineFragment extends Fragment implements Observer {
                 // Get the habit event from clicked, and its associated habit
                 // to prepare it to be sent to view habit event fragment
                 HabitEvent hEvent = (HabitEvent) adapterView.getItemAtPosition(i);
-                Habit habit = userController.getHabit(hEvent.getParentHabitId());
+                Habit habit = userController.getCurrentUser().getHabit(hEvent.getParentHabitId());
 
                 // Navigate to view habit event fragment
                 NavDirections action = MobileNavigationDirections.actionGlobalViewHabitEventFragment(hEvent, habit);
