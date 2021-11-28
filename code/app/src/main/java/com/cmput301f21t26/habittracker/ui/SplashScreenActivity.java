@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
 import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.objects.AuthController;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.cmput301f21t26.habittracker.ui.auth.LoginSignupActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,18 +28,14 @@ public class SplashScreenActivity extends AppCompatActivity {
     private AnimatedVectorDrawable avd2;
     private AnimationDrawable ad;
 
-    // TODO use authController
-    private FirebaseAuth mAuth;
-
     private UserController userController;
+    private AuthController authController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // set layout to be splash screen
         setContentView(R.layout.activity_splash_screen);
-
-        mAuth = FirebaseAuth.getInstance();
 
         ImageView checkmark = findViewById(R.id.checkMark);
         ImageView gradient = findViewById(R.id.Gradient);
@@ -76,11 +73,12 @@ public class SplashScreenActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
         userController = UserController.getInstance();
+        authController = AuthController.getInstance();
 
         // Delays the splash screen and then goes to either the main activity or login/signup page
         // based on auth tokens
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (mAuth.getCurrentUser() != null) {
+            if (authController.getCurrentUser() != null) {
                 // initialize user before moving to MainActivity
                 userController.initCurrentUser(user -> {        // get user data then start activity
                     Intent intent = new Intent(this, MainActivity.class);

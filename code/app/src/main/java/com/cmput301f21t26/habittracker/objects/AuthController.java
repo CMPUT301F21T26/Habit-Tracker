@@ -44,6 +44,14 @@ public class AuthController {
     }
 
     /**
+     * Return current user from the Firebase Authentication
+     * @return FirebaseUser
+     */
+    public FirebaseUser getCurrentUser() {
+        return mAuth.getCurrentUser();
+    }
+
+    /**
      * Logs in the user into Firebase Authentication with the given input.
      * If successful, call onSuccessCallback with the signed in user.
      * Otherwise, call onFailureCallback.
