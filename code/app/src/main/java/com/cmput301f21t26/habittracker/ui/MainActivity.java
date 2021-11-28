@@ -34,6 +34,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.ActivityMainBinding;
+import com.cmput301f21t26.habittracker.objects.AuthController;
 import com.cmput301f21t26.habittracker.objects.FollowRequest;
 import com.cmput301f21t26.habittracker.objects.OtherUserController;
 import com.cmput301f21t26.habittracker.objects.UserController;
@@ -59,10 +60,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private Toolbar toolbar;
     private ImageView redCircle;
     private ImageView searchIcon;
-    private FirebaseAuth mAuth;
 
     private UserController userController;
     private OtherUserController otherUserController;
+    private AuthController authController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +76,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
         navView = findViewById(R.id.nav_view);
 
         // Get our instances
-        mAuth = FirebaseAuth.getInstance();
         userController = UserController.getInstance();
         otherUserController = OtherUserController.getInstance();
+        authController = AuthController.getInstance();
 
         userController.addObserverToCurrentUser(this);
 
@@ -284,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
      * to the signup/login screen
      */
     private void signOut() {
-        mAuth.signOut();
+        authController.signOut();
         Intent intent = new Intent(this, LoginSignupActivity.class);
         // Make it so user can't press back button to go back to home page
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);

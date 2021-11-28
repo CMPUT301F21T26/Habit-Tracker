@@ -20,6 +20,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.cmput301f21t26.habittracker.R;
+import com.cmput301f21t26.habittracker.objects.AuthController;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -52,7 +53,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Validates input and attempts to create account with the entered fields.
  */
 public class SignupFragment extends Fragment {
-    final private String TAG = "signupAuthentication";
+
+    private final String TAG = "signupAuthentication";
+
     private EditText firstNameET;
     private EditText lastNameET;
     private EditText emailET;
@@ -63,68 +66,20 @@ public class SignupFragment extends Fragment {
     private TextInputLayout passwordLayout;
     private Button signupConfirmButton;
     private CircleImageView setProfilePic;
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore mStore;
-    private FirebaseStorage mStorage;
-    private StorageReference mStorageReference;
-    private Boolean creatingUser = false;
+
     // Make it so the default profile pic is...the default profile pic. So user doesn't have to necessarily choose one.
     private Uri imageUri = Uri.parse("android.resource://com.cmput301f21t26.habittracker/drawable/default_profile_pic");
     private String picturePath = "image/" + "default_profile_pic" + ".jpeg";
-    private String profileImageUrl;
 
     private NavController navController = null;
 
-    /**
-     * Functions essentially like the now deprecated onActivityResult.
-     * When User clicks on the circle image view, their default
-     * file explorer pops up, and once they select an image,
-     * onActivityResult here notices, and sets the image
-     * of the circle image view to the selected image.
-     * As well, the picture path is saved to be later used when
-     * the user clicks the signupConfirmButton.
-     */
-    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
-            new ActivityResultCallback<Uri>() {
-                @Override
-                public void onActivityResult(Uri uri) {
-                    // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
-                    if (uri != null) {
-                        picturePath = "image/" + uri.hashCode() + ".jpeg";
-                        imageUri = uri;
-                        setProfilePic.setImageURI(uri);
-                    }
-                }
-            });
-
-    private final View.OnClickListener signupConfirmOnClickListener = view -> {
-        if (!creatingUser && checkFieldsFilled()) {
-            createUser();
-        }
-    };
-
-    private final View.OnClickListener setProfileOnClickListener = view -> {
-        mGetContent.launch("image/*");      // Launch file explorer
-    };
+    private AuthController authController;
+    private Boolean creatingUser;
 
     /**
      * Required empty public constructor
      */
     public SignupFragment() {}
-
-    /**
-     * Initialize the sign up fragment and get instances
-     * @param savedInstanceState
-     *  The instance that was saved before.
-     */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mAuth = FirebaseAuth.getInstance();
-        mStore = FirebaseFirestore.getInstance();
-        mStorage = FirebaseStorage.getInstance();
-    }
 
     /**
      * inflates view
@@ -141,6 +96,9 @@ public class SignupFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        authController = AuthController.getInstance();
+        creatingUser = false;
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_signup, container, false);
     }
@@ -172,186 +130,73 @@ public class SignupFragment extends Fragment {
         navController = Navigation.findNavController(view);
     }
 
-    /**
-     * Function gets the text entered in the fields once it has been filled and the signup button
-     * is clicked. It then checks if the username entered exists, and if not, starts creating
-     * the user in Firebase Authentication. Otherwise, if the username exists, the user
-     * is notified and they must enter a new one before clicking signup again.
-     *
-     *
-     */
-    public void createUser() {
-        final String firstName = firstNameET.getText().toString();
-        final String lastName = lastNameET.getText().toString();
-        final String email = emailET.getText().toString();
-        final String username = usernameET.getText().toString();
-        final String password = passwordET.getText().toString();
+    private final View.OnClickListener signupConfirmOnClickListener = view -> {
+        if (!creatingUser && checkFieldsFilled()) {
+            final String firstName = firstNameET.getText().toString();
+            final String lastName = lastNameET.getText().toString();
+            final String email = emailET.getText().toString();
+            final String username = usernameET.getText().toString();
+            final String password = passwordET.getText().toString();
 
-        // Check if username already exists
-        DocumentReference ref = mStore.collection("users").document(username);
+            authController.isUserUnique(username, unused -> {
 
-        ref.get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        assert document != null;
-                        if (document.exists()) {
-                            // Username exists
-                            usernameET.setError("Username already exists");
-                        } else {
-                            // Username does not exist.
-                            createUserFirebaseAuth(firstName, lastName, email, username, password);
-                            creatingUser = true;
-                            if (getActivity() != null) {
-                                Toast.makeText(getActivity(), "Creating user, please wait a moment", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    } else {
-                        Log.d(TAG, "Fetching username failed with: ", task.getException());
-                    }
-                });
-    }
+                creatingUser = true;
+                if (getActivity() != null) {
+                    Toast.makeText(getActivity(), "Creating user, please wait a moment", Toast.LENGTH_LONG).show();
+                }
 
-    /**
-     * Once user has entered all the fields (which has already been checked) and signup button is clicked,
-     * this function creates a new User within the Firebase Authentication section.
-     *
-     * @param firstName
-     *  The name entered in the firstNameET EditText, type {@link String}
-     * @param lastName
-     *  The name entered in the lastNameET EditText, type {@link String}
-     * @param email
-     *  The email entered in the emailET EditText, type {@link String}
-     * @param username
-     *  The username entered in the usernameET EditText, type {@link String}
-     * @param password
-     *  The password entered in the passwordET EditText, type {@link String}
-     */
-    public void createUserFirebaseAuth(final String firstName, final String lastName, final String email, final String username, final String password) {
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "Creation of User with email successful.");
+                authController.createUserFirebaseAuth(firstName, lastName, email, username, password, unused1 -> {
 
-                        // Set Display Name of user in Firebase Authentication so we can get it in MainActivity
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {
-                            UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(username).build();
-                            user.updateProfile(profileUpdate);
-                        }
-
-                        // User created in Firebase Authentication, now to add its data into Firestore database
-                        storeOrGetProfilePicture(firstName, lastName, email, username);
-                    } else {
-                        Log.w(TAG, "Creation of User with email failed. " + Objects.requireNonNull(task.getException()).getMessage());
+                    authController.createUserFirebaseFirestore(username, firstName, lastName, email, picturePath, imageUri, unused2 -> {
+                        // Notify user that account was created successfully
                         if (getActivity() != null) {
-                            Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
                         }
+                        // Go to login fragment once data has been added
+                        navController.navigate(R.id.action_signupFragment_to_loginFragment);
                         creatingUser = false;
-                    }
-                });
-    }
+                    }, errorMsg -> {
+                        if (getActivity() != null) {
+                            Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
+                        }
+                    });
 
-    /**
-     * stores or gets the profile picture in Firebase Storage. If the given picture path
-     * already exists in Firebase Storage, it will retrieve that download URL and store it
-     * into the user's pictureURL field. This is so then we aren't replacing the old image
-     * with the new image and thus changing the tokens, which caused loading errors when
-     * using Glide
-     * @see <a href="https://stackoverflow.com/questions/41943860/getting-403-forbidden-error-when-trying-to-load-image-from-firebase-storage">Source</a>
-     *
-     * After storing or getting the picture url, we send the downloaded URL to createUserFirebaseFirestore
-     * to store the rest of the data into Firestore.
-     *
-     * @param firstName
-     *  The name entered in the firstNameET EditText, type {@link String}
-     * @param lastName
-     *  The name entered in the lastNameET EditText, type {@link String}
-     * @param email
-     *  The email entered in the emailET EditText, type {@link String}
-     * @param username
-     *  The username entered in the usernameET EditText, type {@link String}
-     */
-    public void storeOrGetProfilePicture(String firstName, String lastName, String email, String username) {
-
-        final CollectionReference usersRef = mStore.collection("users");
-
-        mStorage.getReference()
-                .child(picturePath)
-                .getDownloadUrl()
-                .addOnSuccessListener(uri -> {
-                    // if the image file already exists, download that url and store it in user
-                    profileImageUrl = uri.toString();
-                    createUserFirebaseFirestore(profileImageUrl, firstName, lastName, email, username);
-
-                })
-                .addOnFailureListener(e ->  {
-                    // If image file doesn't exist, add it and get its url
-                    mStorageReference = mStorage.getReference(picturePath);
-                    mStorageReference
-                            .putFile(imageUri)
-                            .addOnSuccessListener(taskSnapshot -> {
-                                mStorageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Uri> task) {
-                                        profileImageUrl = task.getResult().toString();
-                                        createUserFirebaseFirestore(profileImageUrl, firstName, lastName, email, username);
-                                    }
-                                });
-
-                            });
-
-                });
-    }
-
-    /**
-     * Creates a Firestore document for the newly signed up user with
-     * all userdata in it.
-     * @param profileImageUrl
-     *  The profile picture's url, type {@link String}
-     * @param firstName
-     *  The name entered in the firstNameET EditText, type {@link String}
-     * @param lastName
-     *  The name entered in the lastNameET EditText, type {@link String}
-     * @param email
-     *  The email entered in the emailET EditText, type {@link String}
-     * @param username
-     *  The username entered in the usernameET EditText, type {@link String}
-     */
-    private void createUserFirebaseFirestore(String profileImageUrl, String firstName, String lastName, String email, String username) {
-        final CollectionReference usersRef = mStore.collection("users");
-        Map<String, Object> user = new HashMap<>();
-
-        user.put("firstName", firstName);
-        user.put("lastName", lastName);
-        user.put("email", email);
-        user.put("username", username);
-        user.put("pictureURL", profileImageUrl);
-        user.put("dateLastAccessed", Calendar.getInstance().getTime());
-        user.put("followings", new ArrayList<String>());
-        user.put("followers", new ArrayList<String>());
-
-        usersRef
-                .document(username)     // user id: username
-                .set(user)
-                .addOnSuccessListener(unused -> {
-                    Log.d(TAG, "Data added succesfully");
-                    // Notify user that account was created successfully
+                }, errorMsg -> {
                     if (getActivity() != null) {
-                        Toast.makeText(getActivity(), "User created successfully!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_LONG).show();
                     }
-                    // Go to login fragment once data has been added
-                    navController.navigate(R.id.action_signupFragment_to_loginFragment);
                     creatingUser = false;
-                })
-                .addOnFailureListener(e -> {
-                    Log.d(TAG, "Data failed to add.");
-                    if (getActivity() != null) {
-                        Toast.makeText(getActivity(), "There was an error with your user account", Toast.LENGTH_LONG).show();
-                    }
                 });
-    }
+
+            }, errorMsg -> usernameET.setError(errorMsg));
+        }
+    };
+
+    /**
+     * Functions essentially like the now deprecated onActivityResult.
+     * When User clicks on the circle image view, their default
+     * file explorer pops up, and once they select an image,
+     * onActivityResult here notices, and sets the image
+     * of the circle image view to the selected image.
+     * As well, the picture path is saved to be later used when
+     * the user clicks the signupConfirmButton.
+     */
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    // Make sure uri not null; uri null can occur when we click to go to file explorer and press the back button without choosing an image
+                    if (uri != null) {
+                        picturePath = "image/" + uri.hashCode() + ".jpeg";
+                        imageUri = uri;
+                        setProfilePic.setImageURI(uri);
+                    }
+                }
+            });
+
+    private final View.OnClickListener setProfileOnClickListener = view -> {
+        mGetContent.launch("image/*");      // Launch file explorer
+    };
 
     /**
      * Checks all the EditText fields and makes sure they are filled and
