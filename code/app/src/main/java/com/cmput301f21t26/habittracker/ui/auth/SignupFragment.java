@@ -145,7 +145,7 @@ public class SignupFragment extends Fragment {
                     Toast.makeText(getActivity(), "Creating user, please wait a moment", Toast.LENGTH_LONG).show();
                 }
 
-                authController.createUserFirebaseAuth(firstName, lastName, email, username, password, unused1 -> {
+                authController.createUserFirebaseAuth(email, username, password, unused1 -> {
 
                     authController.createUserFirebaseFirestore(username, firstName, lastName, email, picturePath, imageUri, unused2 -> {
                         // Notify user that account was created successfully

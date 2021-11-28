@@ -92,6 +92,9 @@ public class AuthController {
                 });
     }
 
+    /**
+     * Sign out from the application
+     */
     public void signOut() {
         mAuth.signOut();
     }
@@ -128,21 +131,20 @@ public class AuthController {
     }
 
     /**
-     * Once user has entered all the fields (which has already been checked) and signup button is clicked,
-     * this function creates a new User within the Firebase Authentication section.
+     * Create a new user in Firebase Authentication.
+     * If successful, call onSuccessCallback.
+     * Otherwise, call onFailureCallback.
      *
-     * @param firstName
-     *  The name entered in the firstNameET EditText, type {@link String}
-     * @param lastName
-     *  The name entered in the lastNameET EditText, type {@link String}
      * @param email
      *  The email entered in the emailET EditText, type {@link String}
      * @param username
      *  The username entered in the usernameET EditText, type {@link String}
      * @param password
      *  The password entered in the passwordET EditText, type {@link String}
+     * @param onSuccessCallback callback to be called if the user creation is successful
+     * @param onFailureCallback callback to be called if the user creation is not successful
      */
-    public void createUserFirebaseAuth(final String firstName, final String lastName, final String email, final String username, final String password,
+    public void createUserFirebaseAuth(final String email, final String username, final String password,
                                        OnSuccessCallback onSuccessCallback, OnFailureCallback onFailureCallback) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
@@ -168,16 +170,17 @@ public class AuthController {
     /**
      * Creates a Firestore document for the newly signed up user with
      * all userdata in it.
-     * @param picturePath
-     *  The path to the picture, type {@link String}
-     * @param firstName
-     *  The name entered in the firstNameET EditText, type {@link String}
-     * @param lastName
-     *  The name entered in the lastNameET EditText, type {@link String}
-     * @param email
-     *  The email entered in the emailET EditText, type {@link String}
-     * @param username
-     *  The username entered in the usernameET EditText, type {@link String}
+     * If successful, call onSuccessCallback.
+     * Otherwise, call onFailureCallback.
+     *
+     * @param username user's unique id, type {@link String}
+     * @param firstName user's first name, type {@link String}
+     * @param lastName user's last name, type {@link String}
+     * @param email user's email, type {@link String}
+     * @param picturePath path to the profile picture, type {@link String}
+     * @param imageUri uri of the profile picture, type {@link Uri}
+     * @param onSuccessCallback callback to be called if the user creation is successful
+     * @param onFailureCallback callback to be called if the user creation is not successful
      */
      public void createUserFirebaseFirestore(String username, String firstName, String lastName, String email, String picturePath, Uri imageUri,
                                              OnSuccessCallback onSuccessCallback, OnFailureCallback onFailureCallback) {
@@ -210,18 +213,16 @@ public class AuthController {
     }
 
     /**
-     * stores or gets the profile picture in Firebase Storage. If the given picture path
-     * already exists in Firebase Storage, it will retrieve that download URL and store it
-     * into the user's pictureURL field. This is so then we aren't replacing the old image
-     * with the new image and thus changing the tokens, which caused loading errors when
-     * using Glide
+     * If the given picture path already exists in Firebase Storage, retrieve that download URL.
+     * This is so then we are not replacing the old image with the new image
+     * and thus changing the tokens, which caused loading errors when using Glide.
      * @see <a href="https://stackoverflow.com/questions/41943860/getting-403-forbidden-error-when-trying-to-load-image-from-firebase-storage">Source</a>
      *
-     * After storing or getting the picture url, we send the downloaded URL to createUserFirebaseFirestore
-     * to store the rest of the data into Firestore.
+     * Call callback with the download URL.
      *
-     * @param picturePath
-     *  The path to the picture, type {@link String}
+     * @param picturePath path to the picture, type {@link String}
+     * @param imageUri uri of the image, type {@link Uri}
+     * @param callback callback to be called after storing/retrieving
      */
     private void storeOrGetProfilePicture(String picturePath, Uri imageUri, ProfileImageUrlCallback callback) {
 
