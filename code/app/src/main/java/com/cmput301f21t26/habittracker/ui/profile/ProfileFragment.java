@@ -404,7 +404,6 @@ public class ProfileFragment extends Fragment implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        // TODO what's this for?
         // set our info into the textViews and profile pic
         // and only update if the user we're viewing
         // is the current user (because other users don't have
