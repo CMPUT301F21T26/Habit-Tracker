@@ -14,7 +14,7 @@ public class FollowRequest implements Serializable {
     private String toUid;
     private Date dateSent;
     private String id;
-    private String pictureURL;
+    private String senderProfilePictureUrl;
 
     public FollowRequest() { }
 
@@ -23,7 +23,7 @@ public class FollowRequest implements Serializable {
         this.toUid = toUser.getUid();
         this.dateSent = Calendar.getInstance().getTime();
         this.id = UUID.randomUUID().toString();
-        this.pictureURL = fromUser.getPictureURL();
+        this.senderProfilePictureUrl = fromUser.getPictureURL();
     }
 
     public String getFromUid() {
@@ -42,7 +42,7 @@ public class FollowRequest implements Serializable {
         return id;
     }
 
-    public String getPictureURL() {
-        return pictureURL;
+    public String getSenderProfilePictureUrl() {
+        return senderProfilePictureUrl;
     }
 }
