@@ -74,7 +74,7 @@ public class ViewHabitFragmentTest {
      * @throws InterruptedException
      */
     public static void clickOnHabit() throws InterruptedException {
-        ArrayList<Habit> todayHabitList = (ArrayList<Habit>) UserController.getCurrentUser().getTodayHabits();
+        ArrayList<Habit> todayHabitList = (ArrayList<Habit>) UserController.getInstance().getCurrentUser().getTodayHabits();
         Integer position = todayHabitList.size() - 1;
         onView(withId(R.id.todayHabitRV))
             .perform(RecyclerViewActions.actionOnItemAtPosition(position, click()));
