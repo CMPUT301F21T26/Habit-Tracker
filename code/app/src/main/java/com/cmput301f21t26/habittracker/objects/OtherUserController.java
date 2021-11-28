@@ -26,7 +26,6 @@ public class OtherUserController {
 
     private final FirebaseFirestore mStore;
     private final CollectionReference usersRef;
-    private User otherUser;
 
     // Singleton
     private final static OtherUserController instance = new OtherUserController();

@@ -227,6 +227,15 @@ public class HabitEventController {
         batch.commit().addOnSuccessListener(unused -> callback.onCallback(user));
     }
 
+    /**
+     * Get download url from Firestore Storage and update the habit event image url.
+     * Call callback function with the signed in user after the update
+     *
+     * @param hEvent target habit event
+     * @param picturePath path to the picture
+     * @param imageUri uri of the image
+     * @param callback callback function to be called after the update
+     */
     public void updateHabitEventImageInDb(HabitEvent hEvent, String picturePath, Uri imageUri, UserCallback callback) {
 
         User user = userController.getCurrentUser();
@@ -244,35 +253,5 @@ public class HabitEventController {
                     });
                 })
                 .addOnFailureListener(e -> Log.d("storeHabitEventImage", "Habit Event Image was not stored"));
-    }
-
-    public void getAllHabitEvents(Habit habit, UserCallback callback) {
-
-
-        User user = userController.getCurrentUser();
-        assert user != null;
-
-        callback.onCallback(user);
-        return;
-
-        /*
-        final DocumentReference userRef = mStore.collection("users").document(user.getUid());
-        final DocumentReference habitRef = userRef.collection("habits").document(habit.getHabitId());
-
-        habitRef.collection("habitEvents")
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            HabitEvent hEvent = document.toObject(HabitEvent.class);
-
-                            habit.addHabitEvent(hEvent);
-                        }
-                        callback.onCallback(user);
-                    }
-                }).addOnFailureListener(e -> Log.w("getHabits", e));
-
-         */
     }
 }
