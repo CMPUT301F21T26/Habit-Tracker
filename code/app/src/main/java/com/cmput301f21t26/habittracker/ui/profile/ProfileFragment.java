@@ -311,7 +311,7 @@ public class ProfileFragment extends Fragment implements Observer {
             // if for whatever reason the picture path is null
             // make the profile picture the default one
             imageUri = Uri.parse("android.resource://com.cmput301f21t26.habittracker/drawable/default_profile_pic");
-            picturePath = "image/" + imageUri.hashCode() + ".jpeg";
+            picturePath = "image/" + "default_profile_pic" + ".jpeg";
 
             userController.updateProfilePicInDb(picturePath, imageUri, user -> {
                 if (getActivity() != null) {

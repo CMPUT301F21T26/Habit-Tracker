@@ -27,6 +27,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     private AnimatedVectorDrawable avd2;
     private AnimationDrawable ad;
 
+    // TODO use authController
     private FirebaseAuth mAuth;
 
     private UserController userController;
