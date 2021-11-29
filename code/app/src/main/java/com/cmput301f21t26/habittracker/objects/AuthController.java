@@ -143,16 +143,16 @@ public class AuthController {
      * If successful, call onSuccessCallback.
      * Otherwise, call onFailureCallback.
      *
-     * @param email
-     *  The email entered in the emailET EditText, type {@link String}
      * @param username
      *  The username entered in the usernameET EditText, type {@link String}
+     * @param email
+     *  The email entered in the emailET EditText, type {@link String}
      * @param password
      *  The password entered in the passwordET EditText, type {@link String}
      * @param onSuccessCallback callback to be called if the user creation is successful
      * @param onFailureCallback callback to be called if the user creation is not successful
      */
-    public void createUserFirebaseAuth(final String email, final String username, final String password,
+    public void createUserFirebaseAuth(final String username, final String email, final String password,
                                        OnSuccessCallback onSuccessCallback, OnFailureCallback onFailureCallback) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
