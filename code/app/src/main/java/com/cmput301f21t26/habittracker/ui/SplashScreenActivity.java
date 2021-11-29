@@ -16,7 +16,6 @@ import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.AuthController;
 import com.cmput301f21t26.habittracker.objects.UserController;
 import com.cmput301f21t26.habittracker.ui.auth.LoginSignupActivity;
-import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * File contains the logic for the splash screen.
