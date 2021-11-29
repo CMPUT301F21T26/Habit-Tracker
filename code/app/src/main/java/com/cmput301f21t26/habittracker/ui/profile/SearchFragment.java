@@ -29,6 +29,9 @@ import com.cmput301f21t26.habittracker.ui.MainActivity;
 
 import java.util.ArrayList;
 
+/**
+ * Allows users to be able to search for other users
+ */
 public class SearchFragment extends Fragment {
     private SearchView searchView;
     private ArrayList<User> usersList;

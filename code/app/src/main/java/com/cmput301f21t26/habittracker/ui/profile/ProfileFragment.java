@@ -41,6 +41,9 @@ import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * Set's up profile page of a user, where the user can navigate to the habit's, followers, and following tabs
+ */
 public class ProfileFragment extends Fragment implements Observer {
     private String TAG = "ProfileFragment";
     private FragmentProfileBinding binding;

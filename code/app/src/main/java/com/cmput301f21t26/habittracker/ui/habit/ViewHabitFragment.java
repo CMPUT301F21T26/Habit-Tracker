@@ -33,6 +33,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
+/**
+ * Displays the selected habit and it's respective information
+ */
 public class ViewHabitFragment extends Fragment {
 
     final private String TAG = "viewHabitFragment";

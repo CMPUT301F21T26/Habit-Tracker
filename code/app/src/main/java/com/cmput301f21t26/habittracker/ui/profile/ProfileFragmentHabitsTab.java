@@ -28,7 +28,9 @@ import com.cmput301f21t26.habittracker.ui.habit.HabitItemTouchHelper;
 
 import java.util.ArrayList;
 
-
+/**
+ * A tab of  the profile that display's all of a user's habits
+ */
 public class ProfileFragmentHabitsTab extends Fragment {
     private String TAG = "ProfileFragmentHabitsTab";
 

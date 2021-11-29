@@ -51,6 +51,9 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.UUID;
 
+/**
+ * Handles editing of existing habit event, updating the information with any new inputs
+ */
 public class EditHabitEventFragment extends Fragment {
 
     private final String TAG = "EditHabitEventFragment";
