@@ -40,6 +40,9 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+/**
+ * Allows user to add a habit, ensures the requirements for a habit are met
+ */
 public class AddHabitFragment extends Fragment {
 
     private final String TAG = "AddHabitFragment";
