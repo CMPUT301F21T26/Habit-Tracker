@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewFinder;
 import androidx.test.espresso.action.CoordinatesProvider;
@@ -22,7 +23,9 @@ import androidx.test.espresso.action.GeneralLocation;
 import androidx.test.espresso.action.GeneralSwipeAction;
 import androidx.test.espresso.action.Press;
 import androidx.test.espresso.action.Swipe;
+import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
 
 import com.cmput301f21t26.habittracker.objects.Habit;
@@ -56,7 +59,7 @@ public class ReorderingTest {
 
                         Log.d("screenPos", Arrays.toString(screenPos));
                         float screenX = screenPos[0] + width / 2;
-                        float screenY = screenPos[1] + margin + height / 2 + (margin + height) * fromPos;
+                        float screenY = screenPos[1] + margin + (height / 2) + (height*fromPos);
                         float[] coords = {screenX, screenY};
                         Log.d("screenPos", Arrays.toString(coords));
 
@@ -71,7 +74,7 @@ public class ReorderingTest {
                         float width = view.getWidth();
 
                         float screenX = screenPos[0] + width / 2;
-                        float screenY = screenPos[1] + margin + height / 2 + (margin + height) * toPos;
+                        float screenY = screenPos[1] + margin + (height / 2) + (height*fromPos) + height;
                         float[] coords = {screenX, screenY};
                         Log.d("screenPos", Arrays.toString(coords));
 
@@ -95,15 +98,16 @@ public class ReorderingTest {
         Thread.sleep(1000);
     }
     @Test
-    public void testSwipeUp() throws InterruptedException {
+    public void testSwiping() throws InterruptedException {
         onView(withId(R.id.navigation_profile)).perform(click());
         clickOnHabit();
+
     }
     public static void clickOnHabit() throws InterruptedException {
         ArrayList<Habit> todayHabitList = (ArrayList<Habit>) UserController.getInstance().getCurrentUser().getHabits();
         Integer position = todayHabitList.size() - 1;
 
-        onView(withId(R.id.profileHabitsRecyclerView)).perform(dragFrom(0, 1));
+        onView(withId(R.id.profileHabitsRecyclerView)).perform(dragFrom(1, 2));
         Thread.sleep(1000);
     }
 
