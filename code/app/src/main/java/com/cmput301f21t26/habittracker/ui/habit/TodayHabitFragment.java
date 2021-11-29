@@ -27,6 +27,9 @@ import com.cmput301f21t26.habittracker.objects.UserController;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+/**
+ * Display's today's date and the daily habits of the user
+ */
 public class TodayHabitFragment extends Fragment {
 
     private final String TAG = "TodayHabitFragment";
@@ -44,6 +47,13 @@ public class TodayHabitFragment extends Fragment {
 
     private UserController userController;
 
+    /**
+     * Assign UI elements
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -57,6 +67,11 @@ public class TodayHabitFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Fetch today's habits and display them
+     * @param view
+     * @param savedInstanceState
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

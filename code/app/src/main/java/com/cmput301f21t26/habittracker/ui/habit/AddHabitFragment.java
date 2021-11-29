@@ -39,6 +39,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+/**
+ * Allows user to add a habit, ensures the requirements for a habit are met
+ */
 public class AddHabitFragment extends Fragment {
 
     private final String TAG = "AddHabitFragment";

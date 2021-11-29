@@ -41,6 +41,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+/**
+ * Allows user to edit an existing habit of theirs
+ */
 public class EditHabitFragment extends Fragment {
 
     final private String TAG = "editHabitFragment";
