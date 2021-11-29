@@ -34,12 +34,53 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ReorderingTest {
 
     private static RecyclerView mRecyclerList;
-    private CoordinatesProvider startC;
-    private CoordinatesProvider endC;
+
+    public static ViewAction dragFrom(int fromPos, int toPos) {
+
+        float margin = 8;
+        float height = 80;
+
+        return new GeneralSwipeAction(
+                Swipe.SLOW,
+                new CoordinatesProvider() {
+                    @Override
+                    public float[] calculateCoordinates(View view) {
+                        int[] screenPos = new int[2];
+                        view.getLocationOnScreen(screenPos);
+                        float width = view.getWidth();
+
+                        Log.d("screenPos", Arrays.toString(screenPos));
+                        float screenX = screenPos[0] + width / 2;
+                        float screenY = screenPos[1] + margin + height / 2 + (margin + height) * fromPos;
+                        float[] coords = {screenX, screenY};
+                        Log.d("screenPos", Arrays.toString(coords));
+
+                        return coords;
+                    }
+                },
+                new CoordinatesProvider() {
+                    @Override
+                    public float[] calculateCoordinates(View view) {
+                        int[] screenPos = new int[2];
+                        view.getLocationOnScreen(screenPos);
+                        float width = view.getWidth();
+
+                        float screenX = screenPos[0] + width / 2;
+                        float screenY = screenPos[1] + margin + height / 2 + (margin + height) * toPos;
+                        float[] coords = {screenX, screenY};
+                        Log.d("screenPos", Arrays.toString(coords));
+
+                        return coords;
+                    }
+                },
+                Press.FINGER
+        );
+    }
 
     @Rule
     public ActivityTestRule<LoginSignupActivity> rule = new ActivityTestRule<>(LoginSignupActivity.class);
@@ -62,8 +103,7 @@ public class ReorderingTest {
         ArrayList<Habit> todayHabitList = (ArrayList<Habit>) UserController.getInstance().getCurrentUser().getHabits();
         Integer position = todayHabitList.size() - 1;
 
-        onView(withId(R.id.profileHabitsRecyclerView)).perform(new GeneralSwipeAction(Swipe.SLOW, GeneralLocation.BOTTOM_LEFT,GeneralLocation.CENTER,
-                Press.FINGER));
+        onView(withId(R.id.profileHabitsRecyclerView)).perform(dragFrom(0, 1));
         Thread.sleep(1000);
     }
 
