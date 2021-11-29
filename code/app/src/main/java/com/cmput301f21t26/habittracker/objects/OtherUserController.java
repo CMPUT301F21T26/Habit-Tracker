@@ -20,7 +20,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 /**
- * This class handles users that are not the current user
+ * OtherUserController provides methods that allow the views to access
+ * all users other than the currently signed in user
  */
 public class OtherUserController {
 

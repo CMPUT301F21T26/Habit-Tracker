@@ -25,6 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * HabitEventController provides methods that access the database.
+ * It manages HabitEvent objects the currently signed in user has and associated snapshot listener.
+ */
 public class HabitEventController {
 
     private static HabitEventController instance = new HabitEventController();

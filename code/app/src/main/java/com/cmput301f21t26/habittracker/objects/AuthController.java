@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * AuthController provides methods for the views to access Firebase Authentication and database
+ */
 public class AuthController {
 
     private final static AuthController instance = new AuthController();

@@ -19,6 +19,10 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+/**
+ * FollowRequestController provides methods that access the database.
+ * It manages FollowRequest objects the currently signed in user received and associated snapshot listener.
+ */
 public class FollowRequestController {
 
     private static FollowRequestController instance = new FollowRequestController();
