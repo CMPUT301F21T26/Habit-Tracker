@@ -401,6 +401,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                         // if profile pic is loaded properly, then set the OG icon to null and make the profile pic the "icon"
                         profileItem.setIcon(null);
                         profilePicIV.setImageBitmap(resource);
+                        profileItemView.removeAllViews();
                         profileItemView.addView(profile_badge);
                     }
 
