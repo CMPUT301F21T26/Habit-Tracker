@@ -343,19 +343,18 @@ public class HabitController {
         //first things first convert dayLastAccessed to a calendar object to make comparisons easier
         Calendar start = Calendar.getInstance();
         start.setTime(dayLastAccessed);
+        start.set(start.get(Calendar.YEAR), start.get(Calendar.MONTH), start.get(Calendar.DAY_OF_MONTH), 23, 59, 59);
         //now check today>start
-        if (start.before(today) && start.get(Calendar.DAY_OF_WEEK) < today.get(Calendar.DAY_OF_WEEK)) {
+        while (start.before(today)) {
             //now we know at least one day has passed, loop through all days until we get to today
-            do {
-                start.add(Calendar.DAY_OF_WEEK, 1);
-                if (habit.getDaysList().contains(start.get(Calendar.DAY_OF_WEEK)-1)) {
-                    habit.setSupposedHE(habit.getSupposedHE()+1);
-                }
-                // loops up to exact date
-            } while (start.before(today) || (start.get(Calendar.DAY_OF_WEEK)) == (today.get(Calendar.DAY_OF_WEEK)));
-            //update the habit in the DB, which will trigger the listener to update with the user too
-            updateHabitInDb(habit, user -> {});
+            start.add(Calendar.DAY_OF_WEEK, 1);
+            if (habit.getDaysList().contains(start.get(Calendar.DAY_OF_WEEK)-1)) {
+                habit.setSupposedHE(habit.getSupposedHE()+1);
+            }
+            // loops up to exact date
         }
+        updateHabitInDb(habit, user -> {});
     }
+
 
 }

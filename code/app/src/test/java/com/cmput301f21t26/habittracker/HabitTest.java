@@ -96,5 +96,14 @@ public class HabitTest {
 
 
     }
-    // TODO test methods that use HabitEvent or HabitPlan as an input
+
+    /**
+     * Test getVisualRatio
+     */
+    @Test
+    void testGetVisualRatio(){
+        habit.setSupposedHE(5);
+        habit.setCompletedHE(2);
+        assertEquals(habit.getVisualRatio(), ((float) 2)/5);
+    }
 }
