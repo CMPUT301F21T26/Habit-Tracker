@@ -39,9 +39,6 @@ public class MapFragmentTest {
         }
 
         //Make sure there is a Habit titled Test and that the box is checked off.
-        Thread.sleep(1000);
-        onView(withId(R.id.navigation_timeline)).perform(click());
-        onView(withId(R.id.navigation_timeline)).check(matches(isDisplayed()));
 
         ViewAction itemViewAction = ActionOnItemView.actionOnItemView(withId(R.id.habitCheckbox), click());
         onView(withId(R.id.todayHabitRV))

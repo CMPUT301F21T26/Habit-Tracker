@@ -46,6 +46,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.UUID;
 
 public class EditHabitEventFragment extends Fragment {
 
@@ -286,7 +287,7 @@ public class EditHabitEventFragment extends Fragment {
                     removeImageImageButton.setVisibility(View.VISIBLE);
 
                     uri = getImageUri(getContext(), captureImage);
-                    picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
+                    picturePath = "eventPictures/" + UUID.randomUUID().toString() + ".jpeg";
                     habitEventController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> {
 
                     });
@@ -331,7 +332,7 @@ public class EditHabitEventFragment extends Fragment {
                             habitEventImage.setImageURI(uri);
                             removeImageImageButton.setVisibility(View.VISIBLE);
 
-                            picturePath = "eventPictures/" + uri.hashCode() + ".jpeg";
+                            picturePath = "eventPictures/" + UUID.randomUUID().toString() + ".jpeg";
                             habitEventController.updateHabitEventImageInDb(hEvent, picturePath, uri, user -> { });
                         }
                     }

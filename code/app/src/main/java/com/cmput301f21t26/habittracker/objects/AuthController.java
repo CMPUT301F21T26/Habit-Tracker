@@ -193,7 +193,7 @@ public class AuthController {
      public void createUserFirebaseFirestore(String username, String firstName, String lastName, String email, String picturePath, Uri imageUri,
                                              OnSuccessCallback onSuccessCallback, OnFailureCallback onFailureCallback) {
 
-         storeOrGetProfilePicture(picturePath, imageUri, profileImageUrl -> {
+         storeProfilePic(picturePath, imageUri, profileImageUrl -> {
 
              Map<String, Object> user = new HashMap<>();
 
@@ -221,10 +221,7 @@ public class AuthController {
     }
 
     /**
-     * If the given picture path already exists in Firebase Storage, retrieve that download URL.
-     * This is so then we are not replacing the old image with the new image
-     * and thus changing the tokens, which caused loading errors when using Glide.
-     * @see <a href="https://stackoverflow.com/questions/41943860/getting-403-forbidden-error-when-trying-to-load-image-from-firebase-storage">Source</a>
+     * Store the profile picture in the database and get its download url
      *
      * Call callback with the download URL.
      *
@@ -232,32 +229,24 @@ public class AuthController {
      * @param imageUri uri of the image, type {@link Uri}
      * @param callback callback to be called after storing/retrieving
      */
-    private void storeOrGetProfilePicture(String picturePath, Uri imageUri, ProfileImageUrlCallback callback) {
+    private void storeProfilePic(String picturePath, Uri imageUri, ProfileImageUrlCallback callback) {
 
         final CollectionReference usersRef = mStore.collection("users");
 
-        mStorage.getReference()
-                .child(picturePath)
-                .getDownloadUrl()
-                .addOnSuccessListener(uri -> {
-                    // if the image file already exists, download that url and store it in user
-                    callback.onCallback(uri.toString());
-                })
-                .addOnFailureListener(e ->  {
-                    // If image file doesn't exist, add it and get its url
-                    StorageReference mStorageReference = mStorage.getReference(picturePath);
-                    mStorageReference
-                            .putFile(imageUri)
-                            .addOnSuccessListener(taskSnapshot -> {
-                                mStorageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Uri> task) {
-                                        String profileImageUrl = task.getResult().toString();
-                                        callback.onCallback(profileImageUrl);
-                                    }
-                                });
-                            });
+        // Add image file to storage and get it's URL to store in user
+        StorageReference mStorageReference = mStorage.getReference(picturePath);
+        mStorageReference
+                .putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    mStorageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            String profileImageUrl = task.getResult().toString();
+                            callback.onCallback(profileImageUrl);
+                        }
+                    });
                 });
+
     }
 
     public interface OnSuccessCallback {

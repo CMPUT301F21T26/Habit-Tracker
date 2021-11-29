@@ -60,7 +60,7 @@ public class ProfileFragmentFollowersTab extends Fragment {
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_main);
 
-        updateFollowToSeeFollowingText();
+        updateFollowToSeeFollowersText();
         updateListView();
         return view;
     }
@@ -110,7 +110,7 @@ public class ProfileFragmentFollowersTab extends Fragment {
      * Reveals the text "FOLLOW THIS USER TO SEE THEIR FOLLOWERS"
      * if user is not following, shown otherwise.
      */
-    private void updateFollowToSeeFollowingText() {
+    private void updateFollowToSeeFollowersText() {
         if (!userObject.getUid().equals(userController.getCurrentUserId())) {
             if (userController.getCurrentUser().isFollowing(userObject)) {
                 lockFollowersImageView.setVisibility(View.GONE);

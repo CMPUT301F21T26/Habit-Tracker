@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/todays_habits"
@@ -13,7 +14,7 @@
 
     <item
         android:id="@+id/navigation_profile"
-        android:icon="@drawable/ic_person"
-        android:title="Profile" />
+        android:title="Profile"
+        android:icon="@drawable/ic_person"/>
 
 </menu>
