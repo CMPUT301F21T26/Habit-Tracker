@@ -48,6 +48,10 @@ public class ReorderingTest {
         float margin = 8;
         float height = 80;
 
+        /**
+         * find coordinates for swipe action to take place
+         * based on position of habits in recycler view
+         */
         return new GeneralSwipeAction(
                 Swipe.SLOW,
                 new CoordinatesProvider() {
@@ -74,7 +78,7 @@ public class ReorderingTest {
                         float width = view.getWidth();
 
                         float screenX = screenPos[0] + width / 2;
-                        float screenY = screenPos[1] + margin + (height / 2) + (height*fromPos) + height;
+                        float screenY = screenPos[1] + margin + (height / 2) + (height*toPos);
                         float[] coords = {screenX, screenY};
                         Log.d("screenPos", Arrays.toString(coords));
 
@@ -97,6 +101,12 @@ public class ReorderingTest {
         }
         Thread.sleep(1000);
     }
+
+    /**
+     *
+     * @throws InterruptedException
+     * tests drag and drop of habits in habit list of profile
+     */
     @Test
     public void testSwiping() throws InterruptedException {
         onView(withId(R.id.navigation_profile)).perform(click());
