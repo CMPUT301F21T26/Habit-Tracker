@@ -24,6 +24,7 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class HabitController {
 
@@ -310,6 +311,51 @@ public class HabitController {
                 }
             }
         });
+    }
+
+    /**
+     * Loops through all user habits and updates their denominators for visual indicators
+     */
+    public void updateVisualIndicator() {
+        User user = userController.getCurrentUser();
+        assert user != null;
+        Date lastAccessed = user.getDateLastAccessed();
+        Calendar now = Calendar.getInstance();
+        List<Habit> habits = user.getHabits();
+        for (int i=0; i<habits.size(); i++) {
+            updateVisualDenominator(habits.get(i), lastAccessed, now);
+        }
+    }
+
+    /**
+     * Updates supposedHE to keep track of how many habit events were supposed to have happened
+     * Used in UserController in the process of setting up the user class when logging in/authenticating
+     * Grabs dayLastAccessed before it can update to today from the user, then loops through to today
+     * Checks for days after current day
+     * @param dayLastAccessed
+     * The last time the user logged in prior to today
+     * @param today
+     * the date for today, only passed so we don't have to get todays date every time within the function
+     */
+    public void updateVisualDenominator(Habit habit, Date dayLastAccessed, Calendar today) {
+        //loop through days until we get to current day, translate this.daysList into which days
+        //of the week we need to update the denominator for
+        //first things first convert dayLastAccessed to a calendar object to make comparisons easier
+        Calendar start = Calendar.getInstance();
+        start.setTime(dayLastAccessed);
+        //now check today>start
+        if (start.before(today) && start.get(Calendar.DAY_OF_WEEK) < today.get(Calendar.DAY_OF_WEEK)) {
+            //now we know at least one day has passed, loop through all days until we get to today
+            do {
+                start.add(Calendar.DAY_OF_WEEK, 1);
+                if (habit.getDaysList().contains(start.get(Calendar.DAY_OF_WEEK)-1)) {
+                    habit.setSupposedHE(habit.getSupposedHE()+1);
+                }
+                // loops up to exact date
+            } while (start.before(today) || (start.get(Calendar.DAY_OF_WEEK)) == (today.get(Calendar.DAY_OF_WEEK)));
+            //update the habit in the DB, which will trigger the listener to update with the user too
+            updateHabitInDb(habit, user -> {});
+        }
     }
 
 }

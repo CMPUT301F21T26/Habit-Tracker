@@ -99,15 +99,6 @@ public class HabitEventController {
                                     break;
                                 case REMOVED:
                                     user.getHabit(parentHabitId).deleteHabitEvent(hEvent);
-
-                                    habitController = HabitController.getInstance();
-
-                                    // if habit event to be removed is dated to today, set done for today of parent habit to false
-                                    if (hEvent.getHabitEventDateDay().equals(user.getDateLastAccessedDay())) {
-                                        Habit habit = user.getHabit(parentHabitId);
-                                        habit.setDoneForToday(false);
-                                        habitController.updateHabitInDb(habit, user -> { });
-                                    }
                                     break;
                                 default:
                                     Log.d("habitAdded", "Unexpected type: " + dc.getType());

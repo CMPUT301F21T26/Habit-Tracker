@@ -87,6 +87,7 @@ public class UserController {
             followRequestController.initFollowRequestSnapshotListener();
 
             habitController.resetHabitsInDb(cbUser -> {
+                habitController.updateVisualIndicator();
                 updateUserLastAccessedDateInDb(callback);
             });
         });

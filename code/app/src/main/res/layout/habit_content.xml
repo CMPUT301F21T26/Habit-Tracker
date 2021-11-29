@@ -15,22 +15,41 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-            <ProgressBar
+            <RelativeLayout
+                android:id="@+id/indicator"
                 android:layout_centerInParent="true"
-                android:id="@+id/habitProgressBar"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:padding="3dp"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:indeterminate="false"
-                android:max="100"
-                android:progress="20"
-                android:progressDrawable="@drawable/custom_progress"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                >
+                <com.cmput301f21t26.habittracker.objects.VisualIndicator
+                    android:id="@+id/habitProgressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="50"
+                    android:progressDrawable="@drawable/custom_progress"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"/>
+                <TextView
+                    android:id="@+id/progressDisplay"
+                    android:background="#00000000"
+                    android:layout_alignStart="@id/habitProgressBar"
+                    android:layout_alignTop="@id/habitProgressBar"
+                    android:layout_alignEnd="@id/habitProgressBar"
+                    android:layout_alignBottom="@id/habitProgressBar"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:text="@id/habitProgressBar"
+                    android:fontFamily="@font/rubik"
+                    android:textSize="12sp"
+                    />
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -41,7 +60,7 @@
                 android:paddingStart="8dp"
                 app:layout_constraintEnd_toStartOf="@+id/habitCheckbox"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/habitProgressBar"
+                app:layout_constraintStart_toEndOf="@+id/indicator"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
