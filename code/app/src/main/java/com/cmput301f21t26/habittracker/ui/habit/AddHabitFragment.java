@@ -38,6 +38,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 public class AddHabitFragment extends Fragment {
 
@@ -163,6 +164,12 @@ public class AddHabitFragment extends Fragment {
 
                 newHabit = new Habit(title, reason, date, daysList);
                 newHabit.setPrivate(isPrivate);
+                Log.d(TAG, String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)));
+                Log.d(TAG, daysList.stream().map(Object::toString).collect(Collectors.joining(", ")));
+                if (daysList.contains(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1)) {
+                    Log.d(TAG, "create same day");
+                    newHabit.setSupposedHE(1);
+                }
                 habitController.setNewHabitPosition(newHabit, cbUser -> {
                     Log.d(TAG, newHabit.getReason());
                     habitController.storeHabitInDb(newHabit, cbUser2 -> {

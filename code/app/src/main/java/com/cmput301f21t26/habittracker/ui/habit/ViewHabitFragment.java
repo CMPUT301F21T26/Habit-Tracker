@@ -8,6 +8,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,7 @@ import com.cmput301f21t26.habittracker.databinding.FragmentViewHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.objects.VisualIndicator;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -44,6 +46,8 @@ public class ViewHabitFragment extends Fragment {
     private Button editHabitButton;
     private ChipGroup chipGroup;
     private SwitchCompat isPrivateSwitch;
+    private VisualIndicator visualIndicator;
+    private TextView indicatorNumberTV;
 
     private UserController userController;
 
@@ -68,6 +72,8 @@ public class ViewHabitFragment extends Fragment {
         confirmHabitButton = binding.confirmHabitButton;
         editHabitButton = binding.editHabitButton;
         isPrivateSwitch = binding.privacySwitch;
+        visualIndicator = binding.habitProgressBar;
+        indicatorNumberTV = binding.progressDisplay;
 
         userController = UserController.getInstance();
 
@@ -139,6 +145,7 @@ public class ViewHabitFragment extends Fragment {
 
         binding.habitTitle.setText(habit.getTitle());
         binding.habitReasoning.setText(habit.getReason());
+
         if (habit.isPrivate()) {
             isPrivateSwitch.setChecked(true);
         } else {
@@ -147,6 +154,9 @@ public class ViewHabitFragment extends Fragment {
 
 
         // TODO set percentage done
+        visualIndicator.updateProgress(habit);
+        String toIndicate = visualIndicator.getProgress()+"%";
+        indicatorNumberTV.setText(toIndicate);
 
         // get the date and make it ready for presentation
         String datePattern = "yyyy-MM-dd";

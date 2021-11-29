@@ -84,26 +84,45 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-
-            <ProgressBar
+            <RelativeLayout
+                android:id="@+id/indicator"
                 android:layout_centerInParent="true"
-                android:id="@+id/habitProgressBar"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:padding="3dp"
                 android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
                 android:layout_marginVertical="@dimen/activity_vertical_margin"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:indeterminate="false"
-                android:max="100"
-                android:progress="20"
-                android:progressDrawable="@drawable/custom_progress"
                 app:layout_constraintBottom_toTopOf="@id/divider"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/habitReasoningLayout"
                 app:layout_constraintHorizontal_bias="0.5"
-                />
+                >
+                <com.cmput301f21t26.habittracker.objects.VisualIndicator
+                    android:id="@+id/habitProgressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="50"
+                    android:progressDrawable="@drawable/custom_progress"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"/>
+                <TextView
+                    android:id="@+id/progressDisplay"
+                    android:background="#00000000"
+                    android:layout_alignStart="@id/habitProgressBar"
+                    android:layout_alignTop="@id/habitProgressBar"
+                    android:layout_alignEnd="@id/habitProgressBar"
+                    android:layout_alignBottom="@id/habitProgressBar"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:text="50"
+                    android:fontFamily="@font/rubik"
+                    android:textSize="20sp"
+                    />
+            </RelativeLayout>
+
 
             <View
                 android:id="@+id/divider"
@@ -115,7 +134,7 @@
                 app:layout_constraintHorizontal_bias="0.487"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/habitProgressBar"
+                app:layout_constraintTop_toBottomOf="@+id/indicator"
                 app:layout_constraintVertical_bias="0.857" />
 
             <TextView
