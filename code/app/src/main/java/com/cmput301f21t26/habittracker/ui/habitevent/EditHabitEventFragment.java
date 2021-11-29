@@ -207,7 +207,6 @@ public class EditHabitEventFragment extends Fragment {
             habitEventController.updateHabitEventInDb(hEvent, user -> {
                 NavDirections action = (NavDirections) MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                 navController.navigate(action);
-                MainActivity.setTimelineItemSelected();
             });
         }
     };
@@ -230,7 +229,6 @@ public class EditHabitEventFragment extends Fragment {
                             habitEventController.removeHabitEventFromDb(hEvent, cbUser -> {
                                 NavDirections action = (NavDirections) MobileNavigationDirections.actionGlobalNavigationTimeline(null);
                                 navController.navigate(action);
-                                MainActivity.setTimelineItemSelected();
                             });
                         }
                     })
