@@ -29,12 +29,8 @@ import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitController;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.HabitEventController;
-import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
-import com.cmput301f21t26.habittracker.objects.VisualIndicator;
 import com.google.android.material.snackbar.Snackbar;
-
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

@@ -26,7 +26,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 >
-                <com.cmput301f21t26.habittracker.objects.VisualIndicator
+                <com.cmput301f21t26.habittracker.ui.habit.VisualIndicator
                     android:id="@+id/habitProgressBar"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:indeterminate="false"
