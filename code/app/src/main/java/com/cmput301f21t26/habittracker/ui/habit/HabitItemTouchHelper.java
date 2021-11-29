@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.HabitController;
 
+/**
+ * Helps implement drag and dropping habits
+ */
 public class HabitItemTouchHelper extends androidx.recyclerview.widget.ItemTouchHelper.Callback {
     private final ItemTouchHelperAdapter itemTouchHelperAdapter;
     private boolean draggable = true;

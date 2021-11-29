@@ -30,7 +30,9 @@ import com.cmput301f21t26.habittracker.ui.MainActivity;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-
+/**
+ * Display's the existing habit event that has been selected
+ */
 public class ViewHabitEventFragment extends Fragment {
     private String TAG = "ViewHabitEventFragment";
 

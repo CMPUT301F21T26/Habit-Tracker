@@ -100,6 +100,13 @@ public class EditHabitEventFragment extends Fragment {
         habitController = HabitController.getInstance();
     }
 
+    /**
+     * Assign UI elements to variables for use
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -123,6 +130,11 @@ public class EditHabitEventFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Set listeners to necessary UI elements
+     * @param view
+     * @param savedInstanceState
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
