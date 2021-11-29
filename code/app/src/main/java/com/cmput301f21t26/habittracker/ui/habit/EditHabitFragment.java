@@ -27,6 +27,8 @@ import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitController;
+import com.cmput301f21t26.habittracker.objects.HabitEvent;
+import com.cmput301f21t26.habittracker.objects.HabitEventController;
 import com.cmput301f21t26.habittracker.objects.VisualIndicator;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.android.material.chip.Chip;
@@ -66,6 +68,7 @@ public class EditHabitFragment extends Fragment {
     private Habit habit;
 
     private HabitController habitController;
+    private HabitEventController habitEventController;
 
     public EditHabitFragment() {
         // Required empty public constructor
@@ -77,6 +80,7 @@ public class EditHabitFragment extends Fragment {
         setHasOptionsMenu(true);
 
         habitController = HabitController.getInstance();
+        habitEventController = HabitEventController.getInstance();
     }
 
     @Override
@@ -239,6 +243,22 @@ public class EditHabitFragment extends Fragment {
                 Log.d(TAG, "The days list is " + daysList.toString());
                 if(privacySwitch.isChecked()) {
                     isPrivate = true;
+                }
+                //check if current date is checked or unchecked in the chip count
+                ArrayList<Integer> daysCheckedPrior = habit.getDaysList();
+                int today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1;
+                if (daysCheckedPrior.contains(today) && !daysList.contains(today)) {
+                    // if it was checked before but not now, remove a supposed HE, and remove a completed HE with day today
+                    HabitEvent hE = habit.getHabitEventByDate(Calendar.getInstance().getTime());
+                    // if its null, simply decrease the supposedHE
+                    if (hE!=null) {
+                        habitEventController.removeHabitEventFromDb(hE, user -> {});
+                    }
+                    habit.setSupposedHE(habit.getSupposedHE()-1);
+
+                } else if (!daysCheckedPrior.contains(today) && daysList.contains(today)) {
+                    // if it wasn't checked prior but it is now, add a supposed HE
+                    habit.setSupposedHE(habit.getSupposedHE()+1);
                 }
 
                 habit.setTitle(title);
