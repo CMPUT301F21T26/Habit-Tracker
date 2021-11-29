@@ -70,7 +70,7 @@ public class SignupFragment extends Fragment {
 
     // Make it so the default profile pic is...the default profile pic. So user doesn't have to necessarily choose one.
     private Uri imageUri = Uri.parse("android.resource://com.cmput301f21t26.habittracker/drawable/default_profile_pic");
-    private String picturePath = "image/" + "default_profile_pic" + ".jpeg";
+    private String picturePath = "image/" + UUID.randomUUID().toString() + ".jpeg";
 
     private NavController navController = null;
 
