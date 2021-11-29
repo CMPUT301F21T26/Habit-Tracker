@@ -255,7 +255,6 @@ public class EditHabitFragment extends Fragment {
                         habit.setDoneForToday(false);
                         habit.setCompletedHE(habit.getCompletedHE()-1);
                         habitEventController.removeHabitEventFromDb(hE, user -> {});
-
                     }
                     habit.setSupposedHE(habit.getSupposedHE()-1);
 
