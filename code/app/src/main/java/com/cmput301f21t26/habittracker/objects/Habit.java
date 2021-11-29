@@ -25,6 +25,8 @@ public class Habit implements Serializable {
     private ArrayList<HabitEvent> habitEvents;
     private ArrayList<Integer> daysList;
     private int habitPosition;
+    private int supposedHE;
+    private int completedHE;
 
     /**
      * A default Habit constructor.
@@ -50,6 +52,8 @@ public class Habit implements Serializable {
         this.habitId = UUID.randomUUID().toString();
         this.isPrivate = false;
         this.habitPosition = 0;
+        this.supposedHE = 0;
+        this.completedHE = 0;
     }
 
     /**
@@ -240,5 +244,21 @@ public class Habit implements Serializable {
 
     public void setHabitPosition(int habitPosition) {
         this.habitPosition = habitPosition;
+    }
+
+    public void setSupposedHE(int supposedHE) { this.supposedHE = supposedHE; }
+
+    public void setCompletedHE(int completedHE) { this.completedHE = completedHE; }
+
+    public int getSupposedHE() { return supposedHE; }
+
+    public int getCompletedHE() { return completedHE; }
+
+    public float getVisualRatio() {
+        if (supposedHE==0) {
+            return 0;
+        } else {
+            return ((float) completedHE)/supposedHE;
+        }
     }
 }

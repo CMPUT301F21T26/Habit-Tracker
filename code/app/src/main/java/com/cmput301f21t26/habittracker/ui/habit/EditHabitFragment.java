@@ -27,6 +27,7 @@ import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
 import com.cmput301f21t26.habittracker.objects.HabitController;
+import com.cmput301f21t26.habittracker.objects.VisualIndicator;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -48,7 +49,7 @@ public class EditHabitFragment extends Fragment {
 
     private ArrayList<Integer> daysList;
 
-    private @NonNull FragmentEditHabitBinding binding;
+    private FragmentEditHabitBinding binding;
 
     private Button confirmHabitButton;
     private Button deleteHabitButton;
@@ -59,6 +60,8 @@ public class EditHabitFragment extends Fragment {
     private TextView dateFormatMessageTV;
     private Button chooseDateButton;
     private SwitchCompat privacySwitch;
+    private VisualIndicator visualIndicator;
+    private TextView indicatorNumberTV;
 
     private Habit habit;
 
@@ -91,6 +94,8 @@ public class EditHabitFragment extends Fragment {
         dateFormatMessageTV = binding.dateFormatMessage;
         chooseDateButton = binding.chooseDateButton;
         privacySwitch = binding.privacySwitch;
+        visualIndicator = binding.habitProgressBar;
+        indicatorNumberTV = binding.progressDisplay;
 
         // Inflate the layout for this fragment
         return binding.getRoot();
@@ -173,6 +178,10 @@ public class EditHabitFragment extends Fragment {
         habitReasoningET.setText(habit.getReason());
 
         // TODO set percentage done
+        visualIndicator.updateProgress(habit);
+        String toIndicate = visualIndicator.getProgress()+"%";
+        indicatorNumberTV.setText(toIndicate);
+
 
         // get the date and make it ready for presentation
         String datePattern = "yyyy-MM-dd";

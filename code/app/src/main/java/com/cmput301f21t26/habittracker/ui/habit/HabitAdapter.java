@@ -31,7 +31,10 @@ import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.HabitEventController;
 import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
+import com.cmput301f21t26.habittracker.objects.VisualIndicator;
 import com.google.android.material.snackbar.Snackbar;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -96,6 +99,9 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         holder.getTitleTV().setText(habit.getTitle());
         holder.getPlanTV().setText(getPlanMsg(habit));
         holder.getDoneTodayCB().setChecked(habit.isDoneForToday());
+        holder.getIndicator().updateProgress(habit);
+        String toIndicate = holder.getIndicator().getProgress()+"%";
+        holder.getIndicatorNumber().setText(toIndicate);
         holder.getDoneTodayCB().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,6 +117,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                                     habitEventController.removeHabitEventFromDb(habit.getHabitEventByDate(Calendar.getInstance().getTime()), callback -> {
                                         holder.getDoneTodayCB().setChecked(false);
                                         habit.setDoneForToday(false);
+                                        habit.setCompletedHE(habit.getCompletedHE()-1);
                                         habitController.updateHabitInDb(habit, user -> {});
                                     });
                                 }
@@ -140,6 +147,7 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
                 } else {
                     // if check box is unchecked, set habit's done for today to true and update it in db
                     habit.setDoneForToday(true);
+                    habit.setCompletedHE(habit.getCompletedHE()+1);
                     holder.getDoneTodayCB().setChecked(true);
 
                     HabitEvent hEvent = new HabitEvent(habit.getHabitId());
@@ -224,6 +232,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         private final TextView titleTV;
         private final TextView planTV;
         private final CheckBox doneTodayCB;
+        private final VisualIndicator visualIndicator;
+        private final TextView indicatorNumber;
         GestureDetector gestureDetector;
 
         public ViewHolder(View view) {
@@ -232,6 +242,8 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
             titleTV = view.findViewById(R.id.habitTitleTV);
             planTV = view.findViewById(R.id.habitPlanTV);
             doneTodayCB = view.findViewById(R.id.habitCheckbox);
+            visualIndicator = view.findViewById(R.id.habitProgressBar);
+            indicatorNumber = view.findViewById(R.id.progressDisplay);
             gestureDetector = new GestureDetector(view.getContext(), this);
 
             view.setOnTouchListener(this);
@@ -248,6 +260,10 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         public CheckBox getDoneTodayCB() {
             return doneTodayCB;
         }
+
+        public VisualIndicator getIndicator() { return visualIndicator; }
+
+        public TextView getIndicatorNumber() { return indicatorNumber; }
 
 
         @Override

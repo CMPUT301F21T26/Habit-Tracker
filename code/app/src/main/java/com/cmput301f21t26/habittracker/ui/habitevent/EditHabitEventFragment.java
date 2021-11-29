@@ -38,6 +38,7 @@ import com.cmput301f21t26.habittracker.MobileNavigationDirections;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.databinding.FragmentEditHabitEventBinding;
 import com.cmput301f21t26.habittracker.objects.Habit;
+import com.cmput301f21t26.habittracker.objects.HabitController;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
 import com.cmput301f21t26.habittracker.objects.HabitEventController;
 import com.cmput301f21t26.habittracker.ui.MainActivity;
@@ -45,6 +46,8 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -79,6 +82,7 @@ public class EditHabitEventFragment extends Fragment {
     private HabitEvent hEvent;
 
     private HabitEventController habitEventController;
+    private HabitController habitController;
 
     public EditHabitEventFragment() {
         // Required empty public constructor
@@ -93,6 +97,7 @@ public class EditHabitEventFragment extends Fragment {
         hEvent = EditHabitEventFragmentArgs.fromBundle(getArguments()).getHabitEvent();
 
         habitEventController = HabitEventController.getInstance();
+        habitController = HabitController.getInstance();
     }
 
     @Override
@@ -226,9 +231,15 @@ public class EditHabitEventFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // update DB
+                            if (Calendar.getInstance().toInstant().truncatedTo(ChronoUnit.DAYS).equals(hEvent.getHabitEventDateDay())) {
+                                habit.setDoneForToday(false);
+                            }
+                            habit.setCompletedHE(habit.getCompletedHE()-1);
                             habitEventController.removeHabitEventFromDb(hEvent, cbUser -> {
-                                NavDirections action = (NavDirections) MobileNavigationDirections.actionGlobalNavigationTimeline(null);
-                                navController.navigate(action);
+                                habitController.updateHabitInDb(habit, user -> {
+                                    NavDirections action = (NavDirections) MobileNavigationDirections.actionGlobalNavigationTimeline(null);
+                                    navController.navigate(action);
+                                });
                             });
                         }
                     })
