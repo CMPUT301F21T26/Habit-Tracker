@@ -14,12 +14,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cmput301f21t26.habittracker.R;
 import com.cmput301f21t26.habittracker.objects.HabitEvent;
-import com.cmput301f21t26.habittracker.objects.User;
 import com.cmput301f21t26.habittracker.objects.UserController;
 
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 
 /**
  * The list view adapter for the timeline fragment;

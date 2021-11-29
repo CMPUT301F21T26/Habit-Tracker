@@ -20,6 +20,9 @@ import java.util.Observer;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * Adapter for a list of FollowRequest objects to inflate them into ListView
+ */
 public class FollowRequestListAdapter extends BaseAdapter implements Observer {
 
     private String TAG = "PermissionListAdapter";

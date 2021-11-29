@@ -103,7 +103,7 @@
                 app:layout_constraintTop_toBottomOf="@id/habitReasoningLayout"
                 app:layout_constraintHorizontal_bias="0.5"
                 >
-                <com.cmput301f21t26.habittracker.objects.VisualIndicator
+                <com.cmput301f21t26.habittracker.ui.habit.VisualIndicator
                     android:id="@+id/habitProgressBar"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:indeterminate="false"

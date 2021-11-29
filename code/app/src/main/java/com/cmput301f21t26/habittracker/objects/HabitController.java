@@ -26,6 +26,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+
+/**
+ * HabitController provides methods that access the database.
+ * It manages Habit objects the currently signed in user has and associated snapshot listener.
+ */
 public class HabitController {
 
     private static HabitController instance = new HabitController();

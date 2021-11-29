@@ -1,9 +1,11 @@
-package com.cmput301f21t26.habittracker.objects;
+package com.cmput301f21t26.habittracker.ui.habit;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ProgressBar;
+
+import com.cmput301f21t26.habittracker.objects.Habit;
 
 public class VisualIndicator extends ProgressBar {
 
