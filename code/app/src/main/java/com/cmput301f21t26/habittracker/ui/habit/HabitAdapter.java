@@ -40,7 +40,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 /**
- * Creates an adapter for the habits
+ * Adapter for Habit class to inflate all habits in RecyclerView
  */
 public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> implements Observer, ItemTouchHelperAdapter {
 

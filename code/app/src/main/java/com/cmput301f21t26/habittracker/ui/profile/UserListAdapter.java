@@ -16,6 +16,9 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * Adapter for users list to inflate all users in the list into ListView
+ */
 public class UserListAdapter extends BaseAdapter {
     private String TAG = "UserListAdapter";
     private ArrayList<User> usersList;
