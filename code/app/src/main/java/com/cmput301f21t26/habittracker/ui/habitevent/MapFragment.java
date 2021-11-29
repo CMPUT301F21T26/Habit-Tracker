@@ -56,6 +56,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Creates interactive map for user to optionally add a location to their habit events
+ */
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveListener {
 
     private final String TAG = "MapFragment";

@@ -43,6 +43,9 @@ import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 
+/**
+ * Creates an adapter for the habits
+ */
 public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> implements Observer, ItemTouchHelperAdapter {
 
     private final String TAG = "HabitAdapter";
