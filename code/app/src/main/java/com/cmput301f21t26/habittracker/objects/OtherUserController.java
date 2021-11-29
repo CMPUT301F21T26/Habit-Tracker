@@ -24,6 +24,7 @@ import java.util.ArrayList;
  */
 public class OtherUserController {
 
+    private final int MAX_NUM_RETRIEVAL = 10;
     private final FirebaseFirestore mStore;
     private final CollectionReference usersRef;
 
@@ -60,7 +61,7 @@ public class OtherUserController {
 
         ArrayList<User> usersList = new ArrayList<>();
         if (!newText.isEmpty()) {
-            Query query = usersRef.orderBy("username").startAt(newText).endAt(newText+ "\uf8ff");
+            Query query = usersRef.orderBy("username").limit(MAX_NUM_RETRIEVAL).startAt(newText).endAt(newText+ "\uf8ff");
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot user : task.getResult()) {
