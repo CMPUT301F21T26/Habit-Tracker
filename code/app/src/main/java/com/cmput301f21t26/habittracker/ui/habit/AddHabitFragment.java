@@ -212,7 +212,7 @@ public class AddHabitFragment extends Fragment {
      * Checks all the fields and makes sure
      * they are not empty (except for choose date)
      */
-    public boolean checkFieldsFilled() {
+    private boolean checkFieldsFilled() {
         boolean filled = true;
         final String title = habitTitleET.getText().toString();
         final String reason = habitReasoningET.getText().toString();

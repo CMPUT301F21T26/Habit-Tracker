@@ -45,7 +45,6 @@ public class EditHabitFragment extends Fragment {
 
     final private String TAG = "editHabitFragment";
     private final String datePattern = "yyyy-MM-dd";
-    private final String defaultDate = "YYYY-MM-DD";
 
     private ArrayList<Integer> daysList;
 
@@ -134,49 +133,9 @@ public class EditHabitFragment extends Fragment {
 
         // make the confirm button and delete buttons clickable
         // confirm first
-        confirmHabitButton.setOnClickListener(confirmOnClickListener);
+        confirmHabitButton.setOnClickListener(editConfirmOnClickListener);
         // delete button
-        deleteHabitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // prompt user to approve
-                AlertDialog dialog = new AlertDialog.Builder(getContext())
-                    .setTitle("Delete Habit")
-                    .setMessage("Are you sure you want to delete this habit? The data will be lost forever.")
-                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // update DB
-                            habitController.removeHabitFromDb(habit, cbUser -> {
-                                // go to previous fragment user was in
-                                navController.popBackStack();       // this goes back to view habit fragment
-                                navController.popBackStack();
-                            });
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    })
-                    .show();
-
-                // Change buttons and background
-                dialog.getWindow().setBackgroundDrawableResource(R.drawable.notif_panel_background);
-                Button btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                Button btnNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
-                layoutParams.weight = 10;
-                btnPositive.setLayoutParams(layoutParams);
-                btnNegative.setLayoutParams(layoutParams);
-                btnPositive.setTypeface(getResources().getFont(R.font.rubik_black));
-                btnNegative.setTypeface(getResources().getFont(R.font.rubik_black));
-                btnPositive.setTextColor(ContextCompat.getColor(getContext(), R.color.green));
-                btnNegative.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
-            }
-        });
+        deleteHabitButton.setOnClickListener(deleteConfirmOnClickListener);
     }
 
     /**
@@ -234,7 +193,7 @@ public class EditHabitFragment extends Fragment {
         }
     }
 
-    private View.OnClickListener confirmOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener editConfirmOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             if (checkFieldsFilled()) {
@@ -285,6 +244,48 @@ public class EditHabitFragment extends Fragment {
                     navController.popBackStack();
                 });
             }
+        }
+    };
+
+    private View.OnClickListener deleteConfirmOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            // prompt user to approve
+            AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    .setTitle("Delete Habit")
+                    .setMessage("Are you sure you want to delete this habit? The data will be lost forever.")
+                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // update DB
+                            habitController.removeHabitFromDb(habit, cbUser -> {
+                                // go to previous fragment user was in
+                                navController.popBackStack();       // this goes back to view habit fragment
+                                navController.popBackStack();
+                            });
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
+
+            // Change buttons and background
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.notif_panel_background);
+            Button btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            Button btnNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
+            layoutParams.weight = 10;
+            btnPositive.setLayoutParams(layoutParams);
+            btnNegative.setLayoutParams(layoutParams);
+            btnPositive.setTypeface(getResources().getFont(R.font.rubik_black));
+            btnNegative.setTypeface(getResources().getFont(R.font.rubik_black));
+            btnPositive.setTextColor(ContextCompat.getColor(getContext(), R.color.green));
+            btnNegative.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
         }
     };
 
