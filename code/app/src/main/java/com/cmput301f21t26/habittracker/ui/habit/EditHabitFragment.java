@@ -252,6 +252,8 @@ public class EditHabitFragment extends Fragment {
                     HabitEvent hE = habit.getHabitEventByDate(Calendar.getInstance().getTime());
                     // if its null, simply decrease the supposedHE
                     if (hE!=null) {
+                        habit.setDoneForToday(false);
+                        habit.setCompletedHE(habit.getCompletedHE()-1);
                         habitEventController.removeHabitEventFromDb(hE, user -> {});
                     }
                     habit.setSupposedHE(habit.getSupposedHE()-1);
