@@ -364,6 +364,10 @@ public class EditHabitEventFragment extends Fragment {
     private View.OnClickListener chooseLocOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            // update comment locally
+            String comment = commentET.getText().toString();
+            hEvent.setComment(comment);
+
             NavDirections direction = EditHabitEventFragmentDirections.actionEditHabitEventFragmentToMapFragment(habit, hEvent);
             navController.navigate(direction);
         }
