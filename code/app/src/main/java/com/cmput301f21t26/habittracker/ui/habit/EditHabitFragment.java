@@ -273,6 +273,13 @@ public class EditHabitFragment extends Fragment {
 
                 habitController.updateHabitInDb(habit, cbUser -> {
                     // go to previous fragment user was in
+                    SimpleDateFormat formatter = new SimpleDateFormat(datePattern, Locale.ROOT);
+                    for (HabitEvent hEvent : habit.getHabitEvents()) {
+                        // Set the title of the habit event
+                        String habitEventDateFormat = formatter.format(hEvent.getHabitEventDate());
+                        hEvent.setTitle(getString(R.string.habit_event_title, habit.getTitle(), habitEventDateFormat));
+                        habitEventController.updateHabitEventInDb(hEvent, user -> { });
+                    }
                     navController.popBackStack();       // this goes back to view habit fragment
                     navController.popBackStack();
                 });
